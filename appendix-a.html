@@ -1,0 +1,1068 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Introduction to R and RStudio | Applied Multivariate Calculus Using R and Python</title><link rel="stylesheet" href="site.css"><script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script></head><body><a class="skip" href="#main">Skip to content</a><nav class="site-nav" aria-label="Book navigation"><a class="brand" href="index.html">Applied Multivariate Calculus Using R and Python</a><p class="subtitle">Volume III · Abraham Ayebo</p><label for="book-search">Search book</label><input id="book-search" type="search" placeholder="Search chapters"><div id="search-results" class="search-results" aria-live="polite"></div><div class="nav-label">Contents</div><a href="index.html">Welcome</a><a href="chapter01.html">1. Vectors and Geometry in Three-Dimensional Space</a><a href="chapter02.html">2. Curves, Surfaces, and Coordinate Systems</a><a href="chapter03.html">3. Functions of Several Variables and Partial Differentiation</a><a href="chapter04.html">4. Gradients, Taylor Approximations, and Optimization</a><a href="chapter05.html">5. Multiple Integration and Applications</a><a href="chapter06.html">6. Vector Fields and Integral Theorems</a><a href="chapter07.html">7. Introduction to Tensor Calculus and Differential Geometry</a><a href="chapter08.html">8. Partial Differential Equations and Computational Methods</a><a href="appendix-a.html" class="active" aria-current="page">Appendix A. Introduction to R and RStudio</a><a href="appendix-b.html">Appendix B. Introduction to Python and Jupyter</a><a href="resources.html">Computational resources</a><a href="about.html">About this book</a><div class="nav-label">Series</div><a href="https://aayebo.github.io/applied-precalculus/">Volume I · Applied Precalculus</a><a href="https://aayebo.github.io/applied-calculus/">Volume II · Applied Calculus</a></nav><header class="topbar"><button class="menu" aria-expanded="false">Contents</button><span>Applied Mathematics · Volume III</span><span class="spacer"></span><a href="resources.html">Code &amp; resources</a></header><div class="page-grid"><main id="main"><h1>Appendix A. Introduction to R and RStudio</h1><p><span id="app:r" label="app:r"></span></p>
+<div class="learning-box example"><p><strong>Learning.</strong> After completing this appendix, you should
+be able to install and navigate R and RStudio; write, save, and run
+reproducible scripts; work with vectors, matrices, functions, and data
+frames; construct two- and three-dimensional mathematical
+visualizations; carry out symbolic-style derivations where appropriate
+and reliable numerical computations; solve the representative calculus
+problems encountered in Chapters 1–8; diagnose common errors; and
+communicate computational results clearly.</p></div>
+<h2 id="why-r-belongs-in-a-multivariable-calculus-textbook">Why R
+belongs in a multivariable calculus textbook</h2>
+<p>R is a programming language and computational environment designed
+for statistical computing and graphics, but its vectorized operations,
+matrix algebra, numerical solvers, and visualization tools also make it
+useful for multivariable calculus. The purpose of this appendix is not
+to replace mathematical reasoning with software. In every chapter, we
+first define the mathematical object, derive the needed formula, and
+only then use R to compute, verify, visualize, or extend the result. A
+numerical answer does not establish a theorem: the proof or analytical
+justification remains a separate task.</p>
+<h5 id="what-r-does-well.">What R does well.</h5>
+<p>R handles vectors and matrices, numerical optimization, quadrature,
+ordinary differential equations through packages, tabular data, and
+reproducible graphics. Its base installation supports much of this
+appendix. Some advanced features require separately installed packages;
+these are identified explicitly. Unlike a computer algebra system, base
+R does not generally return symbolic antiderivatives or exact symbolic
+derivatives.</p>
+<h2 id="installing-r-and-rstudio">Installing R and RStudio</h2>
+<h3 id="two-related-but-different-programs">Two related but different
+programs</h3>
+<p><strong>R</strong> is the language and execution engine.
+<strong>RStudio</strong> is an integrated development environment (IDE)
+that provides a script editor, Console, environment browser, plot
+viewer, and file/project management. Install R before installing RStudio
+Desktop. RStudio is convenient, but every base-R example here can also
+run in an ordinary R session.</p>
+<h3 id="a-reliable-setup-procedure">A reliable setup procedure</h3>
+<ol type="1">
+<li><p>Obtain a current release of R from the Comprehensive R Archive
+Network (CRAN): <a class="uri" href="https://cran.r-project.org/">https://cran.r-project.org/</a>. Choose the installer
+appropriate for Windows, macOS, or Linux and follow its
+instructions.</p></li>
+<li><p>Obtain RStudio Desktop from Posit’s official download site: <a class="uri" href="https://posit.co/download/rstudio-desktop/">https://posit.co/download/rstudio-desktop/</a>. Install and
+launch it after R is installed.</p></li>
+<li><p>In the Console, enter <code>R.version.string</code> and
+<code>getwd()</code>. The first identifies your installed R version; the
+second prints the current working directory.</p></li>
+<li><p>Create a new RStudio Project for this book, for example
+<code>multivariable-calculus-r</code>. Create subfolders named
+<code>scripts</code>, <code>data</code>, <code>figures</code>, and
+<code>results</code>.</p></li>
+<li><p>Save a script called <code>scripts/first_steps.R</code>; enter
+<code>2 + 3</code> and run the line. Save the script and verify that the
+Console displays <code>5</code>.</p></li>
+</ol>
+<p>Software menus and interface arrangements change across versions. The
+conceptual workflow—write code in a script, run it in the Console,
+inspect results, and save reproducible outputs—is more important than
+the precise position of an icon.</p>
+<h3 id="understanding-the-rstudio-interface">Understanding the RStudio
+interface</h3>
+<p>In a typical RStudio layout, the <em>Source</em> pane holds scripts,
+the <em>Console</em> executes commands, the <em>Environment/History</em>
+pane shows objects and prior commands, and the
+<em>Files/Plots/Packages/Help</em> pane supports navigation and output.
+Pane placement can be customized. The <code>&gt;</code> prompt means R
+is ready; a <code>+</code> prompt usually means an expression is
+incomplete, often because a parenthesis, quotation mark, or brace has
+not been closed. Press Escape to abandon an incomplete expression and
+inspect the previous lines.</p>
+<div class="learning-box check"><p><strong>Checkpoint.</strong> Create an RStudio Project and run
+<code>getwd()</code>, <code>R.version.string</code>, and
+<code>sessionInfo()</code>. Explain which command identifies your
+project location, which identifies the R version, and which records
+package and platform information useful for reproducibility.</p></div>
+<h2 id="writing-and-running-a-reproducible-script">Writing and running a
+reproducible script</h2>
+<p>A script is a plain-text file containing R commands. It is preferable
+to a long sequence of unsaved Console entries because it documents the
+computation and allows another reader to reproduce it.</p>
+<div class="code-shell"><div class="code-bar">R<a href="code/appendix-a-listing-01.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code># scripts/first_steps.R
+rm(list = ls())               # optional for a fresh teaching session
+radius &lt;- 3
+height &lt;- 8
+volume &lt;- pi * radius^2 * height
+cat("Cylinder volume:", round(volume, 3), "cubic units\n")</code></pre></div>
+<p>The assignment operator <code>&lt;-</code> stores a value. R also
+accepts <code>=</code> for assignment in many contexts, but this book
+uses <code>&lt;-</code> consistently. Comments begin with
+<code>#</code>. The <code>cat()</code> function writes formatted text;
+<code>round()</code> controls displayed precision. Clearing the
+workspace with <code>rm(list = ls())</code> is optional and should not
+substitute for designing a script that runs from a fresh session.</p>
+<h3 id="files-folders-and-projects">Files, folders, and projects</h3>
+<p>Keep data and output paths relative to the project root:
+<code>read.csv("data/measurements.csv")</code> rather than an absolute
+path that works only on one computer. <code>getwd()</code> reports the
+current directory; <code>list.files()</code> lists its contents. Avoid
+relying on manually changing directories with <code>setwd()</code>
+inside shared scripts. Save code and results separately so a figure can
+be regenerated without searching through unrelated files.</p>
+<h2 id="r-syntax-and-mathematical-arithmetic">R syntax and mathematical
+arithmetic</h2>
+<h3 id="basic-operators-and-precedence">Basic operators and
+precedence</h3>
+<div class="center">
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Operation</th>
+<th style="text-align: left;">R syntax</th>
+<th style="text-align: left;">Mathematical meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Addition, subtraction</td>
+<td style="text-align: left;"><code>a+b</code>, <code>a-b</code></td>
+<td style="text-align: left;"><span class="math inline">\(a+b\)</span>,
+<span class="math inline">\(a-b\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Multiplication, division</td>
+<td style="text-align: left;"><code>a*b</code>, <code>a/b</code></td>
+<td style="text-align: left;"><span class="math inline">\(ab\)</span>,
+<span class="math inline">\(a/b\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Exponentiation</td>
+<td style="text-align: left;"><code>a^b</code></td>
+<td style="text-align: left;"><span class="math inline">\(a^b\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Square root</td>
+<td style="text-align: left;"><code>sqrt(a)</code></td>
+<td style="text-align: left;"><span class="math inline">\(\sqrt
+a\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Natural logarithm</td>
+<td style="text-align: left;"><code>log(a)</code></td>
+<td style="text-align: left;"><span class="math inline">\(\ln
+a\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Trigonometry</td>
+<td style="text-align: left;"><code>sin(t)</code>,
+<code>cos(t)</code></td>
+<td style="text-align: left;">radians</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Equality test</td>
+<td style="text-align: left;"><code>a == b</code></td>
+<td style="text-align: left;">logical comparison</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Matrix product</td>
+<td style="text-align: left;"><code>A %*% B</code></td>
+<td style="text-align: left;"><span class="math inline">\(AB\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Use parentheses whenever precedence might be ambiguous. For example,
+<code>(x+y)^2</code> is different from <code>x+y^2</code>. R uses
+radians in trigonometric functions; convert degrees with
+<code>theta * pi / 180</code>. Values such as <code>pi</code>,
+<code>Inf</code>, <code>NaN</code>, and <code>NA</code> have distinct
+meanings: mathematical constant, infinity, undefined numerical result,
+and missing value.</p>
+<div class="code-shell"><div class="code-bar">R<a href="code/appendix-a-listing-02.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>theta_deg &lt;- 60
+theta &lt;- theta_deg * pi / 180
+sin(theta)
+cos(theta)
+all.equal(sin(theta)^2 + cos(theta)^2, 1)</code></pre></div>
+<p>Floating-point calculations generally produce approximations. Compare
+computed values using a tolerance, not always <code>==</code>. The
+expression <code>all.equal()</code> returns <code>TRUE</code> when
+values agree within its tolerance, or a descriptive message otherwise.
+For programmatic tests, <code>isTRUE(all.equal(a,b))</code> is
+useful.</p>
+<h3 id="object-types-and-inspection">Object types and inspection</h3>
+<p>An R object can be numeric, integer, logical, character, complex, a
+vector, a matrix, a list, or a data frame. Use <code>class(x)</code>,
+<code>typeof(x)</code>, <code>length(x)</code>, <code>str(x)</code>, and
+<code>summary(x)</code> to understand it. R is case-sensitive:
+<code>velocity</code> and <code>Velocity</code> are different names.</p>
+<h2 id="vectors-the-foundation-of-computational-calculus">Vectors: the
+foundation of computational calculus</h2>
+<h3 id="creating-and-indexing-vectors">Creating and indexing
+vectors</h3>
+<div class="code-shell"><div class="code-bar">R<a href="code/appendix-a-listing-03.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>v &lt;- c(2, -1, 4)
+w &lt;- c(1, 3, -2)
+v[1]                      # first component: R indexes from 1
+v[2:3]                    # second and third components
+length(v)                 # number of entries
+v + w                     # componentwise addition
+3 * v                     # scalar multiplication
+sum(v * w)                # dot product
+sqrt(sum(v^2))            # Euclidean norm</code></pre></div>
+<p>R’s <code>c()</code> combines values into a vector. Indexing starts
+at <strong>1</strong>, unlike Python. For a vector <span class="math inline">\(\boldsymbol{v}=(v_1,v_2,v_3)\)</span>, the
+Euclidean norm is <span class="math inline">\(\|\boldsymbol{v}\|=\sqrt{v_1^2+v_2^2+v_3^2}\)</span>
+and the dot product is <span class="math inline">\(\boldsymbol{v}\cdot\boldsymbol{w}=\sum_i
+v_iw_i\)</span>.</p>
+<h3 id="the-cross-product-in-three-dimensions">The cross product in
+three dimensions</h3>
+<p>Base R has no dedicated general cross-product operator, so we can
+define one using the determinant formula.</p>
+<div class="code-shell"><div class="code-bar">R<a href="code/appendix-a-listing-04.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>cross3 &lt;- function(a, b) {
+  stopifnot(length(a) == 3, length(b) == 3)
+  c(a[2]*b[3] - a[3]*b[2],
+    a[3]*b[1] - a[1]*b[3],
+    a[1]*b[2] - a[2]*b[1])
+}
+a &lt;- c(1, 2, 0)
+b &lt;- c(0, 1, 3)
+cross3(a, b)
+sum(cross3(a, b) * a)    # zero: orthogonality</code></pre></div>
+<p>For the displayed vectors, <span class="math inline">\(\boldsymbol{a}\times\boldsymbol{b}=(6,-3,1)\)</span>.
+Verify that its dot product with each original vector is zero.
+Geometrically, <span class="math inline">\(\|\boldsymbol{a}\times\boldsymbol{b}\|\)</span>
+equals the parallelogram area spanned by <span class="math inline">\(\boldsymbol{a}\)</span> and <span class="math inline">\(\boldsymbol{b}\)</span>.</p>
+<h3 id="recycling-an-important-source-of-errors">Recycling: an important
+source of errors</h3>
+<p>R sometimes repeats elements of a shorter vector during arithmetic.
+Thus <code>c(1,2,3,4) + c(10,20)</code> produces a result by recycling.
+This can be useful but can also conceal a mathematical mistake. Before
+combining vectors that represent geometric objects, check that their
+dimensions agree using <code>stopifnot(length(a)==length(b))</code>.</p>
+<h2 id="matrices-determinants-and-linear-systems">Matrices,
+determinants, and linear systems</h2>
+<div class="code-shell"><div class="code-bar">R<a href="code/appendix-a-listing-05.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>A &lt;- matrix(c(2, 1, 1, 3), nrow = 2, byrow = TRUE)
+b &lt;- c(5, 7)
+A
+nrow(A); ncol(A)
+t(A)                       # transpose
+det(A)                     # determinant
+solve(A, b)                # solve A x = b
+A %*% solve(A, b)          # verify solution</code></pre></div>
+<p>R fills matrices by columns unless <code>byrow=TRUE</code>.
+Elementwise multiplication uses <code>A*B</code>; matrix multiplication
+uses <code>A %*% B</code>. The function <code>solve(A,b)</code> is
+generally preferable to explicitly forming <code>solve(A) %*% b</code>
+when solving <span class="math inline">\(A\boldsymbol{x}=\boldsymbol{b}\)</span>. A
+near-singular matrix may produce unstable numerical results even if the
+syntax is correct. Use <code>kappa(A)</code> to inspect
+conditioning.</p>
+<h3 id="eigenvalues-and-the-hessian">Eigenvalues and the Hessian</h3>
+<p>For a twice-differentiable function <span class="math inline">\(f(x,y)\)</span>, the Hessian collects second
+partial derivatives. Its eigenvalues help classify a stationary point
+when the Hessian is nonsingular.</p>
+<div class="code-shell"><div class="code-bar">R<a href="code/appendix-a-listing-06.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>H &lt;- matrix(c(4, 1, 1, 6), nrow = 2, byrow = TRUE)
+eigen(H)$values</code></pre></div>
+<p>Both eigenvalues are positive, so this symmetric Hessian is positive
+definite. If it is the Hessian at a stationary point, the
+second-derivative test establishes a strict local minimum. This
+conclusion assumes the usual differentiability conditions; an arbitrary
+positive-definite matrix alone does not establish where a function is
+stationary.</p>
+<h2 id="sequences-grids-and-vectorized-evaluation">Sequences, grids, and
+vectorized evaluation</h2>
+<div class="code-shell"><div class="code-bar">R<a href="code/appendix-a-listing-07.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>x &lt;- seq(-2, 2, length.out = 101)
+y &lt;- seq(-2, 2, length.out = 101)
+z &lt;- x^2 + 2*x + 1
+head(z)
+G &lt;- expand.grid(x = seq(-1, 1, by = 0.5),
+                 y = seq(-1, 1, by = 0.5))
+G$height &lt;- G$x^2 + G$y^2
+head(G)</code></pre></div>
+<p><code>seq()</code> constructs a sequence; <code>rep()</code> repeats
+values; <code>expand.grid()</code> enumerates Cartesian combinations.
+Vectorization evaluates a function at many points without an explicit
+loop when operations naturally act elementwise. This is especially
+useful for level curves, surfaces, and numerical integration.</p>
+<h2 id="functions-conditionals-and-iteration">Functions, conditionals,
+and iteration</h2>
+<h3 id="writing-a-mathematical-function">Writing a mathematical
+function</h3>
+<div class="code-shell"><div class="code-bar">R<a href="code/appendix-a-listing-08.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>f &lt;- function(x, y) {
+  x^2 + 3*x*y + y^2
+}
+f(1, 2)</code></pre></div>
+<p>The last evaluated expression is returned automatically, although
+<code>return()</code> may improve clarity in longer functions. Function
+arguments are local variables; values outside the function should not be
+relied upon implicitly.</p>
+<h3 id="conditional-statements-and-loops">Conditional statements and
+loops</h3>
+<div class="code-shell"><div class="code-bar">R<a href="code/appendix-a-listing-09.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>classify &lt;- function(x) {
+  if (x &gt; 0) {
+    "positive"
+  } else if (x &lt; 0) {
+    "negative"
+  } else {
+    "zero"
+  }
+}
+for (k in 1:4) {
+  cat("k =", k, "; k squared =", k^2, "\n")
+}</code></pre></div>
+<p>An <code>if</code> condition must evaluate to one nonmissing logical
+value. For a vector of values, use <code>ifelse()</code> carefully or a
+vectorized mathematical expression. The <code>for</code> loop is
+appropriate when a numerical algorithm requires sequential updates, such
+as Euler’s method or a finite-difference time step.</p>
+<h2 id="managing-tabular-data-and-missing-values">Managing tabular data
+and missing values</h2>
+<div class="code-shell"><div class="code-bar">R<a href="code/appendix-a-listing-10.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>observations &lt;- data.frame(
+  x = c(0, 1, 2, 3),
+  temperature = c(20.0, 22.4, NA, 26.1)
+)
+str(observations)
+mean(observations$temperature, na.rm = TRUE)
+complete.cases(observations)
+write.csv(observations, "results/observations.csv",
+          row.names = FALSE)</code></pre></div>
+<p>A data frame stores columns of equal length, possibly of different
+types. The dollar sign accesses a named column. <code>NA</code> denotes
+missing information; <code>na.rm=TRUE</code> removes missing entries
+from certain summaries but does not justify ignoring why data are
+missing. Use <code>read.csv()</code> and <code>write.csv()</code> for
+portable CSV files. A mathematical model should clearly state which
+quantities are measured and which are calculated.</p>
+<h2 id="creating-publication-quality-mathematical-graphics">Creating
+publication-quality mathematical graphics</h2>
+<h3 id="base-r-plots-and-annotations">Base-R plots and annotations</h3>
+<div class="code-shell"><div class="code-bar">R<a href="code/appendix-a-listing-11.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>x &lt;- seq(-2, 2, length.out = 401)
+y &lt;- x^3 - 3*x
+plot(x, y, type = "l", lwd = 2,
+     xlab = "x", ylab = "f(x)",
+     main = "A cubic function")
+abline(h = 0, v = 0, lty = 3)
+points(c(-1, 1), c(2, -2), pch = 19)</code></pre></div>
+<p>The plotting call should label axes, identify units where
+appropriate, and use a title or figure caption that communicates the
+mathematical purpose. Export reproducibly with
+<code>pdf("figures/cubic.pdf", width=6, height=4)</code> before plotting
+and <code>dev.off()</code> afterward. Close graphics devices even when
+the plotting script is adapted to a different computer.</p>
+<h3 id="contour-plots-and-surface-plots">Contour plots and surface
+plots</h3>
+<div class="code-shell"><div class="code-bar">R<a href="code/appendix-a-listing-12.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>x &lt;- seq(-2, 2, length.out = 81)
+y &lt;- seq(-2, 2, length.out = 81)
+z &lt;- outer(x, y, function(a, b) a^2 + b^2)
+contour(x, y, z, xlab = "x", ylab = "y",
+        main = "Level curves of z = x^2 + y^2")
+persp(x, y, z, theta = 35, phi = 25,
+      xlab = "x", ylab = "y", zlab = "z",
+      main = "Paraboloid")</code></pre></div>
+<p>The function <code>outer()</code> creates a matrix whose <span class="math inline">\((i,j)\)</span> entry is the value at <span class="math inline">\((x_i,y_j)\)</span>. Base R’s <code>persp()</code>
+creates a perspective view of a surface <span class="math inline">\(z=f(x,y)\)</span>. More sophisticated interactive
+three-dimensional graphics require additional packages; they are
+optional for this book.</p>
+<h3 id="plotting-a-parametrized-curve">Plotting a parametrized
+curve</h3>
+<div class="code-shell"><div class="code-bar">R<a href="code/appendix-a-listing-13.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>t &lt;- seq(0, 4*pi, length.out = 500)
+x &lt;- cos(t); y &lt;- sin(t); z &lt;- t/4
+plot(x, y, type = "l", asp = 1,
+     xlab = "x(t)", ylab = "y(t)",
+     main = "Projection of a helix onto the xy-plane")
+plot(t, z, type = "l", xlab = "t", ylab = "z(t)",
+     main = "Vertical coordinate of the helix")</code></pre></div>
+<p>These two plots show complementary projections, not a
+three-dimensional rendering. When presenting a 3D view, distinguish the
+geometric object from its 2D projection and avoid treating perspective
+distortion as a quantitative measurement.</p>
+<h2 id="numerical-differentiation-and-the-meaning-of-step-size">Numerical
+differentiation and the meaning of step size</h2>
+<p>The centered finite-difference approximation to <span class="math inline">\(f'(x)\)</span> is <span class="math display">\[D_hf(x)=\frac{f(x+h)-f(x-h)}{2h}.\]</span> For
+sufficiently smooth <span class="math inline">\(f\)</span>, the
+truncation error is <span class="math inline">\(O(h^2)\)</span>, but
+floating-point cancellation can dominate when <span class="math inline">\(h\)</span> is extremely small. Thus smaller <span class="math inline">\(h\)</span> does not always mean a more accurate
+result.</p>
+<div class="code-shell"><div class="code-bar">R<a href="code/appendix-a-listing-14.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>centered_derivative &lt;- function(f, x, h = 1e-5) {
+  (f(x + h) - f(x - h)) / (2*h)
+}
+centered_derivative(sin, pi/3)
+cos(pi/3)                 # analytical comparison</code></pre></div>
+<p>For a function of two variables, hold one coordinate fixed when
+approximating a partial derivative.</p>
+<div class="code-shell"><div class="code-bar">R<a href="code/appendix-a-listing-15.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>f &lt;- function(x, y) x^2*y + sin(x*y)
+h &lt;- 1e-5
+fx &lt;- (f(1+h, 2) - f(1-h, 2))/(2*h)
+fy &lt;- (f(1, 2+h) - f(1, 2-h))/(2*h)
+cat("Approximate gradient:", fx, fy, "\n")</code></pre></div>
+<p>Analytically, <span class="math inline">\(f_x=2xy+y\cos(xy)\)</span>
+and <span class="math inline">\(f_y=x^2+x\cos(xy)\)</span>. Evaluate
+these formulas at <span class="math inline">\((1,2)\)</span> and compare
+with the numerical approximations. This is the recommended workflow:
+derive first, compute second, verify third.</p>
+<h2 id="gradients-jacobians-and-tangent-plane-approximations">Gradients,
+Jacobians, and tangent-plane approximations</h2>
+<p>For <span class="math inline">\(f:\mathbb{R}^2\to\mathbb{R}\)</span>,
+the tangent-plane approximation at <span class="math inline">\((a,b)\)</span> is <span class="math display">\[L(x,y)=f(a,b)+f_x(a,b)(x-a)+f_y(a,b)(y-b).\]</span></p>
+<div class="code-shell"><div class="code-bar">R<a href="code/appendix-a-listing-16.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>f &lt;- function(x, y) x^2 + x*y + 2*y^2
+a &lt;- 1; b &lt;- -1
+fx &lt;- function(x, y) 2*x + y
+fy &lt;- function(x, y) x + 4*y
+L &lt;- function(x, y) {
+  f(a, b) + fx(a, b)*(x-a) + fy(a, b)*(y-b)
+}
+c(exact = f(1.1, -0.9), linear = L(1.1, -0.9))</code></pre></div>
+<p>For a vector-valued map <span class="math inline">\(\boldsymbol{F}=(F_1,F_2)\)</span>, the Jacobian is
+the matrix of first partial derivatives. Its determinant describes local
+signed area scaling where the map is differentiable.</p>
+<div class="code-shell"><div class="code-bar">R<a href="code/appendix-a-listing-17.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code># F(r,theta) = (r*cos(theta), r*sin(theta))
+polar_J &lt;- function(r, theta) {
+  matrix(c(cos(theta), -r*sin(theta),
+           sin(theta),  r*cos(theta)),
+         nrow = 2, byrow = TRUE)
+}
+det(polar_J(2, pi/4))     # equals r = 2</code></pre></div>
+<h2 id="optimization-with-r">Optimization with R</h2>
+<h3 id="one-variable-optimization">One-variable optimization</h3>
+<p><code>optimize()</code> searches for a minimum or maximum of a
+one-variable function over a specified interval. It is a numerical
+procedure, not a substitute for examining endpoints and proving a global
+claim.</p>
+<div class="code-shell"><div class="code-bar">R<a href="code/appendix-a-listing-18.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>g &lt;- function(x) (x - 2)^2 + 1
+optimize(g, interval = c(-5, 5))</code></pre></div>
+<h3 id="unconstrained-optimization-in-several-variables">Unconstrained
+optimization in several variables</h3>
+<div class="code-shell"><div class="code-bar">R<a href="code/appendix-a-listing-19.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>objective &lt;- function(p) {
+  x &lt;- p[1]; y &lt;- p[2]
+  (x - 1)^2 + 2*(y + 2)^2
+}
+gradient &lt;- function(p) {
+  c(2*(p[1] - 1), 4*(p[2] + 2))
+}
+fit &lt;- optim(par = c(0, 0), fn = objective,
+             gr = gradient, method = "BFGS")
+fit$par
+fit$value
+fit$convergence            # zero typically indicates convergence</code></pre></div>
+<p>The analytical minimizer is <span class="math inline">\((1,-2)\)</span> and the minimum is <span class="math inline">\(0\)</span>. Compare the numerical output with
+these values. <code>optim()</code> offers multiple algorithms; their
+suitability depends on differentiability, constraints, scaling, and
+initial values.</p>
+<h3 id="constrained-optimization-by-reducing-the-dimension">Constrained
+optimization by reducing the dimension</h3>
+<p>Suppose <span class="math inline">\(x+y=6\)</span> and <span class="math inline">\(x,y\ge0\)</span>, and minimize <span class="math inline">\(x^2+2y^2\)</span>. Substituting <span class="math inline">\(y=6-x\)</span> reduces the problem to one variable
+on <span class="math inline">\(0\le x\le6\)</span>.</p>
+<div class="code-shell"><div class="code-bar">R<a href="code/appendix-a-listing-20.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>q &lt;- function(x) x^2 + 2*(6-x)^2
+answer &lt;- optimize(q, c(0, 6))
+x_star &lt;- answer$minimum
+y_star &lt;- 6 - x_star
+c(x = x_star, y = y_star, objective = answer$objective)</code></pre></div>
+<p>The Lagrange-multiplier equations yield <span class="math inline">\(x=4\)</span>, <span class="math inline">\(y=2\)</span>. Always examine whether a numerical
+optimum satisfies the original constraints. General nonlinear
+constraints may require a specialist package; do not treat unconstrained
+<code>optim()</code> as a constrained solver.</p>
+<h2 id="numerical-integration-one-dimension-to-several">Numerical
+integration: one dimension to several</h2>
+<h3 id="base-r-quadrature">Base R quadrature</h3>
+<div class="code-shell"><div class="code-bar">R<a href="code/appendix-a-listing-21.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>integrate(function(x) x^2, lower = 0, upper = 1)</code></pre></div>
+<p>The exact answer is <span class="math inline">\(1/3\)</span>. The
+<code>integrate()</code> function uses adaptive numerical quadrature;
+the result includes an error estimate, but numerical error estimates are
+not mathematical proofs of exactness.</p>
+<h3 id="an-iterated-double-integral">An iterated double integral</h3>
+<p>Consider <span class="math inline">\(\int_0^1\int_0^x
+(x+y)\,dy\,dx\)</span>. Its inner integral is <span class="math inline">\(\tfrac32x^2\)</span> and its exact value is <span class="math inline">\(1/2\)</span>.</p>
+<div class="code-shell"><div class="code-bar">R<a href="code/appendix-a-listing-22.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>inner &lt;- function(x) {
+  vapply(x, function(xx) {
+    integrate(function(y) xx + y, 0, xx)$value
+  }, numeric(1))
+}
+integrate(inner, 0, 1)$value</code></pre></div>
+<p>The use of <code>vapply()</code> ensures the inner function can
+accept a vector of outer quadrature points, as <code>integrate()</code>
+requires. An integrand and its integration region must be specified
+separately and precisely.</p>
+<h3 id="polar-coordinate-integration">Polar-coordinate integration</h3>
+<p>For a disk of radius <span class="math inline">\(R\)</span>, the area
+integral becomes <span class="math display">\[\iint_{x^2+y^2\le
+R^2}1\,dA
+=\int_0^{2\pi}\int_0^R r\,dr\,d\theta=\pi R^2.\]</span></p>
+<div class="code-shell"><div class="code-bar">R<a href="code/appendix-a-listing-23.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>R &lt;- 2
+area &lt;- integrate(function(r) 2*pi*r, 0, R)$value
+c(numerical = area, exact = pi*R^2)</code></pre></div>
+<p>The factor <span class="math inline">\(r\)</span> is the absolute
+Jacobian determinant. Omitting it is a common error when changing
+coordinates.</p>
+<h3 id="monte-carlo-integration-and-uncertainty">Monte Carlo integration
+and uncertainty</h3>
+<p>For uniformly sampled <span class="math inline">\((X_i,Y_i)\)</span>
+in the unit square, an estimator of <span class="math inline">\(\iint_{[0,1]^2}f(x,y)\,dA\)</span> is the sample
+mean of <span class="math inline">\(f(X_i,Y_i)\)</span>.</p>
+<div class="code-shell"><div class="code-bar">R<a href="code/appendix-a-listing-24.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>set.seed(2026)
+n &lt;- 100000
+x &lt;- runif(n); y &lt;- runif(n)
+values &lt;- x^2 + y^2
+estimate &lt;- mean(values)
+mc_se &lt;- sd(values)/sqrt(n)
+c(estimate = estimate, SE = mc_se, exact = 2/3)</code></pre></div>
+<p>The Monte Carlo standard error measures sampling variability under
+the stated sampling design; it is not a guarantee about every random
+run. Recording the seed makes the demonstration reproducible.</p>
+<h2 id="vector-fields-circulation-and-flux">Vector fields, circulation,
+and flux</h2>
+<p>For <span class="math inline">\(\boldsymbol{F}(x,y)=(-y,x)\)</span>
+on the unit circle <span class="math inline">\(\boldsymbol{r}(t)=(\cos
+t,\sin t)\)</span>, <span class="math inline">\(0\le t\le2\pi\)</span>,
+we have <span class="math inline">\(\boldsymbol{r}'(t)=(-\sin t,\cos
+t)\)</span> and <span class="math inline">\(\boldsymbol{F}(\boldsymbol{r}(t))\cdot\boldsymbol{r}'(t)=1\)</span>.
+Therefore the circulation is <span class="math inline">\(2\pi\)</span>.</p>
+<div class="code-shell"><div class="code-bar">R<a href="code/appendix-a-listing-25.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>integrand &lt;- function(t) {
+  x &lt;- cos(t); y &lt;- sin(t)
+  Fx &lt;- -y; Fy &lt;- x
+  dx &lt;- -sin(t); dy &lt;- cos(t)
+  Fx*dx + Fy*dy
+}
+c(numerical = integrate(integrand, 0, 2*pi)$value,
+  exact = 2*pi)</code></pre></div>
+<p>The planar scalar curl is <span class="math inline">\(\partial
+F_y/\partial x-\partial F_x/\partial y=2\)</span>. Green’s theorem gives
+the same circulation as <span class="math inline">\(\iint_D2\,dA=2\pi\)</span>. The orientation is
+counterclockwise; reversing the orientation changes the sign.</p>
+<h3 id="flux-across-a-circle">Flux across a circle</h3>
+<p>For <span class="math inline">\(\boldsymbol{G}(x,y)=(x,y)\)</span>,
+the outward unit normal on the unit circle is <span class="math inline">\((\cos t,\sin t)\)</span> and <span class="math inline">\(ds=dt\)</span>. The outward flux is <span class="math inline">\(2\pi\)</span>, consistent with the divergence
+theorem because <span class="math inline">\(\nabla\cdot\boldsymbol{G}=2\)</span>.</p>
+<div class="code-shell"><div class="code-bar">R<a href="code/appendix-a-listing-26.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>flux_integrand &lt;- function(t) {
+  nx &lt;- cos(t); ny &lt;- sin(t)
+  Gx &lt;- cos(t); Gy &lt;- sin(t)
+  Gx*nx + Gy*ny
+}
+integrate(flux_integrand, 0, 2*pi)$value</code></pre></div>
+<h2 id="metrics-coordinate-geometry-and-geodesics">Metrics, coordinate
+geometry, and geodesics</h2>
+<p>In Chapter 7, the unit sphere with coordinates <span class="math inline">\((\theta,\phi)\)</span> has line element <span class="math inline">\(ds^2=d\theta^2+\sin^2\theta\,d\phi^2\)</span>
+where <span class="math inline">\(\theta\)</span> is colatitude. Thus
+the metric matrix is <span class="math display">\[g(\theta,\phi)=\begin{pmatrix}1&amp;0\\0&amp;\sin^2\theta\end{pmatrix}.\]</span></p>
+<div class="code-shell"><div class="code-bar">R<a href="code/appendix-a-listing-27.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>sphere_metric &lt;- function(theta) {
+  matrix(c(1, 0, 0, sin(theta)^2),
+         nrow = 2, byrow = TRUE)
+}
+sphere_metric(pi/3)
+det(sphere_metric(pi/3))   # sin(theta)^2</code></pre></div>
+<p>The coordinate singularities at the poles are not physical
+singularities of the sphere. The metric determinant vanishes at <span class="math inline">\(\theta=0,\pi\)</span> because these coordinates
+cease to be regular there.</p>
+<h3 id="great-circle-distance">Great-circle distance</h3>
+<p>For unit vectors <span class="math inline">\(\boldsymbol{u}\)</span>
+and <span class="math inline">\(\boldsymbol{v}\)</span> representing
+points on a sphere of radius <span class="math inline">\(R\)</span>, the
+central angle is <span class="math inline">\(\alpha=\arccos(\boldsymbol{u}\cdot\boldsymbol{v})\)</span>
+after clamping numerical roundoff to <span class="math inline">\([-1,1]\)</span>. The shorter great-circle distance
+is <span class="math inline">\(R\alpha\)</span>.</p>
+<div class="code-shell"><div class="code-bar">R<a href="code/appendix-a-listing-28.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>great_circle &lt;- function(u, v, radius = 1) {
+  u &lt;- u/sqrt(sum(u^2)); v &lt;- v/sqrt(sum(v^2))
+  d &lt;- sum(u*v)
+  radius * acos(max(-1, min(1, d)))
+}
+great_circle(c(1,0,0), c(0,1,0), radius = 6371)</code></pre></div>
+<p>The example gives a quarter-circumference distance of <span class="math inline">\(6371\pi/2\)</span> kilometers when the
+illustrative Earth radius is <span class="math inline">\(6371\)</span>
+km. A spherical approximation does not capture ellipsoidal Earth
+geometry or the details of actual travel routes.</p>
+<h2 id="numerical-solutions-of-differential-equations">Numerical
+solutions of differential equations</h2>
+<h3 id="eulers-method-from-first-principles">Euler’s method from first
+principles</h3>
+<p>For <span class="math inline">\(y'(t)=f(t,y)\)</span>, Euler’s
+method advances <span class="math inline">\(y_{n+1}=y_n+h
+f(t_n,y_n)\)</span>. The following implementation solves <span class="math inline">\(y'=-y\)</span> with <span class="math inline">\(y(0)=1\)</span>.</p>
+<div class="code-shell"><div class="code-bar">R<a href="code/appendix-a-listing-29.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>h &lt;- 0.05
+N &lt;- 20
+t &lt;- seq(0, N*h, by = h)
+y &lt;- numeric(N+1)
+y[1] &lt;- 1
+for (k in 1:N) {
+  y[k+1] &lt;- y[k] - h*y[k]
+}
+max(abs(y - exp(-t)))
+plot(t, y, type = "b", xlab = "t", ylab = "y(t)")
+lines(t, exp(-t), lty = 2)</code></pre></div>
+<p>The exact solution is <span class="math inline">\(e^{-t}\)</span>.
+This first-order method is pedagogically transparent but not always the
+best method for high-accuracy or stiff systems. For more advanced ODE
+work, the separately installed <code>deSolve</code> package provides
+established numerical solvers.</p>
+<h2 id="finite-differences-for-the-heat-equation">Finite differences for
+the heat equation</h2>
+<p>The one-dimensional heat equation is <span class="math display">\[u_t=\kappa u_{xx},\qquad 0&lt;x&lt;L,\quad
+t&gt;0,\]</span> with prescribed initial and boundary conditions. On a
+uniform grid, the forward-time, centered-space method is <span class="math display">\[u_i^{n+1}=u_i^n+\lambda(u_{i-1}^n-2u_i^n+u_{i+1}^n),\qquad
+\lambda=\frac{\kappa\Delta t}{\Delta x^2}.\]</span> For the standard
+explicit scheme with constant diffusivity and Dirichlet boundaries,
+choose <span class="math inline">\(0&lt;\lambda\le1/2\)</span> for
+stability.</p>
+<div class="code-shell"><div class="code-bar">R<a href="code/appendix-a-listing-30.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>L &lt;- 1; kappa &lt;- 0.1
+nx &lt;- 51
+x &lt;- seq(0, L, length.out = nx)
+dx &lt;- x[2] - x[1]
+lambda &lt;- 0.4
+dt &lt;- lambda*dx^2/kappa
+nt &lt;- 100
+u &lt;- sin(pi*x)
+u[1] &lt;- 0; u[nx] &lt;- 0
+for (step in 1:nt) {
+  old &lt;- u
+  u[2:(nx-1)] &lt;- old[2:(nx-1)] + lambda*(
+    old[1:(nx-2)] - 2*old[2:(nx-1)] + old[3:nx])
+  u[1] &lt;- 0; u[nx] &lt;- 0
+}
+time &lt;- nt*dt
+exact &lt;- exp(-kappa*pi^2*time)*sin(pi*x)
+cat("Maximum absolute error:", max(abs(u-exact)), "\n")
+plot(x, u, type = "l", xlab = "Position", ylab = "u(x,t)")
+lines(x, exact, lty = 2)</code></pre></div>
+<p>This code explicitly copies the old time level before updating
+interior nodes, avoiding the mistake of mixing old and new values in a
+single explicit step. To study convergence, reduce <span class="math inline">\(\Delta x\)</span> and adjust <span class="math inline">\(\Delta t\)</span> to preserve a stable value of
+<span class="math inline">\(\lambda\)</span>. Check both numerical error
+and the physical boundary conditions.</p>
+<h2 id="packages-and-dependency-management">Packages and dependency
+management</h2>
+<p>An R package extends base functionality. Install a package once with
+<code>install.packages("packageName")</code> while connected to an
+appropriate package repository; load it in a session with
+<code>library(packageName)</code>. A package can also be called using
+<code>packageName::functionName()</code> without attaching all exported
+functions to the search path. This appendix intentionally relies mainly
+on base R, so that students can complete the foundational computations
+without a large package setup.</p>
+<div class="code-shell"><div class="code-bar">R<a href="code/appendix-a-listing-31.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code># Optional; run only if you need the package:
+# install.packages("deSolve")
+# library(deSolve)
+installed.packages()[, "Package"] |&gt; head()</code></pre></div>
+<p>The base pipe <code>|&gt;</code> requires a sufficiently recent
+version of R. For maximum compatibility,
+<code>head(installed.packages()[, "Package"])</code> does the same job.
+Package versions can affect numerical behavior, function defaults, and
+plotting output. Include <code>sessionInfo()</code> when submitting a
+substantial computational project.</p>
+<h2 id="debugging-and-validating-r-programs">Debugging and validating R
+programs</h2>
+<h3 id="common-problems-and-their-causes">Common problems and their
+causes</h3>
+<div class="center">
+<table style="width:98%;">
+<colgroup>
+<col style="width: 25%"/>
+<col style="width: 72%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Symptom</th>
+<th style="text-align: left;">Likely explanation and response</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>+</code> prompt</td>
+<td style="text-align: left;">Unclosed parenthesis, brace, or quote;
+inspect the expression or press Escape.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>object not found</code></td>
+<td style="text-align: left;">A name was misspelled or an earlier
+assignment did not run.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>non-conformable arguments</code></td>
+<td style="text-align: left;">Matrix dimensions are incompatible;
+inspect <code>dim()</code>.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>NA</code> or <code>NaN</code></td>
+<td style="text-align: left;">Missing values or undefined numerical
+operations; inspect inputs.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Unexpected vector length</td>
+<td style="text-align: left;">Recycling or indexing error; inspect
+<code>length()</code> and <code>seq()</code>.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>could not find function</code></td>
+<td style="text-align: left;">A function name is wrong or an optional
+package is not loaded.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Plot not saved</td>
+<td style="text-align: left;">Output device was not opened, closed, or
+given the intended path.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Numerical answer differs</td>
+<td style="text-align: left;">Check radians, orientation, Jacobian
+factors, tolerances, and boundary conditions.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3 id="a-validation-checklist">A validation checklist</h3>
+<p>Before accepting a numerical result, verify that the input dimensions
+and units are correct; evaluate a simple case with a known answer;
+compare against an independent mathematical method; inspect signs and
+orientation; vary discretization or tolerance; and explain any remaining
+approximation error. A graph is useful evidence of behavior but does not
+establish an identity or guarantee accuracy.</p>
+<div class="code-shell"><div class="code-bar">R<a href="code/appendix-a-listing-32.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>check_close &lt;- function(actual, expected, tol = 1e-7) {
+  stopifnot(is.numeric(actual), is.numeric(expected))
+  stopifnot(length(actual) == length(expected))
+  stopifnot(all(is.finite(actual)), all(is.finite(expected)))
+  stopifnot(max(abs(actual - expected)) &lt; tol)
+  invisible(TRUE)
+}
+check_close(sum(c(1,2,3)*c(4,5,6)), 32)</code></pre></div>
+<h2 id="communicating-mathematical-results-professionally">Communicating
+mathematical results professionally</h2>
+<p>Computational output should distinguish exact mathematics from
+numerical estimates, use consistent units, and avoid excessive digits.
+The following code prints a compact interpretation.</p>
+<div class="code-shell"><div class="code-bar">R<a href="code/appendix-a-listing-33.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>value &lt;- integrate(function(x) x^2, 0, 1)$value
+exact &lt;- 1/3
+cat("Integral of x^2 on [0,1]\n")
+cat("  Numerical estimate:", sprintf("%.8f", value), "\n")
+cat("  Exact value:      1/3\n")
+cat("  Absolute error:  ", sprintf("%.2e", abs(value-exact)),
+    "\n")</code></pre></div>
+<p><code>sprintf()</code> creates consistently formatted numbers;
+<code>cat()</code> combines narrative and results; <code>\n</code>
+starts a new line. Use <code>\n\n</code> to separate paragraphs in a
+longer console report. The code itself, input values, and package
+versions should accompany a reported result so another reader can
+reproduce it.</p>
+<h2 id="a-crosswalk-to-the-eight-textbook-chapters">A crosswalk to the
+eight textbook chapters</h2>
+<div class="center">
+<table style="width:98%;">
+<colgroup>
+<col style="width: 9%"/>
+<col style="width: 42%"/>
+<col style="width: 46%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Chapter</th>
+<th style="text-align: left;">Mathematical task</th>
+<th style="text-align: left;">Core R tools</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">Vector geometry, projections, cross
+products</td>
+<td style="text-align: left;"><code>c</code>, <code>sum</code>,
+<code>sqrt</code>, custom <code>cross3</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">Parametric curves and surfaces</td>
+<td style="text-align: left;"><code>seq</code>, <code>plot</code>,
+<code>persp</code>, <code>outer</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">Partial derivatives and Jacobians</td>
+<td style="text-align: left;">functions, centered differences,
+<code>matrix</code>, <code>det</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">Gradient methods and optimization</td>
+<td style="text-align: left;"><code>optim</code>, <code>optimize</code>,
+<code>eigen</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">5</td>
+<td style="text-align: left;">Multiple integrals and mass
+distributions</td>
+<td style="text-align: left;"><code>integrate</code>,
+<code>vapply</code>, <code>runif</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">6</td>
+<td style="text-align: left;">Line integrals, circulation, flux</td>
+<td style="text-align: left;">parametric functions,
+<code>integrate</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">7</td>
+<td style="text-align: left;">Metrics and great-circle geometry</td>
+<td style="text-align: left;">matrices, dot products,
+<code>acos</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">8</td>
+<td style="text-align: left;">ODEs, PDEs, finite differences</td>
+<td style="text-align: left;">vectors, loops, grid refinement</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>This crosswalk is a navigation aid, not a complete list of techniques
+used in each chapter. Return to the mathematical derivation in the
+chapter before adapting its computational implementation.</p>
+<h2 id="extended-worked-laboratory-1-vectors-planes-and-projection">Extended
+worked laboratory 1: vectors, planes, and projection</h2>
+<p>A three-dimensional displacement is <span class="math inline">\(\boldsymbol{d}=(4,-2,5)\)</span> and a plane has
+normal <span class="math inline">\(\boldsymbol{n}=(2,1,-2)\)</span>. The
+scalar component of <span class="math inline">\(\boldsymbol{d}\)</span>
+in the normal direction is <span class="math inline">\(\boldsymbol{d}\cdot\widehat{\boldsymbol{n}}\)</span>,
+and the vector projection is <span class="math inline">\((\boldsymbol{d}\cdot\boldsymbol{n}/\|\boldsymbol{n}\|^2)\boldsymbol{n}\)</span>.
+The component tangent to the plane is the difference between <span class="math inline">\(\boldsymbol{d}\)</span> and its normal
+projection.</p>
+<div class="code-shell"><div class="code-bar">R<a href="code/appendix-a-listing-34.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>d &lt;- c(4, -2, 5)
+n &lt;- c(2, 1, -2)
+normal_component &lt;- sum(d*n)/sqrt(sum(n^2))
+projection &lt;- (sum(d*n)/sum(n^2))*n
+tangent_component &lt;- d - projection
+cat("Normal scalar component:", normal_component, "\n")
+cat("Normal projection:", projection, "\n")
+cat("Tangential component:", tangent_component, "\n")
+stopifnot(abs(sum(tangent_component*n)) &lt; 1e-10)
+stopifnot(max(abs(projection+tangent_component-d)) &lt; 1e-10)</code></pre></div>
+<h5 id="interpretation.">Interpretation.</h5>
+<p>The two components are orthogonal, and their sum recovers the
+original displacement. A useful diagnostic is to test these geometric
+identities rather than checking only a single decimal answer. For a
+plane through <span class="math inline">\(\boldsymbol{p}_0\)</span>, the
+equation is <span class="math inline">\(\boldsymbol{n}\cdot(\boldsymbol{x}-\boldsymbol{p}_0)=0\)</span>;
+the normal direction does not depend on the choice of <span class="math inline">\(\boldsymbol{p}_0\)</span>.</p>
+<h2 id="extended-worked-laboratory-2-curvature-of-a-space-curve">Extended
+worked laboratory 2: curvature of a space curve</h2>
+<p>For the helix <span class="math inline">\(\boldsymbol{r}(t)=(a\cos
+t,a\sin t,bt)\)</span>, the first two derivatives are <span class="math inline">\(\boldsymbol{r}'=(-a\sin t,a\cos t,b)\)</span>
+and <span class="math inline">\(\boldsymbol{r}''=(-a\cos
+t,-a\sin t,0)\)</span>. Its curvature is <span class="math display">\[\kappa(t)=\frac{\|\boldsymbol{r}'(t)\times\boldsymbol{r}''(t)\|}{\|\boldsymbol{r}'(t)\|^3}
+=\frac{a}{a^2+b^2},\qquad a&gt;0.\]</span></p>
+<div class="code-shell"><div class="code-bar">R<a href="code/appendix-a-listing-35.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>cross3 &lt;- function(a, b) {
+  c(a[2]*b[3]-a[3]*b[2],
+    a[3]*b[1]-a[1]*b[3],
+    a[1]*b[2]-a[2]*b[1])
+}
+a &lt;- 2; b &lt;- 0.5
+rprime &lt;- function(t) c(-a*sin(t), a*cos(t), b)
+rsecond &lt;- function(t) c(-a*cos(t), -a*sin(t), 0)
+curvature &lt;- function(t) {
+  v &lt;- rprime(t); acc &lt;- rsecond(t)
+  sqrt(sum(cross3(v,acc)^2))/(sum(v^2)^(3/2))
+}
+times &lt;- seq(0, 2*pi, length.out = 100)
+kvals &lt;- vapply(times, curvature, numeric(1))
+range(kvals)
+stopifnot(max(abs(kvals - a/(a^2+b^2))) &lt; 1e-10)</code></pre></div>
+<p>The constant curvature is a property of this helix, not of arbitrary
+parametrized curves. For a general curve, verify regularity (<span class="math inline">\(\boldsymbol{r}'(t)\ne0\)</span>) before
+applying the curvature formula. Numerical differentiation of sampled
+positions requires additional attention to noise and step size.</p>
+<h2 id="extended-worked-laboratory-3-numerical-gradient-descent">Extended
+worked laboratory 3: numerical gradient descent</h2>
+<p>For the strictly convex quadratic <span class="math inline">\(f(x,y)=\tfrac12(4x^2+2y^2)\)</span>, the gradient
+is <span class="math inline">\((4x,2y)\)</span>. Gradient descent with
+constant step size <span class="math inline">\(\eta\)</span> is <span class="math inline">\(\boldsymbol{x}_{k+1}=\boldsymbol{x}_k-\eta\nabla
+f(\boldsymbol{x}_k)\)</span>. For this quadratic, the iteration
+converges to the origin when <span class="math inline">\(0&lt;\eta&lt;2/4=1/2\)</span>.</p>
+<div class="code-shell"><div class="code-bar">R<a href="code/appendix-a-listing-36.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>f &lt;- function(p) 0.5*(4*p[1]^2 + 2*p[2]^2)
+grad &lt;- function(p) c(4*p[1], 2*p[2])
+eta &lt;- 0.2
+p &lt;- c(3, -2)
+history &lt;- matrix(NA_real_, nrow = 31, ncol = 3)
+colnames(history) &lt;- c("x", "y", "objective")
+for (k in 0:30) {
+  history[k+1, ] &lt;- c(p, f(p))
+  if (k &lt; 30) p &lt;- p - eta*grad(p)
+}
+plot(0:30, history[, "objective"], type = "b",
+     xlab = "Iteration", ylab = "Objective value")
+stopifnot(tail(history[,"objective"],1) &lt; 1e-8)</code></pre></div>
+<h5 id="experiments.">Experiments.</h5>
+<p>Repeat with <span class="math inline">\(\eta=0.49\)</span> and <span class="math inline">\(\eta=0.55\)</span>. Compare convergence and
+divergence. Explain why a step size that works for one objective
+function need not work for another. This exercise connects Hessian
+eigenvalues, optimization geometry, and numerical algorithm design.</p>
+<h2 id="extended-worked-laboratory-4-a-density-weighted-centroid">Extended
+worked laboratory 4: a density-weighted centroid</h2>
+<p>Let a thin rectangular plate occupy <span class="math inline">\(0\le
+x\le2\)</span>, <span class="math inline">\(0\le y\le1\)</span>, with
+density <span class="math inline">\(\rho(x,y)=1+x\)</span>. Its mass is
+<span class="math display">\[M=\int_0^2\int_0^1(1+x)\,dy\,dx=4.\]</span>
+Its centroid is <span class="math inline">\((\bar x,\bar y)\)</span>,
+where <span class="math inline">\(\bar x=M^{-1}\iint_D
+x\rho\,dA\)</span> and <span class="math inline">\(\bar y=M^{-1}\iint_D
+y\rho\,dA\)</span>. Analytically, <span class="math inline">\(\bar
+x=7/6\)</span> and <span class="math inline">\(\bar y=1/2\)</span>.</p>
+<div class="code-shell"><div class="code-bar">R<a href="code/appendix-a-listing-37.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>rho &lt;- function(x,y) 1+x
+inner_y &lt;- function(x, integrand) {
+  vapply(x, function(xx) {
+    integrate(function(y) integrand(xx,y), 0, 1)$value
+  }, numeric(1))
+}
+double_int &lt;- function(integrand) {
+  integrate(function(x) inner_y(x,integrand), 0, 2)$value
+}
+M &lt;- double_int(rho)
+Mx &lt;- double_int(function(x,y) x*rho(x,y))
+My &lt;- double_int(function(x,y) y*rho(x,y))
+centroid &lt;- c(xbar = Mx/M, ybar = My/M)
+print(centroid)
+stopifnot(abs(M-4)&lt;1e-7)
+stopifnot(max(abs(centroid-c(7/6,1/2)))&lt;1e-7)</code></pre></div>
+<h5 id="a-mathematical-check.">A mathematical check.</h5>
+<p>The centroid must lie inside the plate. Because density increases
+with <span class="math inline">\(x\)</span>, its horizontal coordinate
+should exceed the geometric center <span class="math inline">\(x=1\)</span>. Symmetry in the <span class="math inline">\(y\)</span> direction forces <span class="math inline">\(\bar y=1/2\)</span>. These qualitative checks are
+as important as the numerical comparison.</p>
+<h2 id="extended-worked-laboratory-5-reproducible-numerical-experiments">Extended
+worked laboratory 5: reproducible numerical experiments</h2>
+<p>Numerical experiments should separate model parameters, computational
+methods, and output. Here we investigate the convergence of the
+centered-difference derivative of <span class="math inline">\(\sin
+x\)</span> at <span class="math inline">\(x=1\)</span>.</p>
+<div class="code-shell"><div class="code-bar">R<a href="code/appendix-a-listing-38.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>centered &lt;- function(h) (sin(1+h)-sin(1-h))/(2*h)
+h &lt;- 10^seq(-1, -7, by = -1)
+approximation &lt;- vapply(h, centered, numeric(1))
+error &lt;- abs(approximation-cos(1))
+results &lt;- data.frame(h = h, estimate = approximation,
+                      absolute_error = error)
+print(results, digits = 8)
+plot(h, error, log = "xy", type = "b",
+     xlab = "Step size h", ylab = "Absolute error")</code></pre></div>
+<h5 id="interpretation.-1">Interpretation.</h5>
+<p>Over a range of moderately small step sizes, the centered-difference
+truncation error decreases approximately as <span class="math inline">\(h^2\)</span>. At very small steps, floating-point
+cancellation may prevent continued improvement. When comparing methods,
+specify the exact function, evaluation point, error metric, and
+computing environment.</p>
+<h2 id="extended-worked-laboratory-6-reading-cleaning-and-plotting-measurements">Extended
+worked laboratory 6: reading, cleaning, and plotting measurements</h2>
+<p>A small observational data set can be created within a script so the
+example is fully reproducible. Suppose temperature is measured at five
+equally spaced positions and one measurement is missing.</p>
+<div class="code-shell"><div class="code-bar">R<a href="code/appendix-a-listing-39.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>measurements &lt;- data.frame(
+  position = seq(0, 2, by = 0.5),
+  temperature = c(20.1, 21.0, NA, 23.2, 24.1)
+)
+write.csv(measurements, "results/temperature.csv",
+          row.names = FALSE)
+reloaded &lt;- read.csv("results/temperature.csv")
+stopifnot(nrow(reloaded) == 5)
+valid &lt;- complete.cases(reloaded)
+plot(reloaded$position[valid],
+     reloaded$temperature[valid], type = "b",
+     xlab = "Position (m)", ylab = "Temperature (degrees C)")</code></pre></div>
+<h5 id="interpretation.-2">Interpretation.</h5>
+<p>The line between the observed points is a visualization, not proof of
+a linear physical relationship. Do not silently replace a missing
+measurement with a zero. If an interpolation is scientifically
+justified, state the method and distinguish measured from estimated
+values.</p>
+<h2 id="practice-exercises">Practice exercises</h2>
+<ol type="1">
+<li><p>Create a project and script, record <code>sessionInfo()</code>,
+and explain why a relative file path is preferable to an absolute
+path.</p></li>
+<li><p>Write R code for the dot product, cross product, norm, and angle
+between <span class="math inline">\(\boldsymbol{a}=(2,-1,2)\)</span> and
+<span class="math inline">\(\boldsymbol{b}=(1,3,-2)\)</span>. Verify
+orthogonality of the cross product.</p></li>
+<li><p>Solve <span class="math inline">\(A\boldsymbol{x}=\boldsymbol{b}\)</span> with <span class="math inline">\(A=\begin{pmatrix}3&amp;1\\1&amp;2\end{pmatrix}\)</span>
+and <span class="math inline">\(\boldsymbol{b}=(7,5)^T\)</span>. Verify
+the residual numerically.</p></li>
+<li><p>Plot level curves and a perspective surface for <span class="math inline">\(f(x,y)=x^2-2y^2\)</span> on <span class="math inline">\([-2,2]^2\)</span>. Identify the saddle point
+analytically.</p></li>
+<li><p>Approximate the partial derivatives of <span class="math inline">\(f(x,y)=e^{xy}+x^2\)</span> at <span class="math inline">\((1,0)\)</span> using three different step sizes;
+compare with exact derivatives.</p></li>
+<li><p>Implement the polar-coordinate Jacobian and verify its
+determinant for at least four positive radii and angles.</p></li>
+<li><p>Use <code>optim()</code> to minimize <span class="math inline">\(f(x,y)=(x-3)^2+4(y+1)^2\)</span>. Check the
+gradient at the numerical solution.</p></li>
+<li><p>Evaluate <span class="math inline">\(\int_0^2\int_0^x(x+y)\,dy\,dx\)</span> numerically
+and exactly. State the exact value and absolute numerical
+error.</p></li>
+<li><p>Estimate <span class="math inline">\(\iint_{[0,1]^2}(x^2+y^2)\,dA\)</span> with Monte
+Carlo samples of sizes <span class="math inline">\(10^3\)</span>, <span class="math inline">\(10^4\)</span>, and <span class="math inline">\(10^5\)</span>. Compare errors and standard
+errors.</p></li>
+<li><p>Verify Green’s theorem numerically for <span class="math inline">\(\boldsymbol{F}=(-y,x)\)</span> on a circle of
+radius <span class="math inline">\(2\)</span>, with positive
+orientation.</p></li>
+<li><p>Calculate the shorter great-circle distance between two unit
+vectors separated by <span class="math inline">\(60^\circ\)</span> on a
+sphere of radius <span class="math inline">\(R=10\)</span>.</p></li>
+<li><p>Modify the heat-equation program to use two spatial grid sizes.
+Keep <span class="math inline">\(\lambda=0.4\)</span> fixed, compare
+errors at the same physical final time (choose compatible time steps),
+and explain the observed convergence.</p></li>
+</ol>
+<h2 id="capstone-a-reproducible-computational-calculus-portfolio">Capstone:
+a reproducible computational calculus portfolio</h2>
+<p><strong>Goal.</strong> Create a self-contained RStudio Project that
+demonstrates one representative mathematical computation from each of
+Chapters 1–8. Include the derivation, executable R script, at least one
+labeled figure where appropriate, numerical validation, and a concise
+interpretation. The project must run from a fresh R session without
+manually assigning hidden variables.</p>
+<h5 id="required-deliverables.">Required deliverables.</h5>
+<p>Submit the project folder with <code>scripts/</code>,
+<code>figures/</code>, and <code>results/</code>; a short report
+describing all eight tasks; a <code>README</code> with execution
+instructions; and a <code>sessionInfo()</code> record. Every numerical
+result should be checked against an exact formula, a theorem, or an
+independent computation where feasible.</p>
+<h5 id="suggested-assessment-100-points.">Suggested assessment (100
+points).</h5>
+<p>Mathematical derivations and assumptions: 30; correctness and
+reproducibility of R code: 25; verification and numerical error
+analysis: 20; visualizations and interpretation: 15; organization and
+documentation: 10.</p>
+<h2 class="unnumbered" id="further-learning-and-official-documentation">Further learning and
+official documentation</h2>
+<p>The official R manuals and package documentation are accessible
+through <a class="uri" href="https://cran.r-project.org/manuals.html">https://cran.r-project.org/manuals.html</a>. RStudio and
+Posit documentation is available through <a class="uri" href="https://docs.posit.co/">https://docs.posit.co/</a>.
+For help with a specific R function, use <code>?integrate</code>,
+<code>help("optim")</code>, or <code>example(plot)</code>. Documentation
+and package behavior should be checked against the version actually
+installed on the student’s machine.</p>
+<footer><a href="chapter08.html">8. Partial Differential Equations and Computational Methods ←</a><a href="appendix-b.html">Appendix B. Introduction to Python and Jupyter →</a></footer></main><aside class="chapter-toc"><strong>On this page</strong><ul><li><a href="#why-r-belongs-in-a-multivariable-calculus-textbook">Why R
+belongs in a multivariable calculus textbook</a></li><li><a href="#installing-r-and-rstudio">Installing R and RStudio</a></li><li><a href="#two-related-but-different-programs">Two related but different
+programs</a></li><li><a href="#a-reliable-setup-procedure">A reliable setup procedure</a></li><li><a href="#understanding-the-rstudio-interface">Understanding the RStudio
+interface</a></li><li><a href="#writing-and-running-a-reproducible-script">Writing and running a
+reproducible script</a></li><li><a href="#files-folders-and-projects">Files, folders, and projects</a></li><li><a href="#r-syntax-and-mathematical-arithmetic">R syntax and mathematical
+arithmetic</a></li><li><a href="#basic-operators-and-precedence">Basic operators and
+precedence</a></li><li><a href="#object-types-and-inspection">Object types and inspection</a></li><li><a href="#vectors-the-foundation-of-computational-calculus">Vectors: the
+foundation of computational calculus</a></li><li><a href="#creating-and-indexing-vectors">Creating and indexing
+vectors</a></li><li><a href="#the-cross-product-in-three-dimensions">The cross product in
+three dimensions</a></li><li><a href="#recycling-an-important-source-of-errors">Recycling: an important
+source of errors</a></li><li><a href="#matrices-determinants-and-linear-systems">Matrices,
+determinants, and linear systems</a></li><li><a href="#eigenvalues-and-the-hessian">Eigenvalues and the Hessian</a></li><li><a href="#sequences-grids-and-vectorized-evaluation">Sequences, grids, and
+vectorized evaluation</a></li><li><a href="#functions-conditionals-and-iteration">Functions, conditionals,
+and iteration</a></li><li><a href="#writing-a-mathematical-function">Writing a mathematical
+function</a></li><li><a href="#conditional-statements-and-loops">Conditional statements and
+loops</a></li><li><a href="#managing-tabular-data-and-missing-values">Managing tabular data
+and missing values</a></li><li><a href="#creating-publication-quality-mathematical-graphics">Creating
+publication-quality mathematical graphics</a></li><li><a href="#base-r-plots-and-annotations">Base-R plots and annotations</a></li><li><a href="#contour-plots-and-surface-plots">Contour plots and surface
+plots</a></li><li><a href="#plotting-a-parametrized-curve">Plotting a parametrized
+curve</a></li><li><a href="#numerical-differentiation-and-the-meaning-of-step-size">Numerical
+differentiation and the meaning of step size</a></li><li><a href="#gradients-jacobians-and-tangent-plane-approximations">Gradients,
+Jacobians, and tangent-plane approximations</a></li><li><a href="#optimization-with-r">Optimization with R</a></li><li><a href="#one-variable-optimization">One-variable optimization</a></li><li><a href="#unconstrained-optimization-in-several-variables">Unconstrained
+optimization in several variables</a></li><li><a href="#constrained-optimization-by-reducing-the-dimension">Constrained
+optimization by reducing the dimension</a></li><li><a href="#numerical-integration-one-dimension-to-several">Numerical
+integration: one dimension to several</a></li><li><a href="#base-r-quadrature">Base R quadrature</a></li><li><a href="#an-iterated-double-integral">An iterated double integral</a></li><li><a href="#polar-coordinate-integration">Polar-coordinate integration</a></li><li><a href="#monte-carlo-integration-and-uncertainty">Monte Carlo integration
+and uncertainty</a></li><li><a href="#vector-fields-circulation-and-flux">Vector fields, circulation,
+and flux</a></li><li><a href="#flux-across-a-circle">Flux across a circle</a></li><li><a href="#metrics-coordinate-geometry-and-geodesics">Metrics, coordinate
+geometry, and geodesics</a></li><li><a href="#great-circle-distance">Great-circle distance</a></li><li><a href="#numerical-solutions-of-differential-equations">Numerical
+solutions of differential equations</a></li><li><a href="#eulers-method-from-first-principles">Euler’s method from first
+principles</a></li><li><a href="#finite-differences-for-the-heat-equation">Finite differences for
+the heat equation</a></li><li><a href="#packages-and-dependency-management">Packages and dependency
+management</a></li><li><a href="#debugging-and-validating-r-programs">Debugging and validating R
+programs</a></li><li><a href="#common-problems-and-their-causes">Common problems and their
+causes</a></li><li><a href="#a-validation-checklist">A validation checklist</a></li><li><a href="#communicating-mathematical-results-professionally">Communicating
+mathematical results professionally</a></li><li><a href="#a-crosswalk-to-the-eight-textbook-chapters">A crosswalk to the
+eight textbook chapters</a></li><li><a href="#extended-worked-laboratory-1-vectors-planes-and-projection">Extended
+worked laboratory 1: vectors, planes, and projection</a></li><li><a href="#extended-worked-laboratory-2-curvature-of-a-space-curve">Extended
+worked laboratory 2: curvature of a space curve</a></li><li><a href="#extended-worked-laboratory-3-numerical-gradient-descent">Extended
+worked laboratory 3: numerical gradient descent</a></li><li><a href="#extended-worked-laboratory-4-a-density-weighted-centroid">Extended
+worked laboratory 4: a density-weighted centroid</a></li><li><a href="#extended-worked-laboratory-5-reproducible-numerical-experiments">Extended
+worked laboratory 5: reproducible numerical experiments</a></li><li><a href="#extended-worked-laboratory-6-reading-cleaning-and-plotting-measurements">Extended
+worked laboratory 6: reading, cleaning, and plotting measurements</a></li><li><a href="#practice-exercises">Practice exercises</a></li><li><a href="#capstone-a-reproducible-computational-calculus-portfolio">Capstone:
+a reproducible computational calculus portfolio</a></li><li><a href="#further-learning-and-official-documentation">Further learning and
+official documentation</a></li></ul></aside></div><script src="search-index.js"></script><script src="site.js"></script></body></html>

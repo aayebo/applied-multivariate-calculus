@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><title>Curves, Surfaces, and Coordinate Systems | Applied Multivariate Calculus Using R and Python</title><link href="site.css" rel="stylesheet"/><script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]}};</script><script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script></head><body><a class="skip" href="#main">Skip to content</a><nav aria-label="Book navigation" class="site-nav"><a class="brand" href="index.html">Applied Multivariate Calculus Using R and Python</a><p class="subtitle">Volume III · Abraham Ayebo</p><label for="book-search">Search book</label><input id="book-search" placeholder="Search chapters" type="search"/><div aria-live="polite" class="search-results" id="search-results"></div><div class="nav-label">Contents</div><a href="index.html">Welcome</a><a href="chapter01.html">1. Vectors and Geometry in Three-Dimensional Space</a><a aria-current="page" class="active" href="chapter02.html">2. Curves, Surfaces, and Coordinate Systems</a><a href="chapter03.html">3. Functions of Several Variables and Partial Differentiation</a><a href="chapter04.html">4. Gradients, Taylor Approximations, and Optimization</a><a href="chapter05.html">5. Multiple Integration and Applications</a><a href="chapter06.html">6. Vector Fields and Integral Theorems</a><a href="chapter07.html">7. Introduction to Tensor Calculus and Differential Geometry</a><a href="chapter08.html">8. Partial Differential Equations and Computational Methods</a><a href="appendix-a.html">Appendix A. Introduction to R and RStudio</a><a href="appendix-b.html">Appendix B. Introduction to Python and Jupyter</a><a href="resources.html">Computational resources</a><a href="about.html">About this book</a><div class="nav-label">Series</div><a href="https://aayebo.github.io/applied-precalculus/">Volume I · Applied Precalculus</a><a href="https://aayebo.github.io/applied-calculus/">Volume II · Applied Calculus</a></nav><header class="topbar"><button aria-expanded="false" class="menu">Contents</button><span>Applied Mathematics · Volume III</span><span class="spacer"></span><a href="resources.html">Code &amp; resources</a></header><div class="page-grid"><main id="main"><h1>2. Curves, Surfaces, and Coordinate Systems</h1><p><span id="ch:curves-surfaces" label="ch:curves-surfaces"></span></p>
+<div class="learning-box example"><p><strong>Learning.</strong> After studying this chapter, you should be
+able to parametrize planar and spatial curves; compute velocity,
+acceleration, arc length, and curvature; construct the Frenet frame and
+torsion; transform among Cartesian, polar, cylindrical, and spherical
+coordinates; describe and parametrize surfaces; compute tangent planes
+and surface-area elements; and solve representative problems using R and
+Python with reproducible visualizations.</p></div>
+<section class="mv-lab" id="interactive-investigation"><h2>Interactive investigation: Rotatable surfaces</h2><p>Compare a saddle and a paraboloid by changing the viewing angle and surface parameter.</p><div data-mv-lab="2"></div><p><strong>Explore:</strong> Which surface has a local minimum at the origin?</p><noscript>Enable JavaScript to use this investigation.</noscript></section><h2 id="geometry-through-parameters">Geometry through parameters</h2>
+<p>A Cartesian equation describes a geometric object by a relation among
+coordinates. A <em>parametrization</em> instead specifies how to
+generate its points from one or more independent parameters. This
+distinction is essential: a curve is a one-dimensional object, but it
+may live in a two- or three-dimensional ambient space; a surface
+typically requires two parameters. The parameter can represent time,
+position along a curve, or simply a convenient mathematical
+coordinate.</p>
+<div class="learning-box example"><p><strong>Definition — Parametrized curve.</strong> A parametrized
+curve in <span class="math inline">\(\mathbb{R}^n\)</span> is a function
+<span class="math inline">\(\boldsymbol{r}:I\to\mathbb{R}^n\)</span> on
+an interval <span class="math inline">\(I\)</span>, written <span class="math inline">\(\boldsymbol{r}(t)=(r_1(t),\ldots,r_n(t))\)</span>.
+Its <em>trace</em> is the set <span class="math inline">\(\{\boldsymbol{r}(t):t\in I\}\)</span>. The
+parameter orientation is the direction in which the trace is traversed
+as <span class="math inline">\(t\)</span> increases.</p></div>
+<p>A curve and its trace are not the same thing. For example, <span class="math inline">\((\cos t,\sin t)\)</span> for <span class="math inline">\(0\le t\le2\pi\)</span> traverses the unit circle
+once, whereas <span class="math inline">\((\cos2t,\sin2t)\)</span>
+traverses it twice. Their traces coincide, but their velocities and
+parameter-dependent integrals need not.</p>
+<div class="learning-box example"><p><strong>Example — Three ways to describe a parabola.</strong> The
+graph <span class="math inline">\(y=x^2\)</span> admits <span class="math inline">\(\boldsymbol{r}(t)=(t,t^2)\)</span>, <span class="math inline">\(t\in\mathbb{R}\)</span>. It also admits <span class="math inline">\(\boldsymbol{q}(s)=(s^3,s^6)\)</span>, <span class="math inline">\(s\in\mathbb{R}\)</span>. Both have the same trace,
+but <span class="math inline">\(\boldsymbol{q}'(0)=\boldsymbol{0}\)</span>, so
+<span class="math inline">\(s=0\)</span> is not a regular parameter
+value. This illustrates why parameter speed matters even when the
+geometric locus is unchanged.</p></div>
+<h3 class="unnumbered" id="computational-preview-constructing-a-curve">Computational preview:
+constructing a curve</h3>
+<div class="learning-box example"><p><strong>Remark — Computational follow-up.</strong> The R and Python
+implementations of this example appear in the paired computational
+laboratories later in the chapter.</p></div>
+<h2 id="differentiation-tangent-vectors-and-motion">Differentiation,
+tangent vectors, and motion</h2>
+<p>If the component functions are differentiable, the derivative of a
+vector-valued function is computed componentwise: <span class="math display">\[\boldsymbol{r}'(t)=\lim_{h\to0}\frac{\boldsymbol{r}(t+h)-\boldsymbol{r}(t)}{h}
+=(r_1'(t),\ldots,r_n'(t)).\]</span> When <span class="math inline">\(t\)</span> is time, <span class="math inline">\(\boldsymbol{v}=\boldsymbol{r}'\)</span> is
+velocity, <span class="math inline">\(\left\lVert
+\boldsymbol{v}\right\rVert\)</span> is speed, and <span class="math inline">\(\boldsymbol{a}=\boldsymbol{r}''\)</span>
+is acceleration. A parameter value is <em>regular</em> if <span class="math inline">\(\boldsymbol{r}'(t)\ne\boldsymbol{0}\)</span>.
+At a regular point the tangent line is <span class="math display">\[\boldsymbol{L}(s)=\boldsymbol{r}(t_0)+s\boldsymbol{r}'(t_0),\qquad
+s\in\mathbb{R}.\]</span> The tangent direction is unaffected by a
+smooth, orientation-preserving change of parameter, although the
+magnitude of the derivative changes.</p>
+<div class="learning-box example"><p><strong>Example — Tangent line to a parabola.</strong> For <span class="math inline">\(\boldsymbol{r}(t)=(t,t^2)\)</span> at <span class="math inline">\(t_0=0.7\)</span>, <span class="math inline">\(\boldsymbol{r}(0.7)=(0.7,0.49)\)</span> and <span class="math inline">\(\boldsymbol{r}'(0.7)=(1,1.4)\)</span>. Thus
+<span class="math inline">\(\boldsymbol{L}(s)=(0.7,0.49)+s(1,1.4)\)</span>;
+equivalently, <span class="math inline">\(y-0.49=1.4(x-0.7)\)</span>.</p></div>
+<figure id="fig:ch2tangent">
+<img alt="A tangent line is determined by the position and derivative of a regular parametrization. Original figure generated with Python." src="figures/tangent_curve.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">A tangent line is determined by the
+position and derivative of a regular parametrization. Original figure
+generated with Python.</figcaption>
+</figure>
+<div class="learning-box example"><p><strong>Proposition — Differentiation rules.</strong> For
+differentiable vector functions <span class="math inline">\(\boldsymbol{r},\boldsymbol{s}\)</span> and a
+differentiable scalar <span class="math inline">\(f\)</span>, the rules
+<span class="math display">\[(f\boldsymbol{r})'=f'\boldsymbol{r}+f\boldsymbol{r}',\qquad
+(\boldsymbol{r}\cdot\boldsymbol{s})'=\boldsymbol{r}'\cdot\boldsymbol{s}+\boldsymbol{r}\cdot\boldsymbol{s}',\]</span>
+and, in <span class="math inline">\(\mathbb{R}^3\)</span>, <span class="math display">\[(\boldsymbol{r}\times\boldsymbol{s})'=\boldsymbol{r}'\times\boldsymbol{s}+\boldsymbol{r}\times\boldsymbol{s}'\]</span>
+hold componentwise.</p></div>
+<div class="learning-box example"><p><strong>Proof.</strong> For the dot product, expand <span class="math inline">\(\sum_i r_i(t)s_i(t)\)</span> and apply the
+ordinary product rule to each term. The scalar product and cross product
+identities follow from bilinearity and the same limit argument.</p></div>
+<h3 id="tangential-and-normal-acceleration">Tangential and normal
+acceleration</h3>
+<p>Write <span class="math inline">\(v=\left\lVert
+\boldsymbol{r}'\right\rVert\)</span> and <span class="math inline">\(\boldsymbol{T}=\boldsymbol{r}'/v\)</span>
+where <span class="math inline">\(v&gt;0\)</span>. Since <span class="math inline">\(\boldsymbol{r}'=v\boldsymbol{T}\)</span>,
+<span class="math display">\[\boldsymbol{a}=v'\boldsymbol{T}+v\boldsymbol{T}'.\]</span>
+Differentiating <span class="math inline">\(\boldsymbol{T}\cdot\boldsymbol{T}=1\)</span> gives
+<span class="math inline">\(\boldsymbol{T}\cdot\boldsymbol{T}'=0\)</span>.
+Therefore the two terms above are orthogonal. The tangential
+acceleration <span class="math inline">\(a_T=v'\)</span> changes
+speed; the normal acceleration <span class="math inline">\(a_N=\left\lVert
+v\boldsymbol{T}'\right\rVert\)</span> changes direction. Later we
+will show <span class="math inline">\(a_N=\kappa v^2\)</span>.</p>
+<div class="learning-box example"><p><strong>Example — Circular motion.</strong> For <span class="math inline">\(\boldsymbol{r}(t)=(R\cos\omega t,R\sin\omega
+t)\)</span> with <span class="math inline">\(R&gt;0\)</span> and
+constant <span class="math inline">\(\omega\)</span>, velocity is <span class="math inline">\(R\omega(-\sin\omega t,\cos\omega t)\)</span> and
+acceleration is <span class="math inline">\(-R\omega^2(\cos\omega
+t,\sin\omega t)\)</span>. The speed is <span class="math inline">\(R|\omega|\)</span>, the tangential acceleration is
+zero, and the normal acceleration has magnitude <span class="math inline">\(R\omega^2\)</span>.</p></div>
+<h2 id="arc-length-and-unit-speed-parametrization">Arc length and
+unit-speed parametrization</h2>
+<p>The distance between successive sample points approximates a curve’s
+length by polygonal segments. For a continuously differentiable curve,
+passing to the limit gives</p>
+<div class="learning-box example"><p><strong>Definition — Arc length.</strong> If <span class="math inline">\(\boldsymbol{r}:[a,b]\to\mathbb{R}^n\)</span> is
+piecewise continuously differentiable, its length is <span class="math display">\[L=\int_a^b\left\lVert
+\boldsymbol{r}'(t)\right\rVert\,\,\mathrm{d}t.\]</span> The arc
+length measured from <span class="math inline">\(t=a\)</span> is <span class="math inline">\(s(t)=\int_a^t\left\lVert
+\boldsymbol{r}'(u)\right\rVert\,\,\mathrm{d}u\)</span>.</p></div>
+<p>When <span class="math inline">\(\left\lVert
+\boldsymbol{r}'\right\rVert&gt;0\)</span>, <span class="math inline">\(\,\mathrm{d}s/\,\mathrm{d}t=\left\lVert
+\boldsymbol{r}'\right\rVert\)</span>; using <span class="math inline">\(s\)</span> as the parameter produces a unit-speed
+curve, <span class="math inline">\(\left\lVert
+\,\mathrm{d}\boldsymbol{r}/\,\mathrm{d}s\right\rVert=1\)</span>.</p>
+<div class="learning-box example"><p><strong>Example — Length of a helix.</strong> Let <span class="math inline">\(\boldsymbol{r}(t)=(a\cos t,a\sin t,bt)\)</span>
+for <span class="math inline">\(0\le t\le2\pi\)</span>, with <span class="math inline">\(a&gt;0\)</span>. Since <span class="math inline">\(\boldsymbol{r}'=(-a\sin t,a\cos t,b)\)</span>,
+its speed is the constant <span class="math inline">\(\sqrt{a^2+b^2}\)</span> and <span class="math display">\[L=2\pi\sqrt{a^2+b^2}.\]</span> The quantity <span class="math inline">\(2\pi b\)</span> is the vertical change over one
+revolution, while <span class="math inline">\(2\pi a\)</span> is the
+corresponding circumference in the horizontal plane.</p></div>
+<div class="learning-box example"><p><strong>Example — Arc length of a parabola segment.</strong> For
+<span class="math inline">\(\boldsymbol{r}(t)=(t,t^2)\)</span>, <span class="math inline">\(0\le t\le1\)</span>, <span class="math display">\[L=\int_0^1\sqrt{1+4t^2}\,\,\mathrm{d}t
+=\frac{\sqrt5}{2}+\frac{\operatorname{arsinh}(2)}4.\]</span> The
+substitution <span class="math inline">\(u=2t\)</span> and the standard
+antiderivative <span class="math inline">\(\int\sqrt{1+u^2}\,\,\mathrm{d}u=\tfrac12(u\sqrt{1+u^2}+\operatorname{arsinh}u)\)</span>
+produce the exact answer.</p></div>
+<div class="learning-box example"><p><strong>Remark — Computational follow-up.</strong> The R and Python
+implementations of this example appear in the paired computational
+laboratories later in the chapter.</p></div>
+<div class="learning-box check"><p><strong>Checkpoint.</strong> Why does replacing <span class="math inline">\(\boldsymbol{r}(t)\)</span> by <span class="math inline">\(\boldsymbol{r}(3t)\)</span> change its speed but
+not the length of a fixed geometric arc, provided the parameter interval
+is adjusted accordingly?</p></div>
+<h2 id="curvature-and-the-geometry-of-bending">Curvature and the
+geometry of bending</h2>
+<p>Curvature measures the rate at which the unit tangent changes per
+unit distance along a curve. For a regular twice-differentiable curve,
+define <span class="math display">\[\kappa=\left\lVert
+\frac{\,\mathrm{d}\boldsymbol{T}}{\,\mathrm{d}s}\right\rVert.\]</span>
+Using <span class="math inline">\(\,\mathrm{d}s/\,\mathrm{d}t=\left\lVert
+\boldsymbol{r}'\right\rVert\)</span> and the chain rule yields <span class="math display">\[\kappa(t)=\frac{\left\lVert
+\boldsymbol{T}'(t)\right\rVert}{\left\lVert
+\boldsymbol{r}'(t)\right\rVert}.\]</span> In the plane, for <span class="math inline">\(\boldsymbol{r}(t)=(x(t),y(t))\)</span>, an
+equivalent computational formula is <span class="math display">\[\boxed{\kappa(t)=\frac{|x'y''-y'x''|}{(x'^2+y'^2)^{3/2}}}.\]</span>
+In three dimensions, provided <span class="math inline">\(\boldsymbol{r}'\ne0\)</span>, <span class="math display">\[\boxed{\kappa(t)=\frac{\left\lVert
+\boldsymbol{r}'(t)\times\boldsymbol{r}''(t)\right\rVert}{\left\lVert
+\boldsymbol{r}'(t)\right\rVert^3}}.\]</span> The cross product
+measures the part of acceleration perpendicular to velocity; this is
+precisely the part that changes the direction of motion.</p>
+<div class="learning-box example"><p><strong>Proposition — Curvature of a graph.</strong> For the graph
+<span class="math inline">\(y=f(x)\)</span>, parametrized by <span class="math inline">\(\boldsymbol{r}(x)=(x,f(x))\)</span>, the curvature
+is <span class="math display">\[\kappa(x)=\frac{|f''(x)|}{\bigl(1+[f'(x)]^2\bigr)^{3/2}}.\]</span></p></div>
+<div class="learning-box example"><p><strong>Proof.</strong> Substitute <span class="math inline">\(x'=1\)</span>, <span class="math inline">\(y'=f'\)</span>, <span class="math inline">\(x''=0\)</span>, and <span class="math inline">\(y''=f''\)</span> into the planar
+formula.</p></div>
+<div class="learning-box example"><p><strong>Example — Osculating circle of a parabola.</strong> For <span class="math inline">\(y=x^2\)</span>, <span class="math inline">\(\kappa(x)=2/(1+4x^2)^{3/2}\)</span>. At the
+origin, <span class="math inline">\(\kappa=2\)</span>, so the radius of
+curvature is <span class="math inline">\(\rho=1/\kappa=1/2\)</span>. The
+upward unit normal is <span class="math inline">\((0,1)\)</span>;
+therefore the osculating circle has center <span class="math inline">\((0,1/2)\)</span> and equation <span class="math display">\[x^2+(y-\tfrac12)^2=\tfrac14.\]</span></p></div>
+<figure>
+<img alt="The osculating circle matches the tangent direction and curvature of the parabola at the origin. Original Python figure." src="figures/osculating_circle.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">The osculating circle matches the tangent
+direction and curvature of the parabola at the origin. Original Python
+figure.</figcaption>
+</figure>
+<h3 id="the-frenet-frame-and-torsion">The Frenet frame and torsion</h3>
+<p>For a sufficiently smooth regular space curve with <span class="math inline">\(\kappa&gt;0\)</span>, define the unit tangent
+<span class="math inline">\(\boldsymbol{T}\)</span>, principal unit
+normal <span class="math inline">\(\boldsymbol{N}=(\,\mathrm{d}\boldsymbol{T}/\,\mathrm{d}s)/\kappa\)</span>,
+and binormal <span class="math inline">\(\boldsymbol{B}=\boldsymbol{T}\times\boldsymbol{N}\)</span>.
+These form an orthonormal frame that moves along the curve. The
+Frenet–Serret equations, with derivatives taken with respect to arc
+length, are <span class="math display">\[\frac{\,\mathrm{d}\boldsymbol{T}}{\,\mathrm{d}s}=\kappa\boldsymbol{N},\qquad
+\frac{\,\mathrm{d}\boldsymbol{N}}{\,\mathrm{d}s}=-\kappa\boldsymbol{T}+\tau\boldsymbol{B},\qquad
+\frac{\,\mathrm{d}\boldsymbol{B}}{\,\mathrm{d}s}=-\tau\boldsymbol{N}.\]</span>
+The scalar <span class="math inline">\(\tau\)</span> is
+<em>torsion</em>; it measures the rotation of the osculating plane along
+the curve. When <span class="math inline">\(\boldsymbol{r}'\times\boldsymbol{r}''\ne\boldsymbol{0}\)</span>,
+<span class="math display">\[\boxed{\tau(t)=\frac{(\boldsymbol{r}'\times\boldsymbol{r}'')\cdot\boldsymbol{r}'''}{\left\lVert
+\boldsymbol{r}'\times\boldsymbol{r}''\right\rVert^2}}.\]</span>
+For a planar curve, torsion vanishes wherever this formula is
+defined.</p>
+<div class="learning-box example"><p><strong>Example — Curvature and torsion of a circular helix.</strong>
+For <span class="math inline">\(\boldsymbol{r}(t)=(a\cos t,a\sin
+t,bt)\)</span>, differentiate three times. Direct substitution gives
+<span class="math display">\[\kappa=\frac{a}{a^2+b^2},\qquad
+\tau=\frac{b}{a^2+b^2}.\]</span> Both are constant. The circle <span class="math inline">\(b=0\)</span> has torsion zero; increasing <span class="math inline">\(|b|\)</span> introduces twisting out of the
+horizontal plane.</p></div>
+<figure id="fig:ch2frenet">
+<img alt="Unit tangent \boldsymbol{T}, principal normal \boldsymbol{N}, and binormal \boldsymbol{B} on a circular helix. Original Python figure." src="figures/helix_frenet.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">Unit tangent <span class="math inline">\(\boldsymbol{T}\)</span>, principal normal <span class="math inline">\(\boldsymbol{N}\)</span>, and binormal <span class="math inline">\(\boldsymbol{B}\)</span> on a circular helix.
+Original Python figure.</figcaption>
+</figure>
+<h3 class="unnumbered" id="computational-preview-symbolic-verification">Computational preview:
+symbolic verification</h3>
+<div class="learning-box example"><p><strong>Remark — Computational follow-up.</strong> The R and Python
+implementations of this example appear in the paired computational
+laboratories later in the chapter.</p></div>
+<h2 id="polar-coordinates-and-planar-geometry">Polar coordinates and
+planar geometry</h2>
+<p>Polar coordinates describe a point by radial distance <span class="math inline">\(r\ge0\)</span> and angle <span class="math inline">\(\theta\)</span> from the positive <span class="math inline">\(x\)</span>-axis: <span class="math display">\[x=r\cos\theta,\qquad y=r\sin\theta,\qquad
+r=\sqrt{x^2+y^2}.\]</span> Angles are not unique: <span class="math inline">\(\theta\)</span> and <span class="math inline">\(\theta+2\pi k\)</span> describe the same ray. At
+the origin, the angle is undefined. A polar curve is often written <span class="math inline">\(r=f(\theta)\)</span>, and a Cartesian
+parametrization follows immediately: <span class="math display">\[\boldsymbol{r}(\theta)=\bigl(f(\theta)\cos\theta,f(\theta)\sin\theta\bigr).\]</span></p>
+<figure>
+<img alt="Polar grid and a radial segment. Polar coordinates are adapted to circular symmetry. Original Python figure." src="figures/polar_grid.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">Polar grid and a radial segment. Polar
+coordinates are adapted to circular symmetry. Original Python
+figure.</figcaption>
+</figure>
+<div class="learning-box example"><p><strong>Proposition — Arc length in polar form.</strong> If <span class="math inline">\(r=f(\theta)\)</span> is continuously
+differentiable on <span class="math inline">\([\alpha,\beta]\)</span>,
+then <span class="math display">\[L=\int_\alpha^\beta\sqrt{[f(\theta)]^2+[f'(\theta)]^2}\,\,\mathrm{d}\theta.\]</span></p></div>
+<div class="learning-box example"><p><strong>Proof.</strong> Differentiate <span class="math inline">\((f\cos\theta,f\sin\theta)\)</span>; the squared
+norm is <span class="math inline">\((f'\cos\theta-f\sin\theta)^2+(f'\sin\theta+f\cos\theta)^2=(f')^2+f^2\)</span>.</p></div>
+<div class="learning-box example"><p><strong>Example — Archimedean spiral.</strong> For <span class="math inline">\(r=c\theta\)</span> with <span class="math inline">\(c&gt;0\)</span> and <span class="math inline">\(0\le\theta\le2\pi\)</span>, the arc length is
+<span class="math display">\[L=c\int_0^{2\pi}\sqrt{1+\theta^2}\,\,\mathrm{d}\theta.\]</span>
+The radius increases linearly with angle, while the spacing between
+successive turns remains constant at <span class="math inline">\(2\pi
+c\)</span>.</p></div>
+<h3 id="polar-area">Polar area</h3>
+<p>The area swept out by a thin polar sector of angular width <span class="math inline">\(\Delta\theta\)</span> and radius <span class="math inline">\(r\)</span> is approximately <span class="math inline">\(\frac12r^2\Delta\theta\)</span>. Taking a limit
+gives <span class="math display">\[A=\frac12\int_\alpha^\beta
+[f(\theta)]^2\,\,\mathrm{d}\theta,\]</span> provided the region is
+traced without overlapping interiors. This is a geometric area formula,
+distinct from the polar Jacobian <span class="math inline">\(r\)</span>
+used for double integration in Chapter 5.</p>
+<div class="learning-box example"><p><strong>Example — Area of a cardioid.</strong> For <span class="math inline">\(r=1+\cos\theta\)</span>, <span class="math inline">\(0\le\theta\le2\pi\)</span>, <span class="math display">\[A=\frac12\int_0^{2\pi}(1+2\cos\theta+\cos^2\theta)\,\,\mathrm{d}\theta
+=\frac{3\pi}{2}.\]</span></p></div>
+<h2 id="cylindrical-and-spherical-coordinates">Cylindrical and spherical
+coordinates</h2>
+<p>Cartesian coordinates are natural for planes and rectangular regions.
+Cylindrical and spherical coordinates better reflect rotational and
+radial symmetry. The conventions must be stated explicitly because
+symbols vary across textbooks.</p>
+<h3 id="cylindrical-coordinates">Cylindrical coordinates</h3>
+<p>A cylindrical point <span class="math inline">\((r,\theta,z)\)</span>
+satisfies <span class="math display">\[x=r\cos\theta,\quad
+y=r\sin\theta,\quad z=z,
+\qquad r\ge0.\]</span> The surfaces <span class="math inline">\(r=c\)</span> are circular cylinders; <span class="math inline">\(\theta=c\)</span> are vertical half-planes; <span class="math inline">\(z=c\)</span> are horizontal planes. A curve with
+fixed <span class="math inline">\(r\)</span> and linearly increasing
+<span class="math inline">\(z\)</span> is a helix.</p>
+<figure>
+<img alt="A helix has constant cylindrical radius while both angular position and height increase. Original Python figure." src="figures/cylindrical_helix.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">A helix has constant cylindrical radius
+while both angular position and height increase. Original Python
+figure.</figcaption>
+</figure>
+<div class="learning-box example"><p><strong>Example — Converting a surface.</strong> The cylinder <span class="math inline">\(x^2+y^2=9\)</span> becomes <span class="math inline">\(r=3\)</span>. The paraboloid <span class="math inline">\(z=x^2+y^2\)</span> becomes <span class="math inline">\(z=r^2\)</span>. The cone <span class="math inline">\(z=\sqrt{x^2+y^2}\)</span> becomes <span class="math inline">\(z=r\)</span> for <span class="math inline">\(z\ge0\)</span>.</p></div>
+<h3 id="spherical-coordinates">Spherical coordinates</h3>
+<p>We use <span class="math inline">\((\rho,\theta,\phi)\)</span> with
+<span class="math inline">\(\rho\ge0\)</span>, azimuth <span class="math inline">\(0\le\theta&lt;2\pi\)</span>, and polar angle <span class="math inline">\(0\le\phi\le\pi\)</span> measured down from the
+positive <span class="math inline">\(z\)</span>-axis: <span class="math display">\[\boxed{x=\rho\sin\phi\cos\theta,\quad
+y=\rho\sin\phi\sin\theta,\quad
+z=\rho\cos\phi.}\]</span> Consequently <span class="math inline">\(\rho^2=x^2+y^2+z^2\)</span>, <span class="math inline">\(r=\rho\sin\phi\)</span>, and <span class="math inline">\(z=\rho\cos\phi\)</span>. The sphere centered at
+the origin with radius <span class="math inline">\(R\)</span> is simply
+<span class="math inline">\(\rho=R\)</span>. At the poles the azimuth is
+not unique; at the origin neither angle is unique.</p>
+<figure>
+<img alt="Spherical coordinates locate a point by distance from the origin and two angles. Original Python figure." src="figures/spherical_coordinates.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">Spherical coordinates locate a point by
+distance from the origin and two angles. Original Python
+figure.</figcaption>
+</figure>
+<div class="learning-box example"><p><strong>Example — A spherical cap.</strong> The portion of the sphere
+<span class="math inline">\(x^2+y^2+z^2=16\)</span> above <span class="math inline">\(z=2\)</span> is described by <span class="math inline">\(\rho=4\)</span> and <span class="math inline">\(0\le\phi\le\pi/3\)</span>, since <span class="math inline">\(4\cos\phi\ge2\)</span>. The azimuth <span class="math inline">\(\theta\)</span> spans <span class="math inline">\([0,2\pi)\)</span>.</p></div>
+<div class="learning-box check"><p><strong>Checkpoint.</strong> Convert <span class="math inline">\((\rho,\theta,\phi)=(4,\pi/6,\pi/3)\)</span> to
+Cartesian coordinates, and explain why the point with <span class="math inline">\(\rho=0\)</span> has no unique angular
+coordinates.</p></div>
+<h2 id="surfaces-as-level-sets-and-graphs">Surfaces as level sets and
+graphs</h2>
+<p>A surface can be specified implicitly as a level set <span class="math inline">\(F(x,y,z)=c\)</span> or explicitly as a graph <span class="math inline">\(z=f(x,y)\)</span>. A level set is locally a smooth
+surface near points where <span class="math inline">\(\nabla
+F\ne\boldsymbol{0}\)</span>; at such a point the gradient is
+perpendicular to the surface. This follows by differentiating <span class="math inline">\(F(\boldsymbol{r}(t))=c\)</span> along any
+differentiable curve lying on the surface: <span class="math display">\[\nabla
+F(\boldsymbol{r}(t))\cdot\boldsymbol{r}'(t)=0.\]</span> The
+statement anticipates the multivariable chain rule developed formally in
+Chapter 3.</p>
+<div class="learning-box example"><p><strong>Example — A tangent plane to a sphere.</strong> For <span class="math inline">\(F(x,y,z)=x^2+y^2+z^2\)</span>, the sphere of
+radius <span class="math inline">\(3\)</span> is <span class="math inline">\(F=9\)</span>. At <span class="math inline">\((1,2,2)\)</span>, the gradient is <span class="math inline">\((2,4,4)\)</span>. Thus the tangent plane is <span class="math display">\[2(x-1)+4(y-2)+4(z-2)=0,
+\quad\text{or}\quad x+2y+2z=9.\]</span></p></div>
+<h3 id="common-quadric-surfaces">Common quadric surfaces</h3>
+<p>Several quadratic equations provide a useful visual vocabulary: <span class="math display">\[\begin{array}{ll}
+\dfrac{x^2}{a^2}+\dfrac{y^2}{b^2}+\dfrac{z^2}{c^2}=1
+&amp;\text{ellipsoid},\\[5pt]
+\dfrac{x^2}{a^2}+\dfrac{y^2}{b^2}-\dfrac{z^2}{c^2}=1
+&amp;\text{hyperboloid of one sheet},\\[5pt]
+\dfrac{x^2}{a^2}+\dfrac{y^2}{b^2}-\dfrac{z^2}{c^2}=0 &amp;\text{double
+cone},\\[5pt]
+z=\dfrac{x^2}{a^2}+\dfrac{y^2}{b^2} &amp;\text{elliptic
+paraboloid},\\[5pt]
+z=\dfrac{x^2}{a^2}-\dfrac{y^2}{b^2} &amp;\text{hyperbolic paraboloid}.
+\end{array}\]</span></p>
+<figure>
+<img alt="The hyperbolic paraboloid rises in one principal direction and falls in the perpendicular direction. Original Python figure." src="figures/saddle_surface.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">The hyperbolic paraboloid rises in one
+principal direction and falls in the perpendicular direction. Original
+Python figure.</figcaption>
+</figure>
+<p>The intersection of a surface with planes such as <span class="math inline">\(x=c\)</span>, <span class="math inline">\(y=c\)</span>, or <span class="math inline">\(z=c\)</span> is called a <em>trace</em>. Traces
+provide a reliable method for sketching unfamiliar surfaces before using
+a computer.</p>
+<h2 id="parametrized-surfaces-and-tangent-planes">Parametrized surfaces
+and tangent planes</h2>
+<div class="learning-box example"><p><strong>Definition — Parametrized surface.</strong> A parametrized
+surface is a map <span class="math inline">\(\boldsymbol{R}:D\subset\mathbb{R}^2\to\mathbb{R}^3\)</span>,
+<span class="math display">\[\boldsymbol{R}(u,v)=(x(u,v),y(u,v),z(u,v)).\]</span>
+At a point where the partial derivatives <span class="math inline">\(\boldsymbol{R}_u\)</span> and <span class="math inline">\(\boldsymbol{R}_v\)</span> are linearly
+independent, the parametrization is regular. These derivatives span the
+tangent plane, and their cross product is a normal vector.</p></div>
+<p>The tangent plane at <span class="math inline">\((u_0,v_0)\)</span>
+is <span class="math display">\[\boldsymbol{X}(s,t)=\boldsymbol{R}(u_0,v_0)+s\boldsymbol{R}_u(u_0,v_0)+t\boldsymbol{R}_v(u_0,v_0).\]</span>
+An equivalent scalar equation is <span class="math display">\[(\boldsymbol{R}_u\times\boldsymbol{R}_v)\cdot(\boldsymbol{x}-\boldsymbol{R}(u_0,v_0))=0.\]</span>
+Reversing the order of the parameters reverses the cross-product normal
+and hence changes the chosen orientation, but not the underlying tangent
+plane.</p>
+<div class="learning-box example"><p><strong>Example — Graph parametrization.</strong> For <span class="math inline">\(z=x^2-y^2\)</span>, use <span class="math inline">\(\boldsymbol{R}(u,v)=(u,v,u^2-v^2)\)</span>. Then
+<span class="math display">\[\boldsymbol{R}_u=(1,0,2u),\qquad
+\boldsymbol{R}_v=(0,1,-2v),\qquad
+\boldsymbol{R}_u\times\boldsymbol{R}_v=(-2u,2v,1).\]</span> At <span class="math inline">\((u,v)=(1,1)\)</span>, the surface point is <span class="math inline">\((1,1,0)\)</span> and the tangent plane is <span class="math inline">\(-2(x-1)+2(y-1)+z=0\)</span>, or <span class="math inline">\(z=2x-2y\)</span>.</p></div>
+<h3 id="area-of-a-parametrized-surface">Area of a parametrized
+surface</h3>
+<p>A small rectangle of parameter increments <span class="math inline">\(\Delta u,\Delta v\)</span> maps approximately to
+the parallelogram spanned by <span class="math inline">\(\boldsymbol{R}_u\Delta u\)</span> and <span class="math inline">\(\boldsymbol{R}_v\Delta v\)</span>. Its area is
+approximately <span class="math inline">\(\left\lVert
+\boldsymbol{R}_u\times\boldsymbol{R}_v\right\rVert\Delta u\Delta
+v\)</span>. Therefore, for a regular parametrization that covers the
+surface once, <span class="math display">\[\boxed{A=\iint_D\left\lVert
+\boldsymbol{R}_u\times\boldsymbol{R}_v\right\rVert\,\,\mathrm{d}u\,\,\mathrm{d}v.}\]</span>
+For a graph <span class="math inline">\(z=f(x,y)\)</span>, the special
+parametrization <span class="math inline">\((x,y,f(x,y))\)</span> gives
+<span class="math display">\[A=\iint_D\sqrt{1+f_x^2+f_y^2}\,\,\mathrm{d}x\,\,\mathrm{d}y.\]</span>
+These formulas connect the geometry of surfaces to multiple integration,
+treated systematically in Chapter 5.</p>
+<div class="learning-box example"><p><strong>Example — Area of a sphere.</strong> Parametrize the
+radius-<span class="math inline">\(R\)</span> sphere by <span class="math display">\[\boldsymbol{R}(\theta,\phi)=(R\sin\phi\cos\theta,R\sin\phi\sin\theta,R\cos\phi),\]</span>
+with <span class="math inline">\(0\le\theta&lt;2\pi\)</span> and <span class="math inline">\(0\le\phi\le\pi\)</span>. The cross-product norm is
+<span class="math inline">\(R^2\sin\phi\)</span>, so <span class="math display">\[A=\int_0^{2\pi}\int_0^\pi
+R^2\sin\phi\,\,\mathrm{d}\phi\,\,\mathrm{d}\theta=4\pi R^2.\]</span> The
+coordinate singularities at the poles occur on a set of area zero and do
+not affect the integral.</p></div>
+<h2 id="surfaces-of-revolution">Surfaces of revolution</h2>
+<p>Suppose a profile curve in the <span class="math inline">\(rz\)</span>-half-plane is <span class="math inline">\((r(u),z(u))\)</span> with <span class="math inline">\(r(u)\ge0\)</span>. Rotating it around the <span class="math inline">\(z\)</span>-axis yields <span class="math display">\[\boldsymbol{R}(u,v)=\bigl(r(u)\cos v,r(u)\sin
+v,z(u)\bigr),\quad0\le v\le2\pi.\]</span> The partial derivatives
+satisfy <span class="math display">\[\left\lVert
+\boldsymbol{R}_u\times\boldsymbol{R}_v\right\rVert=r(u)\sqrt{[r'(u)]^2+[z'(u)]^2}.\]</span>
+Thus the area of a surface of revolution (assuming no interior overlap)
+is <span class="math display">\[A=2\pi\int_a^b
+r(u)\sqrt{[r'(u)]^2+[z'(u)]^2}\,\,\mathrm{d}u.\]</span></p>
+<figure>
+<img alt="A surface generated by rotating a curved profile around the vertical axis. Original Python figure." src="figures/surface_revolution.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">A surface generated by rotating a curved
+profile around the vertical axis. Original Python figure.</figcaption>
+</figure>
+<div class="learning-box example"><p><strong>Example — Area of a cylinder.</strong> For <span class="math inline">\(r(u)=R\)</span>, <span class="math inline">\(z(u)=u\)</span>, <span class="math inline">\(0\le
+u\le h\)</span>, the surface area is <span class="math inline">\(2\pi\int_0^h R\,\,\mathrm{d}u=2\pi Rh\)</span>.
+This is the lateral area only; the top and bottom disks are separate
+surfaces.</p></div>
+<h2 id="deeper-mathematical-foundations-parameter-invariance-and-geometry">Deeper
+mathematical foundations: parameter invariance and geometry</h2>
+<h3 id="regular-reparametrizations-and-orientation">Regular
+reparametrizations and orientation</h3>
+<p>A geometric curve is not a single formula: it is an equivalence class
+of suitable parametrizations. Suppose <span class="math inline">\(\boldsymbol{q}(u)=\boldsymbol{r}(\varphi(u))\)</span>,
+where <span class="math inline">\(\varphi\)</span> is a continuously
+differentiable bijection with <span class="math inline">\(\varphi'(u)\ne0\)</span>. The chain rule gives
+<span class="math display">\[\boldsymbol{q}'(u)=\boldsymbol{r}'(\varphi(u))\varphi'(u).\]</span>
+Consequently, regularity is preserved. The sign of <span class="math inline">\(\varphi'\)</span> determines whether
+orientation is preserved or reversed. If <span class="math inline">\(\varphi'&gt;0\)</span>, substitution in the
+length integral gives <span class="math display">\[\int_c^d\left\lVert
+\boldsymbol{q}'(u)\right\rVert\,\,\mathrm{d}u=\int_{\varphi(c)}^{\varphi(d)}\left\lVert
+\boldsymbol{r}'(t)\right\rVert\,\,\mathrm{d}t.\]</span> If <span class="math inline">\(\varphi'&lt;0\)</span>, the absolute value in
+speed reverses the integration limits, and the length remains positive.
+This is why geometric length is independent of the chosen regular
+parametrization, even though velocity is not.</p>
+<div class="learning-box example"><p><strong>Example — Two speeds on the same arc.</strong> Let <span class="math inline">\(\boldsymbol{r}(t)=(\cos t,\sin t)\)</span> for
+<span class="math inline">\(0\le t\le\pi\)</span> and <span class="math inline">\(\boldsymbol{q}(u)=(\cos u^3,\sin u^3)\)</span> for
+<span class="math inline">\(0\le u\le\pi^{1/3}\)</span>. Both describe
+the upper semicircle. The first has unit speed; the second has speed
+<span class="math inline">\(3u^2\)</span>, which vanishes at the
+endpoint <span class="math inline">\(u=0\)</span>. Direct integration
+yields <span class="math inline">\(\int_0^{\pi^{1/3}}3u^2\,\,\mathrm{d}u=\pi\)</span>.
+The second parametrization is not regular at the endpoint, illustrating
+that a geometric length formula can still hold under weaker assumptions
+than regularity everywhere.</p></div>
+<h3 id="the-curvature-formula-and-its-limitations">The curvature formula
+and its limitations</h3>
+<p>Write <span class="math inline">\(\boldsymbol{v}=\boldsymbol{r}'\)</span> and
+<span class="math inline">\(\boldsymbol{a}=\boldsymbol{r}''\)</span>.
+Differentiating <span class="math inline">\(\boldsymbol{T}=\boldsymbol{v}/\left\lVert
+\boldsymbol{v}\right\rVert\)</span> and using the identity <span class="math display">\[\left\lVert
+\boldsymbol{v}\times\boldsymbol{a}\right\rVert^2=\left\lVert
+\boldsymbol{v}\right\rVert^2\left\lVert
+\boldsymbol{a}\right\rVert^2-(\boldsymbol{v}\cdot\boldsymbol{a})^2\]</span>
+shows that <span class="math inline">\(\left\lVert
+\,\mathrm{d}\boldsymbol{T}/\,\mathrm{d}s\right\rVert=\left\lVert
+\boldsymbol{v}\times\boldsymbol{a}\right\rVert/\left\lVert
+\boldsymbol{v}\right\rVert^3\)</span>. Curvature is unchanged by
+orientation reversal. The Frenet normal, however, may fail to exist
+where curvature vanishes, even if velocity is nonzero. A straight line
+has a well-defined tangent but no distinguished principal normal.</p>
+<div class="learning-box example"><p><strong>Proposition — Tangential and normal acceleration.</strong>
+For a twice-differentiable regular curve of speed <span class="math inline">\(v(t)\)</span> and curvature <span class="math inline">\(\kappa(t)\)</span>, acceleration decomposes as
+<span class="math display">\[\boldsymbol{a}=\frac{\,\mathrm{d}v}{\,\mathrm{d}t}\boldsymbol{T}+\kappa
+v^2\boldsymbol{N},\]</span> where <span class="math inline">\(\boldsymbol{N}\)</span> is defined when <span class="math inline">\(\kappa&gt;0\)</span>.</p></div>
+<div class="learning-box example"><p><strong>Proof.</strong> Differentiate <span class="math inline">\(\boldsymbol{r}'=v\boldsymbol{T}\)</span> and
+use <span class="math inline">\(\boldsymbol{T}'=
+(\,\mathrm{d}\boldsymbol{T}/\,\mathrm{d}s)(\,\mathrm{d}s/\,\mathrm{d}t)=\kappa
+v\boldsymbol{N}\)</span>.</p></div>
+<div class="learning-box example"><p><strong>Example — Speed changes without changing the path.</strong>
+The particle <span class="math inline">\(\boldsymbol{r}(t)=(\cos
+t^2,\sin t^2)\)</span>, <span class="math inline">\(t&gt;0\)</span>,
+moves around the unit circle with speed <span class="math inline">\(2t\)</span>. Its tangential acceleration is <span class="math inline">\(2\)</span> and its normal acceleration is <span class="math inline">\(4t^2\)</span>, because the circle has curvature
+<span class="math inline">\(1\)</span>. Therefore its acceleration
+magnitude is <span class="math inline">\(\sqrt{4+16t^4}\)</span>. The
+normal acceleration increases even though the path’s curvature is
+constant.</p></div>
+<h3 id="helix-curvature-torsion-and-limiting-cases">Helix curvature,
+torsion, and limiting cases</h3>
+<p>For <span class="math inline">\(\boldsymbol{r}(t)=(a\cos t,a\sin
+t,bt)\)</span> with <span class="math inline">\(a&gt;0\)</span>, the
+first three derivatives are <span class="math display">\[\boldsymbol{r}'=(-a\sin t,a\cos t,b),\quad
+\boldsymbol{r}''=(-a\cos t,-a\sin t,0),\quad
+\boldsymbol{r}'''=(a\sin t,-a\cos t,0).\]</span> The cross
+product is <span class="math inline">\(\boldsymbol{r}'\times\boldsymbol{r}''=(ab\sin
+t,-ab\cos t,a^2)\)</span>, whose squared norm is <span class="math inline">\(a^2(a^2+b^2)\)</span>. Thus <span class="math display">\[\boxed{\kappa=\frac{a}{a^2+b^2}},\qquad\boxed{\tau=\frac{b}{a^2+b^2}}.\]</span>
+When <span class="math inline">\(b=0\)</span>, the helix becomes a
+circle with torsion zero; when <span class="math inline">\(b\)</span> is
+negative, its handedness and the sign of torsion reverse. The formulas
+require <span class="math inline">\(a&gt;0\)</span>: at <span class="math inline">\(a=0\)</span> the curve is a straight vertical line
+and the torsion formula is undefined.</p>
+<div class="learning-box check"><p><strong>Checkpoint.</strong> Why does doubling both <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span> halve curvature and torsion, while
+doubling the length of one turn?</p></div>
+<h2 id="coordinate-conventions-jacobians-and-geometric-scaling">Coordinate
+conventions, Jacobians, and geometric scaling</h2>
+<h3 id="polar-and-cylindrical-area-scaling">Polar and cylindrical area
+scaling</h3>
+<p>For <span class="math inline">\(x=r\cos\theta\)</span>, <span class="math inline">\(y=r\sin\theta\)</span>, the coordinate derivative
+matrix is <span class="math display">\[D\Phi(r,\theta)=\begin{pmatrix}\cos\theta&amp;-r\sin\theta\\\sin\theta&amp;r\cos\theta\end{pmatrix},\qquad\det
+D\Phi=r.\]</span> Therefore a small rectangle of coordinate dimensions
+<span class="math inline">\(\,\mathrm{d}r\)</span> and <span class="math inline">\(\,\mathrm{d}\theta\)</span> maps to an area
+approximately <span class="math inline">\(r\,\,\mathrm{d}r\,\,\mathrm{d}\theta\)</span>. In
+cylindrical coordinates the volume element is <span class="math inline">\(r\,\,\mathrm{d}r\,\,\mathrm{d}\theta\,\,\mathrm{d}z\)</span>.
+These factors are not optional correction terms: they encode the
+changing physical spacing of coordinate lines.</p>
+<div class="learning-box example"><p><strong>Example — Area of an annular sector.</strong> The region
+<span class="math inline">\(1\le r\le3\)</span>, <span class="math inline">\(0\le\theta\le\pi/3\)</span> has area <span class="math display">\[A=\int_0^{\pi/3}\int_1^3
+r\,\,\mathrm{d}r\,\,\mathrm{d}\theta=\frac{4\pi}{3}.\]</span> The same
+answer follows from the difference of sector areas <span class="math inline">\(\tfrac12(3^2-1^2)(\pi/3)\)</span>.</p></div>
+<h3 id="spherical-coordinate-conventions-and-singularities">Spherical-coordinate
+conventions and singularities</h3>
+<p>We adopt <span class="math inline">\(x=\rho\sin\phi\cos\theta\)</span>, <span class="math inline">\(y=\rho\sin\phi\sin\theta\)</span>, and <span class="math inline">\(z=\rho\cos\phi\)</span>, with <span class="math inline">\(\rho\ge0\)</span>, <span class="math inline">\(0\le\theta&lt;2\pi\)</span>, and <span class="math inline">\(0\le\phi\le\pi\)</span>. Here <span class="math inline">\(\theta\)</span> is azimuth and <span class="math inline">\(\phi\)</span> is the polar angle measured downward
+from the positive <span class="math inline">\(z\)</span>-axis. Some
+software and disciplines reverse the two angle names; formulas must be
+checked rather than memorized without a convention. <span class="math display">\[\left|\det\frac{\partial(x,y,z)}{\partial(\rho,\theta,\phi)}\right|=\rho^2\sin\phi.\]</span>
+At <span class="math inline">\(\rho=0\)</span> or <span class="math inline">\(\sin\phi=0\)</span>, the coordinate map is
+singular: the same physical point corresponds to multiple angle values.
+This is a coordinate degeneracy, not a singularity of Euclidean
+space.</p>
+<div class="learning-box example"><p><strong>Example — Volume of a spherical wedge.</strong> For <span class="math inline">\(0\le\rho\le R\)</span>, <span class="math inline">\(0\le\theta\le\alpha\)</span>, and <span class="math inline">\(0\le\phi\le\beta\)</span>, with <span class="math inline">\(0\le\alpha\le2\pi\)</span> and <span class="math inline">\(0\le\beta\le\pi\)</span>, <span class="math display">\[V=\int_0^\alpha\int_0^\beta\int_0^R\rho^2\sin\phi\,\,\mathrm{d}\rho\,\,\mathrm{d}\phi\,\,\mathrm{d}\theta=\frac{\alpha
+R^3}{3}(1-\cos\beta).\]</span> Taking <span class="math inline">\(\alpha=2\pi\)</span> and <span class="math inline">\(\beta=\pi\)</span> recovers <span class="math inline">\(4\pi R^3/3\)</span>.</p></div>
+<h2 id="surface-geometry-regularity-normals-and-area">Surface geometry:
+regularity, normals, and area</h2>
+<p>For a smooth surface <span class="math inline">\(\boldsymbol{X}(u,v)\)</span>, the tangent vectors
+<span class="math inline">\(\boldsymbol{X}_u\)</span> and <span class="math inline">\(\boldsymbol{X}_v\)</span> span a tangent plane
+when they are linearly independent. The normal <span class="math inline">\(\boldsymbol{X}_u\times\boldsymbol{X}_v\)</span>
+gives an orientation, and its norm is the local area magnification. The
+cross product vanishes at a nonregular parameter value; this may be a
+coordinate artifact (as at a sphere’s pole) or a genuine geometric
+singularity.</p>
+<div class="learning-box example"><p><strong>Proposition — Area element of a graph.</strong> If <span class="math inline">\(z=f(x,y)\)</span> is continuously differentiable
+over a planar domain <span class="math inline">\(D\)</span>, its surface
+area is <span class="math display">\[A=\iint_D\sqrt{1+f_x^2+f_y^2}\,\,\mathrm{d}x\,\,\mathrm{d}y.\]</span></p></div>
+<div class="learning-box example"><p><strong>Proof.</strong> Parametrize by <span class="math inline">\(\boldsymbol{X}(x,y)=(x,y,f(x,y))\)</span>. Then
+<span class="math inline">\(\boldsymbol{X}_x=(1,0,f_x)\)</span>, <span class="math inline">\(\boldsymbol{X}_y=(0,1,f_y)\)</span>, and <span class="math inline">\(\boldsymbol{X}_x\times\boldsymbol{X}_y=(-f_x,-f_y,1)\)</span>.
+Take its norm and integrate.</p></div>
+<div class="learning-box example"><p><strong>Example — Exact area of a paraboloid patch.</strong> For
+<span class="math inline">\(z=x^2+y^2\)</span> over the disk <span class="math inline">\(x^2+y^2\le1\)</span>, the area integrand is <span class="math inline">\(\sqrt{1+4x^2+4y^2}\)</span>. In polar coordinates,
+<span class="math display">\[A=2\pi\int_0^1
+r\sqrt{1+4r^2}\,\,\mathrm{d}r=\frac{\pi}{6}(5^{3/2}-1).\]</span> This
+exact result supplies a benchmark for the numerical R and Python
+calculations later in the chapter.</p></div>
+<h3 id="first-fundamental-form-and-distortion">First fundamental form
+and distortion</h3>
+<p>The local squared distance along a parametrized surface is <span class="math display">\[\,\mathrm{d}s^2=E\,\,\mathrm{d}u^2+2F\,\,\mathrm{d}u\,\,\mathrm{d}v+G\,\,\mathrm{d}v^2,\quad
+E=\boldsymbol{X}_u\cdot\boldsymbol{X}_u,\quad
+F=\boldsymbol{X}_u\cdot\boldsymbol{X}_v,\quad
+G=\boldsymbol{X}_v\cdot\boldsymbol{X}_v.\]</span> The area factor
+satisfies <span class="math inline">\(\left\lVert
+\boldsymbol{X}_u\times\boldsymbol{X}_v\right\rVert=\sqrt{EG-F^2}\)</span>
+by the cross-product identity. This anticipates metric tensors in
+Chapter 7 and explains why surface-area calculations depend on
+derivatives of the parametrization.</p>
+<div class="learning-box example"><p><strong>Example — Metric of a cylinder.</strong> For <span class="math inline">\(\boldsymbol{X}(\theta,z)=(R\cos\theta,R\sin\theta,z)\)</span>,
+we have <span class="math inline">\(E=R^2\)</span>, <span class="math inline">\(F=0\)</span>, <span class="math inline">\(G=1\)</span>, and area factor <span class="math inline">\(R\)</span>. Integrating over <span class="math inline">\(0\le\theta\le2\pi\)</span>, <span class="math inline">\(0\le z\le h\)</span> yields the lateral area <span class="math inline">\(2\pi Rh\)</span>.</p></div>
+<h2 id="numerical-accuracy-and-reproducibility-in-geometric-modeling">Numerical
+accuracy and reproducibility in geometric modeling</h2>
+<p>When derivatives are estimated by finite differences, the step size
+controls a tradeoff between truncation error and floating-point
+roundoff. For a centered derivative <span class="math inline">\(D_hf(t)=[f(t+h)-f(t-h)]/(2h)\)</span>, a Taylor
+expansion shows <span class="math inline">\(D_hf(t)=f'(t)+\tfrac16
+f'''(t)h^2+O(h^4)\)</span> when sufficient derivatives
+exist. Choosing <span class="math inline">\(h\)</span> excessively small
+can therefore worsen accuracy. Students should compare at least three
+step sizes and check convergence against an analytic benchmark whenever
+possible.</p>
+<div class="learning-box example"><p><strong>Example — A convergence experiment.</strong> For <span class="math inline">\(f(t)=\sin t\)</span> at <span class="math inline">\(t=1\)</span>, compute <span class="math inline">\(D_hf(1)\)</span> with <span class="math inline">\(h=10^{-1},10^{-2},10^{-3}\)</span> and compare
+against <span class="math inline">\(\cos1\)</span>. Before roundoff
+dominates, dividing <span class="math inline">\(h\)</span> by ten should
+reduce the leading error by approximately a factor of one hundred.</p></div>
+<div class="learning-box check"><p><strong>Checkpoint.</strong> Why is agreement between a numerical
+integral and a symbolic result more informative than agreement between
+two programs using the same numerical algorithm?</p></div>
+<h2 id="geometric-interpretation-and-visualization-workflows">Geometric
+interpretation and visualization workflows</h2>
+<p>A useful mathematical workflow has four stages: (1) define a
+geometric object symbolically; (2) derive the required geometric
+quantities; (3) evaluate numerically at selected points; and (4)
+visualize the result while checking units, orientation, and limiting
+cases. Numerical plots should illuminate the mathematics, not serve as
+substitutes for proofs.</p>
+<h3 id="plotting-a-surface-and-its-tangent-vectors">Plotting a surface
+and its tangent vectors</h3>
+<div class="learning-box example"><p><strong>Remark — Computational follow-up.</strong> The R and Python
+implementations of this example appear in the paired computational
+laboratories later in the chapter.</p></div>
+<h3 id="numerical-accuracy-and-coordinate-pitfalls">Numerical accuracy
+and coordinate pitfalls</h3>
+<p>Computing a derivative by a finite difference introduces truncation
+and rounding errors. A centered difference, <span class="math display">\[\boldsymbol{r}'(t)\approx\frac{\boldsymbol{r}(t+h)-\boldsymbol{r}(t-h)}{2h},\]</span>
+is typically second-order accurate for smooth curves, but reducing <span class="math inline">\(h\)</span> indefinitely does not always improve
+accuracy in floating-point arithmetic. For a curve with very small
+speed, formulas involving <span class="math inline">\(\left\lVert
+\boldsymbol{r}'\right\rVert^{-3}\)</span> can be ill-conditioned.
+Likewise, surface normals become unreliable near parameter singularities
+where <span class="math inline">\(\boldsymbol{R}_u\times\boldsymbol{R}_v\)</span> is
+small. Symbolic formulas and convergence studies help diagnose these
+issues.</p>
+<h2 id="solving-the-mathematical-problems-using-r">Solving the
+mathematical problems using R</h2>
+<p>R represents curve samples as vectors and matrices. The examples
+below deliberately use the same mathematical objects as the subsequent
+Python section, allowing comparisons of numerical output rather than
+unrelated demonstrations. The full executable file is
+<code>code/chapter02_paired.R</code>.</p>
+<h3 id="parametric-curves-and-the-rising-spiral">Parametric curves and
+the rising spiral</h3>
+<p>The R manuscript introduces the rising spiral <span class="math inline">\(\boldsymbol{r}(t)=(2\cos t,2\sin t,t/3)\)</span>
+on <span class="math inline">\(0\le t\le6\pi\)</span>. It completes
+three turns, has radius <span class="math inline">\(2\)</span>, and
+rises by <span class="math inline">\(2\pi/3\)</span> per revolution.
+Base R can display its horizontal projection and its height as functions
+of time.</p>
+<div class="code-shell"><div class="code-bar">R<a href="code/chapter02-listing-01.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>t &lt;- seq(0, 6*pi, length.out=500)
+x &lt;- 2*cos(t); y &lt;- 2*sin(t); z &lt;- t/3
+par(mfrow=c(1,2))
+plot(x,y,type="l",asp=1,xlab="x",ylab="y",main="Top view")
+plot(t,z,type="l",xlab="t",ylab="z",main="Height")
+par(mfrow=c(1,1))</code></pre></div>
+<h3 id="numerical-differentiation-and-the-tangent-line">Numerical
+differentiation and the tangent line</h3>
+<p>For the R-manuscript example <span class="math inline">\(\boldsymbol{r}(t)=(t^2,3t,2)\)</span>, <span class="math inline">\(\boldsymbol{r}'(2)=(4,3,0)\)</span> and the
+speed is <span class="math inline">\(5\)</span>. A centered finite
+difference approximates the derivative componentwise: <span class="math display">\[\boldsymbol{r}'(t)\approx\frac{\boldsymbol{r}(t+h)-\boldsymbol{r}(t-h)}{2h}.\]</span></p>
+<div class="code-shell"><div class="code-bar">R<a href="code/chapter02-listing-02.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>deriv1 &lt;- function(f,t,h=1e-5) (f(t+h)-f(t-h))/(2*h)
+r &lt;- function(t) c(t^2,3*t,2)
+deriv1(r,2) # approximately 4, 3, 0</code></pre></div>
+<p>The error reflects both truncation and floating-point arithmetic.
+Reducing <span class="math inline">\(h\)</span> indefinitely is not a
+reliable way to improve accuracy.</p>
+<h3 id="arc-length-curvature-and-torsion-of-a-helix">Arc length,
+curvature, and torsion of a helix</h3>
+<p>For <span class="math inline">\(\boldsymbol{r}(t)=(a\cos t,a\sin
+t,bt)\)</span>, the exact one-turn arc length, curvature, and torsion
+are <span class="math display">\[L=2\pi\sqrt{a^2+b^2},\qquad
+\kappa=\frac{a}{a^2+b^2},\qquad
+\tau=\frac{b}{a^2+b^2}.\]</span> Taking <span class="math inline">\(a=2\)</span> and <span class="math inline">\(b=1/3\)</span> gives <span class="math inline">\(L=2\pi\sqrt{37}/3\)</span>, <span class="math inline">\(\kappa=18/37\)</span>, and <span class="math inline">\(\tau=3/37\)</span>. These provide exact benchmarks
+for both languages.</p>
+<div class="code-shell"><div class="code-bar">R<a href="code/chapter02-listing-03.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>a &lt;- 2; b &lt;- 1/3
+speed &lt;- function(t) sqrt(a*a+b*b)+0*t
+L_num &lt;- integrate(speed,0,2*pi)$value
+L_exact &lt;- 2*pi*sqrt(a*a+b*b)
+kappa &lt;- a/(a*a+b*b); tau &lt;- b/(a*a+b*b)
+print(c(length=L_num, error=abs(L_num-L_exact),
+        curvature=kappa, torsion=tau))</code></pre></div>
+<h3 id="coordinates-and-surface-geometry">Coordinates and surface
+geometry</h3>
+<p>For Cartesian <span class="math inline">\((x,y,z)=(3,4,5)\)</span>,
+cylindrical coordinates are <span class="math inline">\((r,\theta,z)=(5,\operatorname{atan2}(4,3),5)\)</span>
+and spherical coordinates are <span class="math inline">\((\rho,\theta,\phi)=(\sqrt{50},\operatorname{atan2}(4,3),\arccos(5/\sqrt{50}))\)</span>,
+using the polar angle <span class="math inline">\(\phi\)</span> from the
+positive <span class="math inline">\(z\)</span> axis.</p>
+<div class="code-shell"><div class="code-bar">R<a href="code/chapter02-listing-04.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>x &lt;- 3; y &lt;- 4; z &lt;- 5
+r &lt;- sqrt(x*x+y*y); theta &lt;- atan2(y,x)
+rho &lt;- sqrt(x*x+y*y+z*z); phi &lt;- acos(z/rho)
+print(c(r=r,theta=theta,z=z,rho=rho,phi=phi))</code></pre></div>
+<p>For the surface <span class="math inline">\(\boldsymbol{R}(u,v)=(u,v,u^2+v^2)\)</span>, the
+normal area vector is <span class="math inline">\(\boldsymbol{R}_u\times\boldsymbol{R}_v=(-2u,-2v,1)\)</span>,
+and the surface-area density is <span class="math inline">\(\sqrt{1+4u^2+4v^2}\)</span>. R can numerically
+integrate the area above the unit disk in polar coordinates:</p>
+<div class="code-shell"><div class="code-bar">R<a href="code/chapter02-listing-05.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>area &lt;- integrate(function(r) 2*pi*r*sqrt(1+4*r*r),0,1)$value
+exact &lt;- pi*(5^(3/2)-1)/6
+print(c(numerical=area, exact=exact))</code></pre></div>
+<h2 id="solving-the-same-problems-using-python">Solving the same
+problems using Python</h2>
+<p>Python uses NumPy for numerical arrays, SymPy for exact derivatives,
+SciPy for quadrature, and Matplotlib for visualization. The companion
+program is <code>code/chapter02_paired.py</code>.</p>
+<h3 id="the-same-rising-spiral-and-tangent-calculation">The same rising
+spiral and tangent calculation</h3>
+<div class="code-shell"><div class="code-bar">Python<a href="code/chapter02-listing-06.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>import numpy as np
+import matplotlib.pyplot as plt
+t = np.linspace(0,6*np.pi,500)
+x,y,z = 2*np.cos(t),2*np.sin(t),t/3
+fig,ax = plt.subplots(1,2,figsize=(9,3.5))
+ax[0].plot(x,y); ax[0].set_aspect('equal')
+ax[0].set_title('Top view')
+ax[1].plot(t,z); ax[1].set_title('Height')
+plt.tight_layout()</code></pre></div>
+<div class="code-shell"><div class="code-bar">Python<a href="code/chapter02-listing-07.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>import sympy as sp
+s = sp.symbols('s',real=True)
+r = sp.Matrix([s**2,3*s,2])
+velocity = r.diff(s)
+print(velocity.subs(s,2), sp.sqrt(velocity.dot(velocity)).subs(s,2))</code></pre></div>
+<p>This produces <span class="math inline">\(\boldsymbol{r}'(2)=(4,3,0)\)</span> and speed
+<span class="math inline">\(5\)</span>, matching the analytical and R
+results.</p>
+<h3 id="helix-invariants-and-numerical-quadrature">Helix invariants and
+numerical quadrature</h3>
+<div class="code-shell"><div class="code-bar">Python<a href="code/chapter02-listing-08.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>import numpy as np
+from scipy.integrate import quad
+a,b = 2.0,1.0/3.0
+L_num = quad(lambda t: np.sqrt(a*a+b*b),0,2*np.pi)[0]
+L_exact = 2*np.pi*np.sqrt(a*a+b*b)
+print(L_num, abs(L_num-L_exact), a/(a*a+b*b), b/(a*a+b*b))</code></pre></div>
+<h3 id="coordinate-conversion-and-surface-area">Coordinate conversion
+and surface area</h3>
+<div class="code-shell"><div class="code-bar">Python<a href="code/chapter02-listing-09.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>import numpy as np
+from scipy.integrate import quad
+x,y,z = 3.,4.,5.
+r = np.hypot(x,y); theta = np.arctan2(y,x)
+rho = np.sqrt(x*x+y*y+z*z); phi = np.arccos(z/rho)
+print(r,theta,z,rho,phi)
+area = quad(lambda r: 2*np.pi*r*np.sqrt(1+4*r*r),0,1)[0]
+exact = np.pi*(5**1.5-1)/6
+print(area, exact)</code></pre></div>
+<h3 id="a-common-numerical-benchmark-paraboloid-surface-area">A common
+numerical benchmark: paraboloid surface area</h3>
+<p>The exact benchmark derived earlier is <span class="math inline">\(A=\pi(5^{3/2}-1)/6\)</span>. The following
+independent implementations integrate the same polar-area integrand.</p>
+<h5 id="r-implementation.">R implementation.</h5>
+<div class="code-shell"><div class="code-bar">R<a href="code/chapter02-listing-10.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>area_fun &lt;- function(r) 2*pi*r*sqrt(1+4*r^2)
+area_num &lt;- integrate(area_fun, lower=0, upper=1)$value
+area_exact &lt;- pi*(5^(3/2)-1)/6
+stopifnot(abs(area_num-area_exact)&lt;1e-8)
+print(c(numerical=area_num, exact=area_exact))</code></pre></div>
+<h5 id="python-implementation.">Python implementation.</h5>
+<div class="code-shell"><div class="code-bar">Python<a href="code/chapter02-listing-11.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>import numpy as np
+from scipy.integrate import quad
+area_num, error_est = quad(
+    lambda r: 2*np.pi*r*np.sqrt(1+4*r*r), 0, 1)
+area_exact = np.pi*(5**1.5-1)/6
+assert abs(area_num-area_exact) &lt; 1e-8
+print(area_num, area_exact, error_est)</code></pre></div>
+<p>The printed quadrature error estimate is an algorithmic estimate, not
+a proof of accuracy. Comparing with the exact mathematical result
+provides an additional check.</p>
+<h2 id="comparing-r-and-python">Comparing R and Python</h2>
+<p>Both languages implement the same mathematical formulas. R’s
+<code>integrate()</code> and SciPy’s <code>quad()</code> use adaptive
+numerical quadrature and report approximations rather than exact
+symbolic integrals. SymPy can verify derivatives symbolically; in R,
+exact symbolic work may require an additional package. The conventions
+for <code>atan2</code> agree here, but students must check argument
+order and angle ranges when using other systems. A close numerical match
+supports a calculation; it does not replace a mathematical proof.</p>
+<h2 id="real-world-application-designing-a-helical-access-ramp">Real-world
+application: designing a helical access ramp</h2>
+<p>A mechanical component travels along a helical guide of radius <span class="math inline">\(a=2\)</span> meters and rises <span class="math inline">\(h=2\pi/3\)</span> meters per revolution.
+Parametrize its centerline by <span class="math inline">\(\boldsymbol{r}(t)=(2\cos t,2\sin t,t/3)\)</span>
+for <span class="math inline">\(0\le t\le 6\pi\)</span>. The total
+height gain is <span class="math inline">\(2\pi\)</span> meters and the
+path makes three revolutions. Its speed per unit parameter is <span class="math inline">\(\sqrt{37}/3\)</span>, so the total path length is
+<span class="math inline">\(6\pi\sqrt{37}/3=2\pi\sqrt{37}\)</span>
+meters. The curvature is <span class="math inline">\(18/37\,\mathrm{m}^{-1}\)</span> and the torsion is
+<span class="math inline">\(3/37\,\mathrm{m}^{-1}\)</span>. These
+geometric descriptors matter in guide-rail design, though an engineering
+safety assessment would additionally require loads, friction, materials,
+and regulatory constraints.</p>
+<div class="learning-box check"><p><strong>Checkpoint.</strong> Why is the vertical gain <span class="math inline">\(2\pi\)</span> meters rather than <span class="math inline">\(2\pi/3\)</span> meters? How does increasing the
+radius while holding the vertical rise per revolution fixed change the
+total path length?</p></div>
+<h2 id="chapter-summary">Chapter summary</h2>
+<ul>
+<li><p>A parametrization describes both a geometric trace and how that
+trace is traversed; regularity requires nonzero derivative for curves
+and independent partial derivatives for surfaces.</p></li>
+<li><p>Velocity, speed, and acceleration connect vector calculus to
+physical motion. Arc length is the integral of speed.</p></li>
+<li><p>Curvature measures turning per unit arc length; torsion measures
+twisting out of the osculating plane.</p></li>
+<li><p>Polar, cylindrical, and spherical coordinates simplify geometries
+with circular or radial symmetry, but their angular conventions and
+singularities must be handled carefully.</p></li>
+<li><p>The cross product <span class="math inline">\(\boldsymbol{R}_u\times\boldsymbol{R}_v\)</span>
+determines a surface normal and the local area scale factor.</p></li>
+<li><p>Symbolic computation, numerical approximation, and visualization
+provide complementary ways to understand geometry.</p></li>
+</ul>
+<h2 id="exercises">Exercises</h2>
+<p><strong>Part A: Concepts and analytic computations.</strong> Unless
+otherwise specified, show the main steps and give exact answers.</p>
+<ol type="1">
+<li><p>Find two parametrizations of the line <span class="math inline">\(2x-y=3\)</span> with opposite orientations.
+Explain why they have the same trace.</p></li>
+<li><p>Parametrize the ellipse <span class="math inline">\(x^2/9+y^2/4=1\)</span> counterclockwise, starting
+at <span class="math inline">\((3,0)\)</span>.</p></li>
+<li><p>For <span class="math inline">\(\boldsymbol{r}(t)=(t^2,t^3)\)</span>, determine
+all regular and nonregular parameter values.</p></li>
+<li><p>Find the tangent line to <span class="math inline">\(\boldsymbol{r}(t)=(t,t^2,t^3)\)</span> at <span class="math inline">\(t=1\)</span>.</p></li>
+<li><p>Find velocity, acceleration, and speed for <span class="math inline">\(\boldsymbol{r}(t)=(3\cos2t,3\sin2t,4t)\)</span>.</p></li>
+<li><p>Prove directly that <span class="math inline">\(\boldsymbol{r}'\cdot\boldsymbol{r}''=0\)</span>
+for a curve of constant speed.</p></li>
+<li><p>Find the arc length of <span class="math inline">\(\boldsymbol{r}(t)=(3\cos t,3\sin t)\)</span>,
+<span class="math inline">\(0\le t\le\pi/2\)</span>.</p></li>
+<li><p>Compute the length of <span class="math inline">\(\boldsymbol{r}(t)=(t,2t,2t)\)</span> on <span class="math inline">\([-1,2]\)</span>.</p></li>
+<li><p>Set up (do not evaluate) the length integral for <span class="math inline">\(\boldsymbol{r}(t)=(t,t^3)\)</span>, <span class="math inline">\(0\le t\le1\)</span>.</p></li>
+<li><p>Reparametrize <span class="math inline">\(\boldsymbol{r}(t)=(3t,4t)\)</span> by arc length
+measured from <span class="math inline">\(t=0\)</span>.</p></li>
+<li><p>Determine the curvature of <span class="math inline">\(y=3x^2\)</span> at <span class="math inline">\(x=0\)</span> and <span class="math inline">\(x=1\)</span>.</p></li>
+<li><p>Compute the curvature of a circle of radius <span class="math inline">\(R\)</span> from the cross-product
+formula.</p></li>
+<li><p>Derive the tangential and normal acceleration components for
+circular motion with constant angular velocity.</p></li>
+<li><p>Compute curvature and torsion of <span class="math inline">\(\boldsymbol{r}(t)=(2\cos t,2\sin
+t,3t)\)</span>.</p></li>
+<li><p>Show that a straight line parametrized at constant nonzero speed
+has curvature zero.</p></li>
+<li><p>Explain why the principal normal is not defined by the Frenet
+formula when curvature vanishes.</p></li>
+<li><p>Find the polar coordinates of <span class="math inline">\((\sqrt3,1)\)</span> with <span class="math inline">\(r\ge0\)</span> and <span class="math inline">\(0\le\theta&lt;2\pi\)</span>.</p></li>
+<li><p>Convert the polar curve <span class="math inline">\(r=2\cos\theta\)</span> to Cartesian form and
+identify its trace.</p></li>
+<li><p>Set up the polar arc length integral for <span class="math inline">\(r=1+\sin\theta\)</span>, <span class="math inline">\(0\le\theta\le2\pi\)</span>.</p></li>
+<li><p>Compute the area enclosed by <span class="math inline">\(r=2\sin\theta\)</span>, <span class="math inline">\(0\le\theta\le\pi\)</span>.</p></li>
+<li><p>Express <span class="math inline">\(x^2+y^2=4z\)</span> in
+cylindrical coordinates and sketch its traces at <span class="math inline">\(z=1\)</span> and <span class="math inline">\(z=4\)</span>.</p></li>
+<li><p>Convert <span class="math inline">\((\rho,\theta,\phi)=(6,\pi/3,\pi/6)\)</span> to
+Cartesian coordinates.</p></li>
+<li><p>Describe the region <span class="math inline">\(1\le\rho\le3\)</span>, <span class="math inline">\(0\le\phi\le\pi/2\)</span> in words.</p></li>
+<li><p>Find a Cartesian equation for <span class="math inline">\(\rho=5\)</span> and another for <span class="math inline">\(\phi=\pi/4\)</span>.</p></li>
+<li><p>Identify and sketch the traces of <span class="math inline">\(z=x^2-y^2\)</span> in the planes <span class="math inline">\(x=0\)</span> and <span class="math inline">\(y=0\)</span>.</p></li>
+<li><p>Find the tangent plane to <span class="math inline">\(x^2+2y^2+z^2=12\)</span> at <span class="math inline">\((2,1,2)\)</span>.</p></li>
+<li><p>Parametrize the plane <span class="math inline">\(x+2y+3z=6\)</span> using two parameters.</p></li>
+<li><p>For <span class="math inline">\(\boldsymbol{R}(u,v)=(u,v,u^2+v^2)\)</span>,
+compute <span class="math inline">\(\boldsymbol{R}_u\)</span>, <span class="math inline">\(\boldsymbol{R}_v\)</span>, and an upward-pointing
+normal.</p></li>
+<li><p>Derive the surface-area integrand for <span class="math inline">\(z=x^2+y^2\)</span> over the unit disk.</p></li>
+<li><p>Derive the lateral area of a cone of base radius <span class="math inline">\(R\)</span> and height <span class="math inline">\(h\)</span> using a surface of revolution.</p></li>
+</ol>
+<p><strong>Part B: Python and mathematical investigations.</strong></p>
+<ol type="1">
+<li><p>Use SymPy to differentiate <span class="math inline">\(\boldsymbol{r}(t)=(t^2,\sin t,e^t)\)</span> and
+verify the result at <span class="math inline">\(t=0\)</span>.</p></li>
+<li><p>Use SciPy’s <code>quad</code> to approximate the length of <span class="math inline">\(y=x^2\)</span> on <span class="math inline">\([0,1]\)</span>; compare with the exact
+expression.</p></li>
+<li><p>Draw the tangent line to <span class="math inline">\(y=\sin
+x\)</span> at <span class="math inline">\(x=\pi/3\)</span> and annotate
+the point of tangency.</p></li>
+<li><p>Generate the osculating circle to <span class="math inline">\(y=x^2\)</span> at <span class="math inline">\(x=1\)</span>. Compute its center and radius
+first.</p></li>
+<li><p>Plot the curve <span class="math inline">\(r=1+2\cos\theta\)</span> in Cartesian coordinates.
+Identify any inner loop and explain the sign of <span class="math inline">\(r\)</span>.</p></li>
+<li><p>Compare the Cartesian plots of the spirals <span class="math inline">\(r=\theta\)</span> and <span class="math inline">\(r=2\theta\)</span> for <span class="math inline">\(0\le\theta\le4\pi\)</span>.</p></li>
+<li><p>Plot a cylinder, a cone, and a paraboloid on three separate 3D
+axes with clear axis labels.</p></li>
+<li><p>Parametrize an ellipsoid with semiaxes <span class="math inline">\(2\)</span>, <span class="math inline">\(3\)</span>, and <span class="math inline">\(4\)</span> and visualize it using
+Matplotlib.</p></li>
+<li><p>Use SymPy to compute <span class="math inline">\(\boldsymbol{R}_u\times\boldsymbol{R}_v\)</span>
+for a sphere parametrization and simplify its norm.</p></li>
+<li><p>Numerically approximate the surface area of <span class="math inline">\(z=x^2+y^2\)</span> over the square <span class="math inline">\([-1,1]^2\)</span>.</p></li>
+<li><p>Compare a mesh of <span class="math inline">\(20\times20\)</span>
+points with one of <span class="math inline">\(100\times100\)</span>
+points for the saddle surface; discuss visual and computational
+differences.</p></li>
+<li><p>For the helix <span class="math inline">\(\boldsymbol{r}(t)=(\cos
+t,\sin t,t/3)\)</span>, estimate arc length using polygonal
+approximations with successively doubled sample sizes.</p></li>
+<li><p>At several points of a regular space curve, numerically verify
+that <span class="math inline">\(\boldsymbol{T}\)</span>, <span class="math inline">\(\boldsymbol{N}\)</span>, and <span class="math inline">\(\boldsymbol{B}\)</span> form an orthonormal
+frame.</p></li>
+<li><p>Investigate the failure of spherical-coordinate uniqueness at the
+poles using two distinct values of <span class="math inline">\(\theta\)</span>.</p></li>
+<li><p>Develop a short notebook comparing exact, numerical, and
+graphical descriptions of a surface of revolution of your
+choice.</p></li>
+</ol>
+<h2 id="further-exploration">Further exploration</h2>
+<p><strong>Project 1: Designing a roller-coaster track.</strong>
+Construct a smooth space curve combining horizontal turns and vertical
+changes. Analyze speed under a chosen time parametrization, curvature
+along the track, and the normal acceleration required at several
+locations. State the limitations of the simplified model.</p>
+<p><strong>Project 2: Surface modeling and fabrication.</strong>
+Parametrize a rotationally symmetric vessel, produce a labeled 3D plot,
+and estimate its lateral surface area. Compare results from direct
+numerical integration and a triangulated mesh.</p>
+<p><strong>Project 3: Coordinate systems in physical modeling.</strong>
+Explain why cylindrical coordinates are natural for a pipe and spherical
+coordinates for a planet. Provide equations for at least three
+constant-coordinate surfaces in each system and discuss coordinate
+singularities.</p>
+<h2 id="additional-exercises-paired-computational-practice">Additional
+exercises: paired computational practice</h2>
+<ol type="1">
+<li><p>Use R and Python to plot <span class="math inline">\(\boldsymbol{r}(t)=(2\cos t,2\sin t,t/3)\)</span>
+on <span class="math inline">\(0\le t\le6\pi\)</span>. Explain the
+difference between top and side views.</p></li>
+<li><p>For <span class="math inline">\(\boldsymbol{r}(t)=(t^2,3t,2)\)</span>, compute
+velocity at <span class="math inline">\(t=2\)</span> analytically, by
+centered differences in R, and symbolically in Python.</p></li>
+<li><p>Compare numerical arc-length calculations for a helix with <span class="math inline">\(a=2\)</span>, <span class="math inline">\(b=1/3\)</span> against <span class="math inline">\(2\pi\sqrt{37}/3\)</span>.</p></li>
+<li><p>Calculate curvature and torsion for <span class="math inline">\(a=2\)</span>, <span class="math inline">\(b=1/3\)</span> in both languages; explain their
+physical units.</p></li>
+<li><p>Convert <span class="math inline">\((3,4,5)\)</span> to
+cylindrical and spherical coordinates using both languages, then
+reconstruct the Cartesian point.</p></li>
+<li><p>Numerically compute the area of <span class="math inline">\(z=x^2+y^2\)</span> above the unit disk using both
+languages and compare with the exact value.</p></li>
+<li><p>Change the helix pitch and investigate its effect on curvature,
+torsion, and one-turn length; present a labeled graph and short
+interpretation.</p></li>
+<li><p>Explain how numerical approximation differs from symbolic
+differentiation and why agreement within tolerance is
+appropriate.</p></li>
+</ol>
+<h2 id="chapter-project-trajectory-geometry-and-computational-comparison">Chapter
+project: trajectory geometry and computational comparison</h2>
+<p><strong>Scenario.</strong> A laboratory instrument follows a helical
+path while a camera records its projected position. You are asked to
+develop a geometric model and compare two independent computational
+implementations.</p>
+<ol type="1">
+<li><p>Formulate <span class="math inline">\(\boldsymbol{r}(t)=(a\cos
+t,a\sin t,bt)\)</span>, <span class="math inline">\(0\le
+t\le6\pi\)</span>, with <span class="math inline">\(a=2\)</span> and
+<span class="math inline">\(b=1/3\)</span>. Identify units, assumptions,
+and total rise.</p></li>
+<li><p>Derive velocity, acceleration, speed, arc length, curvature, and
+torsion by hand. State where the formulas require regularity.</p></li>
+<li><p>Implement the model in R, generating top and side views and
+computing numerical arc length.</p></li>
+<li><p>Implement the same model in Python, generating a
+three-dimensional plot and independently checking the formulas with
+SymPy or SciPy.</p></li>
+<li><p>Repeat for two alternative radius/pitch combinations. Present a
+comparison table with path length, curvature, torsion, and height
+gain.</p></li>
+<li><p>Explain whether the geometric model alone is sufficient to
+certify mechanical safety, and identify missing information.</p></li>
+</ol>
+<p><strong>Deliverables:</strong> a 3–5 page report, analytic
+derivations, both source programs, at least three labeled figures, a
+comparison table, and a brief reproducibility statement.<br/>
+<strong>Suggested rubric (100 points):</strong> mathematical formulation
+and derivations (30); R implementation (20); Python implementation (20);
+figures and numerical comparisons (15); interpretation, assumptions, and
+reproducibility (15).</p>
+<footer><a href="chapter01.html">1. Vectors and Geometry in Three-Dimensional Space ←</a><a href="chapter03.html">3. Functions of Several Variables and Partial Differentiation →</a></footer></main><aside class="chapter-toc"><strong>On this page</strong><ul><li><a href="#interactive-investigation">Interactive investigation</a></li><li><a href="#geometry-through-parameters">Geometry through parameters</a></li><li><a href="#computational-preview-constructing-a-curve">Computational preview:
+constructing a curve</a></li><li><a href="#differentiation-tangent-vectors-and-motion">Differentiation,
+tangent vectors, and motion</a></li><li><a href="#tangential-and-normal-acceleration">Tangential and normal
+acceleration</a></li><li><a href="#arc-length-and-unit-speed-parametrization">Arc length and
+unit-speed parametrization</a></li><li><a href="#curvature-and-the-geometry-of-bending">Curvature and the
+geometry of bending</a></li><li><a href="#the-frenet-frame-and-torsion">The Frenet frame and torsion</a></li><li><a href="#computational-preview-symbolic-verification">Computational preview:
+symbolic verification</a></li><li><a href="#polar-coordinates-and-planar-geometry">Polar coordinates and
+planar geometry</a></li><li><a href="#polar-area">Polar area</a></li><li><a href="#cylindrical-and-spherical-coordinates">Cylindrical and spherical
+coordinates</a></li><li><a href="#cylindrical-coordinates">Cylindrical coordinates</a></li><li><a href="#spherical-coordinates">Spherical coordinates</a></li><li><a href="#surfaces-as-level-sets-and-graphs">Surfaces as level sets and
+graphs</a></li><li><a href="#common-quadric-surfaces">Common quadric surfaces</a></li><li><a href="#parametrized-surfaces-and-tangent-planes">Parametrized surfaces
+and tangent planes</a></li><li><a href="#area-of-a-parametrized-surface">Area of a parametrized
+surface</a></li><li><a href="#surfaces-of-revolution">Surfaces of revolution</a></li><li><a href="#deeper-mathematical-foundations-parameter-invariance-and-geometry">Deeper
+mathematical foundations: parameter invariance and geometry</a></li><li><a href="#regular-reparametrizations-and-orientation">Regular
+reparametrizations and orientation</a></li><li><a href="#the-curvature-formula-and-its-limitations">The curvature formula
+and its limitations</a></li><li><a href="#helix-curvature-torsion-and-limiting-cases">Helix curvature,
+torsion, and limiting cases</a></li><li><a href="#coordinate-conventions-jacobians-and-geometric-scaling">Coordinate
+conventions, Jacobians, and geometric scaling</a></li><li><a href="#polar-and-cylindrical-area-scaling">Polar and cylindrical area
+scaling</a></li><li><a href="#spherical-coordinate-conventions-and-singularities">Spherical-coordinate
+conventions and singularities</a></li><li><a href="#surface-geometry-regularity-normals-and-area">Surface geometry:
+regularity, normals, and area</a></li><li><a href="#first-fundamental-form-and-distortion">First fundamental form
+and distortion</a></li><li><a href="#numerical-accuracy-and-reproducibility-in-geometric-modeling">Numerical
+accuracy and reproducibility in geometric modeling</a></li><li><a href="#geometric-interpretation-and-visualization-workflows">Geometric
+interpretation and visualization workflows</a></li><li><a href="#plotting-a-surface-and-its-tangent-vectors">Plotting a surface
+and its tangent vectors</a></li><li><a href="#numerical-accuracy-and-coordinate-pitfalls">Numerical accuracy
+and coordinate pitfalls</a></li><li><a href="#solving-the-mathematical-problems-using-r">Solving the
+mathematical problems using R</a></li><li><a href="#parametric-curves-and-the-rising-spiral">Parametric curves and
+the rising spiral</a></li><li><a href="#numerical-differentiation-and-the-tangent-line">Numerical
+differentiation and the tangent line</a></li><li><a href="#arc-length-curvature-and-torsion-of-a-helix">Arc length,
+curvature, and torsion of a helix</a></li><li><a href="#coordinates-and-surface-geometry">Coordinates and surface
+geometry</a></li><li><a href="#solving-the-same-problems-using-python">Solving the same
+problems using Python</a></li><li><a href="#the-same-rising-spiral-and-tangent-calculation">The same rising
+spiral and tangent calculation</a></li><li><a href="#helix-invariants-and-numerical-quadrature">Helix invariants and
+numerical quadrature</a></li><li><a href="#coordinate-conversion-and-surface-area">Coordinate conversion
+and surface area</a></li><li><a href="#a-common-numerical-benchmark-paraboloid-surface-area">A common
+numerical benchmark: paraboloid surface area</a></li><li><a href="#comparing-r-and-python">Comparing R and Python</a></li><li><a href="#real-world-application-designing-a-helical-access-ramp">Real-world
+application: designing a helical access ramp</a></li><li><a href="#chapter-summary">Chapter summary</a></li><li><a href="#exercises">Exercises</a></li><li><a href="#further-exploration">Further exploration</a></li><li><a href="#additional-exercises-paired-computational-practice">Additional
+exercises: paired computational practice</a></li><li><a href="#chapter-project-trajectory-geometry-and-computational-comparison">Chapter
+project: trajectory geometry and computational comparison</a></li></ul></aside></div><script src="search-index.js"></script><script src="site.js"></script><script src="investigations.js"></script></body></html>

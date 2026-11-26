@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><title>Functions of Several Variables and Partial Differentiation | Applied Multivariate Calculus Using R and Python</title><link href="site.css" rel="stylesheet"/><script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]}};</script><script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script></head><body><a class="skip" href="#main">Skip to content</a><nav aria-label="Book navigation" class="site-nav"><a class="brand" href="index.html">Applied Multivariate Calculus Using R and Python</a><p class="subtitle">Volume III · Abraham Ayebo</p><label for="book-search">Search book</label><input id="book-search" placeholder="Search chapters" type="search"/><div aria-live="polite" class="search-results" id="search-results"></div><div class="nav-label">Contents</div><a href="index.html">Welcome</a><a href="chapter01.html">1. Vectors and Geometry in Three-Dimensional Space</a><a href="chapter02.html">2. Curves, Surfaces, and Coordinate Systems</a><a aria-current="page" class="active" href="chapter03.html">3. Functions of Several Variables and Partial Differentiation</a><a href="chapter04.html">4. Gradients, Taylor Approximations, and Optimization</a><a href="chapter05.html">5. Multiple Integration and Applications</a><a href="chapter06.html">6. Vector Fields and Integral Theorems</a><a href="chapter07.html">7. Introduction to Tensor Calculus and Differential Geometry</a><a href="chapter08.html">8. Partial Differential Equations and Computational Methods</a><a href="appendix-a.html">Appendix A. Introduction to R and RStudio</a><a href="appendix-b.html">Appendix B. Introduction to Python and Jupyter</a><a href="resources.html">Computational resources</a><a href="about.html">About this book</a><div class="nav-label">Series</div><a href="https://aayebo.github.io/applied-precalculus/">Volume I · Applied Precalculus</a><a href="https://aayebo.github.io/applied-calculus/">Volume II · Applied Calculus</a></nav><header class="topbar"><button aria-expanded="false" class="menu">Contents</button><span>Applied Mathematics · Volume III</span><span class="spacer"></span><a href="resources.html">Code &amp; resources</a></header><div class="page-grid"><main id="main"><h1>3. Functions of Several Variables and Partial Differentiation</h1><p><span id="ch:partial-derivatives" label="ch:partial-derivatives"></span></p>
+<div class="learning-box example"><p><strong>Learning.</strong> After completing this chapter, you should
+be able to identify domains and level sets; explain multivariable limits
+and continuity; compute partial and mixed partial derivatives;
+distinguish partial derivatives from differentiability; construct
+tangent planes and linear approximations; use the chain rule in several
+forms; calculate implicit derivatives; interpret directional derivatives
+and the gradient; and verify symbolic formulas and numerical
+approximations using both R and Python.</p></div>
+<section class="mv-lab" id="interactive-investigation"><h2>Interactive investigation: Tangent planes</h2><p>Explore f(x,y)=x²+y² and its tangent plane at (a,0).</p><div data-mv-lab="3"></div><p><strong>Explore:</strong> How does the slope change with a? Where does the plane touch the surface?</p><noscript>Enable JavaScript to use this investigation.</noscript></section><h2 id="from-one-input-to-many">From one input to many</h2>
+<p>In single-variable calculus, a graph <span class="math inline">\(y=f(x)\)</span> associates one output with each
+permissible input. In multivariable calculus, the same idea extends to a
+map <span class="math inline">\(f:D\subseteq\mathbb{R}^n\to\mathbb{R}\)</span> or
+to a vector-valued map <span class="math inline">\(\boldsymbol{F}:D\subseteq\mathbb{R}^n\to\mathbb{R}^m\)</span>.
+The domain <span class="math inline">\(D\)</span> must be specified:
+formulas alone do not always determine a meaningful physical or
+mathematical model. A function of two variables has a graph in
+three-dimensional space, <span class="math display">\[\operatorname{graph}(f)=\{(x,y,z): (x,y)\in D,\
+z=f(x,y)\}.\]</span> The graph of a function of three variables
+generally requires four coordinates and cannot be viewed as an ordinary
+surface in <span class="math inline">\(\mathbb{R}^3\)</span>. Instead,
+we study its level surfaces, slices, and numerical summaries.</p>
+<div class="learning-box example"><p><strong>Example — A temperature model.</strong> Suppose a thin metal
+plate has temperature <span class="math inline">\(T(x,y)=20+3x^2+2y^2\)</span> degrees Celsius,
+where <span class="math inline">\(x,y\)</span> are measured in meters.
+The temperature at <span class="math inline">\((1,-2)\)</span> is <span class="math inline">\(31\)</span> degrees Celsius. Its level set <span class="math inline">\(T=26\)</span> is the ellipse <span class="math inline">\(3x^2+2y^2=6\)</span>. The formula represents a
+spatial field, not the motion of a particle.</p></div>
+<figure id="fig:ch3surface">
+<img alt="A scalar field represented by its graph. Height records the output f(x,y) above each input point. Original Python figure." src="figures/ch3_surface.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">A scalar field represented by its graph.
+Height records the output <span class="math inline">\(f(x,y)\)</span>
+above each input point. Original Python figure.</figcaption>
+</figure>
+<h3 id="domains-and-boundary-behavior">Domains and boundary
+behavior</h3>
+<p>The <em>natural domain</em> of a real-valued formula is the set of
+inputs where all operations are defined in the real numbers.
+Denominators cannot vanish, even roots require nonnegative radicands,
+and logarithms require positive arguments. Domain restrictions can
+interact.</p>
+<div class="learning-box example"><p><strong>Example — Combining restrictions.</strong> For <span class="math inline">\(f(x,y)=\dfrac{\sqrt{9-x^2-y^2}}{x-y}\)</span>, the
+domain is the closed disk <span class="math inline">\(x^2+y^2\le9\)</span> with the line <span class="math inline">\(x=y\)</span> removed. Its boundary includes points
+on the circle and points of the excluded diagonal lying in the disk. The
+function need not approach a finite value near every boundary point.</p></div>
+<figure>
+<img alt="A circular domain for a square-root function. Boundary points are permitted when the radicand is zero." src="figures/ch3_domain.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">A circular domain for a square-root
+function. Boundary points are permitted when the radicand is
+zero.</figcaption>
+</figure>
+<div class="learning-box check"><p><strong>Checkpoint.</strong> Describe the domain of <span class="math inline">\(g(x,y)=\log(4-x^2-y^2)/(x+1)\)</span>, and decide
+which portions of its boundary are included.</p></div>
+<h2 id="level-curves-level-surfaces-and-traces">Level curves, level
+surfaces, and traces</h2>
+<p>A <em>level curve</em> of <span class="math inline">\(f:\mathbb{R}^2\to\mathbb{R}\)</span> is the set
+<span class="math inline">\(f(x,y)=c\)</span> for a fixed value <span class="math inline">\(c\)</span>. A level surface of <span class="math inline">\(F:\mathbb{R}^3\to\mathbb{R}\)</span> is the set
+<span class="math inline">\(F(x,y,z)=c\)</span>. These sets are often
+more informative than a perspective drawing: topographic maps, pressure
+contours, and isotherms use the same principle.</p>
+<div class="learning-box example"><p><strong>Example — Elliptical contours.</strong> For <span class="math inline">\(f(x,y)=2+0.6x^2+0.9y^2\)</span>, a level <span class="math inline">\(c&gt;2\)</span> satisfies <span class="math inline">\(0.6x^2+0.9y^2=c-2\)</span>. These are ellipses;
+the level <span class="math inline">\(c=2\)</span> is the single point
+<span class="math inline">\((0,0)\)</span>; levels below <span class="math inline">\(2\)</span> are empty. Larger contour spacing in a
+fixed direction corresponds to slower change in that direction.</p></div>
+<figure>
+<img alt="Level curves of the same function shown in Figure 1. Each curve consists of points with identical output." src="figures/ch3_contours.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">Level curves of the same function shown
+in Figure <a data-reference="fig:ch3surface" data-reference-type="ref" href="#fig:ch3surface">1</a>. Each curve consists of points
+with identical output.</figcaption>
+</figure>
+<p>A <em>trace</em> is the intersection of a graph with a plane such as
+<span class="math inline">\(x=a\)</span> or <span class="math inline">\(y=b\)</span>. Traces reduce a multivariable
+question to a familiar single-variable question. For instance, fixing
+<span class="math inline">\(y=b\)</span> in <span class="math inline">\(z=x^2+2y^2\)</span> produces the parabola <span class="math inline">\(z=x^2+2b^2\)</span>.</p>
+<h3 class="unnumbered" id="computational-preview-graphs-and-contours">Computational preview:
+graphs and contours</h3>
+<div class="learning-box example"><p><strong>Remark — Computational follow-up.</strong> The same
+mathematical question is revisited with complete R and Python
+implementations in the paired laboratories later in this chapter.</p></div>
+<p><strong>Interpretation.</strong> The code creates a rectangular grid
+of input pairs and evaluates the function on that grid. The contour
+algorithm approximates intersections of the surface with horizontal
+planes. Increasing grid resolution improves the display but does not
+change the underlying function.</p>
+<h2 id="limits-in-more-than-one-dimension">Limits in more than one
+dimension</h2>
+<div class="learning-box example"><p><strong>Definition — Limit.</strong> Let <span class="math inline">\(f:D\subseteq\mathbb{R}^n\to\mathbb{R}\)</span> and
+let <span class="math inline">\(\boldsymbol{a}\)</span> be an
+accumulation point of <span class="math inline">\(D\)</span>. We say
+<span class="math inline">\(\lim_{\boldsymbol{x}\to\boldsymbol{a}}f(\boldsymbol{x})=L\)</span>
+if, for every <span class="math inline">\(\varepsilon&gt;0\)</span>,
+there exists <span class="math inline">\(\delta&gt;0\)</span> such that
+<span class="math inline">\(\boldsymbol{x}\in D\)</span> and <span class="math inline">\(0&lt;\left\lVert
+\boldsymbol{x}-\boldsymbol{a}\right\rVert&lt;\delta\)</span> imply <span class="math inline">\(|f(\boldsymbol{x})-L|&lt;\varepsilon\)</span>.</p></div>
+<p>Unlike a one-variable limit, the point can be approached along
+infinitely many paths. A limit exists only if the same value is
+approached along <em>every</em> permissible route. Testing a few paths
+can disprove a limit, but cannot generally prove that a limit
+exists.</p>
+<div class="learning-box example"><p><strong>Example — A path-dependent expression.</strong> Consider
+<span class="math display">\[h(x,y)=\frac{xy}{x^2+y^2},\qquad
+(x,y)\ne(0,0).\]</span> Along <span class="math inline">\(y=0\)</span>,
+<span class="math inline">\(h(x,0)=0\)</span>. Along <span class="math inline">\(y=x\)</span>, <span class="math inline">\(h(x,x)=1/2\)</span> for <span class="math inline">\(x\ne0\)</span>. Since the limiting values differ,
+<span class="math inline">\(\lim_{(x,y)\to(0,0)}h(x,y)\)</span> does not
+exist.</p></div>
+<figure>
+<img alt="The function xy/(x^2+y^2) approaches different values along two paths to the origin. The horizontal coordinate indexes points on each path, not a common physical y-coordinate." src="figures/ch3_path_limit.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">The function <span class="math inline">\(xy/(x^2+y^2)\)</span> approaches different values
+along two paths to the origin. The horizontal coordinate indexes points
+on each path, not a common physical <span class="math inline">\(y\)</span>-coordinate.</figcaption>
+</figure>
+<h3 id="why-a-successful-path-test-is-not-a-proof">Why a successful path
+test is not a proof</h3>
+<p>Suppose <span class="math inline">\(q(x,y)=\dfrac{x^2y}{x^4+y^2}\)</span> away from
+<span class="math inline">\((0,0)\)</span>. Along any straight line
+<span class="math inline">\(y=mx\)</span>, substitution yields <span class="math inline">\(mx/(x^2+m^2)\)</span> when <span class="math inline">\(m\ne0\)</span>, which approaches zero; the
+horizontal line also gives zero. But along the curved path <span class="math inline">\(y=x^2\)</span>, <span class="math display">\[q(x,x^2)=\frac{x^4}{2x^4}=\frac12.\]</span>
+Therefore the limit fails despite agreement along all straight lines.
+The general lesson is to search for curves that balance terms of
+different polynomial degrees.</p>
+<h3 id="proving-a-limit-with-inequalities">Proving a limit with
+inequalities</h3>
+<div class="learning-box example"><p><strong>Proposition.</strong> The function <span class="math inline">\(p(x,y)=\dfrac{x^2y}{x^2+y^2}\)</span>, defined
+away from the origin, satisfies <span class="math inline">\(\lim_{(x,y)\to(0,0)}p(x,y)=0\)</span>.</p></div>
+<div class="learning-box example"><p><strong>Proof.</strong> Because <span class="math inline">\(0\le
+x^2/(x^2+y^2)\le1\)</span>, <span class="math display">\[|p(x,y)|=|y|\frac{x^2}{x^2+y^2}\le
+|y|\le\sqrt{x^2+y^2}.\]</span> As the distance to the origin tends to
+zero, the upper bound tends to zero. The squeeze theorem proves the
+claim.</p></div>
+<h3 id="polar-coordinates-as-a-limit-tool">Polar coordinates as a limit
+tool</h3>
+<p>Write <span class="math inline">\(x=r\cos\theta\)</span>, <span class="math inline">\(y=r\sin\theta\)</span> and <span class="math inline">\(r=\sqrt{x^2+y^2}\)</span>. If <span class="math inline">\(|f(r\cos\theta,r\sin\theta)-L|\le M(r)\)</span>
+for <em>all</em> angles and <span class="math inline">\(M(r)\to0\)</span> as <span class="math inline">\(r\to0\)</span>, then the limit is <span class="math inline">\(L\)</span>. The uniformity in angle matters. For
+example, <span class="math display">\[\left|\frac{x^2y}{x^2+y^2}\right|=r|\cos^2\theta\sin\theta|\le
+r,\]</span> which immediately proves convergence to zero.</p>
+<h2 id="continuity-and-compositions">Continuity and compositions</h2>
+<div class="learning-box example"><p><strong>Definition — Continuity.</strong> A function <span class="math inline">\(f:D\to\mathbb{R}\)</span> is continuous at <span class="math inline">\(\boldsymbol{a}\in D\)</span> if <span class="math inline">\(\lim_{\boldsymbol{x}\to\boldsymbol{a}}f(\boldsymbol{x})=f(\boldsymbol{a})\)</span>,
+with the limit taken through points of <span class="math inline">\(D\)</span>.</p></div>
+<p>Polynomials are continuous everywhere, and rational functions are
+continuous where denominators do not vanish. Sums, products, quotients
+(with nonzero denominators), and compositions preserve continuity under
+the usual domain conditions.</p>
+<div class="learning-box example"><p><strong>Example — A removable discontinuity.</strong> Define <span class="math inline">\(f(x,y)=(x^2+y^2)\sin\!\left(1/(x^2+y^2)\right)\)</span>
+away from the origin and <span class="math inline">\(f(0,0)=0\)</span>.
+Since <span class="math inline">\(|f(x,y)|\le x^2+y^2\)</span>, the
+function is continuous at the origin. Oscillation alone does not imply
+discontinuity: its amplitude shrinks to zero.</p></div>
+<div class="learning-box check"><p><strong>Checkpoint.</strong> Determine whether the piecewise function
+<span class="math inline">\(f(x,y)=x^2y/(x^2+y^2)\)</span> for <span class="math inline">\((x,y)\ne(0,0)\)</span> and <span class="math inline">\(f(0,0)=0\)</span> is continuous at the origin.
+State which bound justifies your answer.</p></div>
+<h2 id="partial-derivatives">Partial derivatives</h2>
+<div class="learning-box example"><p><strong>Definition — Partial derivatives.</strong> For <span class="math inline">\(f:\mathbb{R}^2\to\mathbb{R}\)</span>, the partial
+derivative with respect to <span class="math inline">\(x\)</span> at
+<span class="math inline">\((a,b)\)</span> is <span class="math display">\[f_x(a,b)=\lim_{h\to0}\frac{f(a+h,b)-f(a,b)}{h},\]</span>
+when the limit exists. Similarly, <span class="math display">\[f_y(a,b)=\lim_{h\to0}\frac{f(a,b+h)-f(a,b)}{h}.\]</span>
+The other coordinate is held fixed during each limit.</p></div>
+<p>Geometrically, <span class="math inline">\(f_x(a,b)\)</span> is the
+slope of the trace obtained by intersecting <span class="math inline">\(z=f(x,y)\)</span> with <span class="math inline">\(y=b\)</span>; <span class="math inline">\(f_y(a,b)\)</span> is the corresponding slope in
+the <span class="math inline">\(x=a\)</span> trace. The units of <span class="math inline">\(f_x\)</span> are output units per unit of <span class="math inline">\(x\)</span>.</p>
+<div class="learning-box example"><p><strong>Example — Symbolic differentiation.</strong> Let <span class="math inline">\(f(x,y)=x^2e^{xy}+\sin y\)</span>. Then <span class="math display">\[f_x(x,y)=(2x+x^2y)e^{xy},\qquad
+f_y(x,y)=x^3e^{xy}+\cos y.\]</span> The derivative of <span class="math inline">\(e^{xy}\)</span> with respect to <span class="math inline">\(x\)</span> is <span class="math inline">\(ye^{xy}\)</span>; with respect to <span class="math inline">\(y\)</span> it is <span class="math inline">\(xe^{xy}\)</span>. This is a simple but essential
+application of the single-variable chain rule inside partial
+differentiation.</p></div>
+<div class="learning-box example"><p><strong>Remark — Computational follow-up.</strong> The same
+mathematical question is revisited with complete R and Python
+implementations in the paired laboratories later in this chapter.</p></div>
+<h3 id="second-and-mixed-partial-derivatives">Second and mixed partial
+derivatives</h3>
+<p>Differentiating a first partial derivative again produces
+second-order partial derivatives: <span class="math display">\[f_{xx}=\frac{\partial^2 f}{\partial x^2},\quad
+f_{yy}=\frac{\partial^2 f}{\partial y^2},\quad
+f_{xy}=\frac{\partial}{\partial y}\left(\frac{\partial f}{\partial
+x}\right),\quad
+f_{yx}=\frac{\partial}{\partial x}\left(\frac{\partial f}{\partial
+y}\right).\]</span> The order of subscripts indicates the order of
+differentiation; notation conventions can vary across disciplines, so an
+explicit operator is useful when ambiguity is possible.</p>
+<div class="learning-box example"><p><strong>Theorem — Equality of mixed partials.</strong> If <span class="math inline">\(f_{xy}\)</span> and <span class="math inline">\(f_{yx}\)</span> are continuous on an open
+neighborhood of <span class="math inline">\((a,b)\)</span>, then <span class="math inline">\(f_{xy}(a,b)=f_{yx}(a,b)\)</span>.</p></div>
+<div class="learning-box example"><p><strong>Remark.</strong> Existence of both mixed partials at a single
+point is not, by itself, sufficient for their equality. The continuity
+assumption is a convenient sufficient condition.</p></div>
+<div class="learning-box example"><p><strong>Example — A mixed derivative.</strong> For <span class="math inline">\(f(x,y)=x^2y^3+e^{xy}\)</span>, <span class="math display">\[f_{xy}=6xy^2+e^{xy}+xye^{xy}=f_{yx}.\]</span> A
+symbolic check can help detect algebra errors, but the theorem explains
+why equality is expected for this smooth function.</p></div>
+<h2 id="differentiability-and-local-linear-models">Differentiability and
+local linear models</h2>
+<p>The existence of partial derivatives does not automatically imply
+differentiability. Differentiability is a stronger assertion that the
+function is well approximated by a linear map in <em>every</em>
+direction simultaneously.</p>
+<div class="learning-box example"><p><strong>Definition — Differentiability.</strong> A function <span class="math inline">\(f:\mathbb{R}^2\to\mathbb{R}\)</span> is
+differentiable at <span class="math inline">\((a,b)\)</span> if there
+exist constants <span class="math inline">\(A,B\)</span> such that <span class="math display">\[f(a+h,b+k)=f(a,b)+Ah+Bk+\varepsilon(h,k)\sqrt{h^2+k^2},\]</span>
+where <span class="math inline">\(\varepsilon(h,k)\to0\)</span> as <span class="math inline">\((h,k)\to(0,0)\)</span>. If <span class="math inline">\(f\)</span> is differentiable, then <span class="math inline">\(A=f_x(a,b)\)</span> and <span class="math inline">\(B=f_y(a,b)\)</span>.</p></div>
+<p>Thus the linear approximation is <span class="math display">\[L(x,y)=f(a,b)+f_x(a,b)(x-a)+f_y(a,b)(y-b).\]</span>
+For the graph <span class="math inline">\(z=f(x,y)\)</span>, this
+formula is the equation of its tangent plane at <span class="math inline">\((a,b,f(a,b))\)</span>.</p>
+<div class="learning-box example"><p><strong>Theorem — A practical differentiability criterion.</strong>
+If <span class="math inline">\(f_x\)</span> and <span class="math inline">\(f_y\)</span> exist in an open neighborhood of
+<span class="math inline">\((a,b)\)</span> and are continuous at <span class="math inline">\((a,b)\)</span>, then <span class="math inline">\(f\)</span> is differentiable at <span class="math inline">\((a,b)\)</span>.</p></div>
+<div class="learning-box example"><p><strong>Proof — Proof idea.</strong> Split the change in output into
+two changes, first moving in the <span class="math inline">\(x\)</span>-direction and then in the <span class="math inline">\(y\)</span>-direction. Apply the one-variable mean
+value theorem to each segment. Continuity of the partial derivatives
+ensures the resulting slopes approach <span class="math inline">\(f_x(a,b)\)</span> and <span class="math inline">\(f_y(a,b)\)</span>, leaving an error small relative
+to the total displacement.</p></div>
+<div class="learning-box example"><p><strong>Example — A tangent plane and exact error.</strong> For <span class="math inline">\(f(x,y)=x^2+2y^2\)</span> at <span class="math inline">\((a,b)=(1,1/2)\)</span>, we have <span class="math inline">\(f(a,b)=3/2\)</span>, <span class="math inline">\(f_x(a,b)=2\)</span>, and <span class="math inline">\(f_y(a,b)=2\)</span>. Hence <span class="math display">\[L(x,y)=\frac32+2(x-1)+2\left(y-\frac12\right).\]</span>
+The approximation error can be computed exactly: <span class="math display">\[f(x,y)-L(x,y)=(x-1)^2+2\left(y-\frac12\right)^2.\]</span>
+The error is quadratic in the displacement, so it becomes much smaller
+than the displacement itself near the point of tangency.</p></div>
+<figure>
+<img alt="The graph of z=x^2+2y^2 and its tangent plane at (1,1/2,3/2). The plane is a first-order local model, not a global replacement." src="figures/ch3_tangent_plane.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">The graph of <span class="math inline">\(z=x^2+2y^2\)</span> and its tangent plane at <span class="math inline">\((1,1/2,3/2)\)</span>. The plane is a first-order
+local model, not a global replacement.</figcaption>
+</figure>
+<h3 id="why-partial-derivatives-alone-can-fail">Why partial derivatives
+alone can fail</h3>
+<p>Define <span class="math display">\[f(x,y)=\begin{cases}\dfrac{xy}{\sqrt{x^2+y^2}},&amp;(x,y)\ne(0,0),\\0,&amp;(x,y)=(0,0).\end{cases}\]</span>
+Both partial derivatives at the origin are zero because <span class="math inline">\(f(h,0)=f(0,k)=0\)</span>. If <span class="math inline">\(f\)</span> were differentiable there, the
+candidate linear map would be zero and we would need <span class="math inline">\(f(x,y)/\sqrt{x^2+y^2}\to0\)</span>. Along <span class="math inline">\(y=x&gt;0\)</span>, however, this ratio equals
+<span class="math inline">\(1/2\)</span>. Therefore <span class="math inline">\(f\)</span> is not differentiable at the origin,
+even though its coordinate partial derivatives exist.</p>
+<h2 id="the-differential-and-uncertainty-propagation">The differential
+and uncertainty propagation</h2>
+<p>For small increments <span class="math inline">\(dx,dy\)</span>, the
+total differential is <span class="math display">\[df=f_x(x,y)\,dx+f_y(x,y)\,dy.\]</span> The
+differential estimates output change and is especially useful when
+inputs are measured rather than known exactly.</p>
+<div class="learning-box example"><p><strong>Example — Error in a cylinder’s volume.</strong> For <span class="math inline">\(V(r,h)=\pi r^2h\)</span>, <span class="math display">\[dV=2\pi rh\,dr+\pi r^2\,dh.\]</span> Dividing by
+<span class="math inline">\(V\)</span> gives the first-order relative
+change <span class="math inline">\(dV/V\approx2\,dr/r+dh/h\)</span>. A
+1% increase in radius, with height unchanged, produces approximately a
+2% increase in volume. For independent random measurement errors,
+uncertainty combination may require a variance calculation rather than
+simply adding signed differentials.</p></div>
+<h2 id="the-multivariable-chain-rule">The multivariable chain rule</h2>
+<p>The chain rule describes how a composite quantity changes when its
+inputs themselves vary.</p>
+<div class="learning-box example"><p><strong>Theorem — Chain rule along a path.</strong> Suppose <span class="math inline">\(f:\mathbb{R}^2\to\mathbb{R}\)</span> is
+differentiable and <span class="math inline">\(x(t),y(t)\)</span> are
+differentiable. Then <span class="math display">\[\frac{d}{dt}f(x(t),y(t))=f_x(x(t),y(t))x'(t)+f_y(x(t),y(t))y'(t).\]</span></p></div>
+<div class="learning-box example"><p><strong>Proof.</strong> The differentiability expansion gives <span class="math inline">\(\Delta f=f_x\Delta x+f_y\Delta y+o(\sqrt{(\Delta
+x)^2+(\Delta y)^2})\)</span>. Divide by <span class="math inline">\(\Delta t\)</span> and let <span class="math inline">\(\Delta t\to0\)</span>. Since <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span> are differentiable, their increments
+are <span class="math inline">\(O(\Delta t)\)</span>, so the remainder
+divided by <span class="math inline">\(\Delta t\)</span> tends to
+zero.</p></div>
+<div class="learning-box example"><p><strong>Example — Temperature measured by a moving sensor.</strong>
+Let <span class="math inline">\(T(x,y)=x^2y+3y\)</span> and suppose a
+sensor follows <span class="math inline">\(x(t)=\cos t\)</span>, <span class="math inline">\(y(t)=t^2\)</span>. Then <span class="math display">\[\frac{dT}{dt}=(2xy)(-\sin t)+(x^2+3)(2t)
+=-2t^2\sin t\cos t+2t(\cos^2t+3).\]</span> The two terms distinguish
+temperature change caused by horizontal and vertical movement.</p></div>
+<h3 id="two-independent-parameters">Two independent parameters</h3>
+<p>If <span class="math inline">\(x=x(s,t)\)</span> and <span class="math inline">\(y=y(s,t)\)</span>, and <span class="math inline">\(z=f(x,y)\)</span>, then <span class="math display">\[\frac{\partial z}{\partial
+s}=f_xx_s+f_yy_s,\qquad
+\frac{\partial z}{\partial t}=f_xx_t+f_yy_t.\]</span> For a general
+differentiable map <span class="math inline">\(\boldsymbol{F}:\mathbb{R}^n\to\mathbb{R}^m\)</span>,
+its derivative is the <span class="math inline">\(m\times n\)</span>
+<em>Jacobian matrix</em> <span class="math inline">\(D\boldsymbol{F}\)</span>, and the chain rule
+becomes <span class="math display">\[D(\boldsymbol{F}\circ\boldsymbol{G})(\boldsymbol{u})=D\boldsymbol{F}(\boldsymbol{G}(\boldsymbol{u}))\,D\boldsymbol{G}(\boldsymbol{u}).\]</span>
+The order of multiplication matters. Dimensions offer a useful check: if
+<span class="math inline">\(\boldsymbol{G}:\mathbb{R}^p\to\mathbb{R}^n\)</span>
+and <span class="math inline">\(\boldsymbol{F}:\mathbb{R}^n\to\mathbb{R}^m\)</span>,
+the product has shape <span class="math inline">\(m\times
+p\)</span>.</p>
+<div class="learning-box example"><p><strong>Example — Jacobian of a coordinate map.</strong> For <span class="math inline">\(x=r\cos\theta\)</span>, <span class="math inline">\(y=r\sin\theta\)</span>, <span class="math display">\[\frac{\partial(x,y)}{\partial(r,\theta)}=
+\begin{pmatrix}\cos\theta&amp;-r\sin\theta\\\sin\theta&amp;r\cos\theta\end{pmatrix}.\]</span>
+Its determinant is <span class="math inline">\(r\)</span>. Later, this
+determinant will explain the factor <span class="math inline">\(r\)</span> in polar-coordinate integration. Here
+it measures local area scaling of the coordinate map.</p></div>
+<div class="learning-box example"><p><strong>Remark — Computational follow-up.</strong> The same
+mathematical question is revisited with complete R and Python
+implementations in the paired laboratories later in this chapter.</p></div>
+<h2 id="implicit-differentiation">Implicit differentiation</h2>
+<p>Sometimes a surface is described by <span class="math inline">\(F(x,y,z)=0\)</span> rather than explicitly as
+<span class="math inline">\(z=f(x,y)\)</span>. If <span class="math inline">\(F\)</span> is continuously differentiable and
+<span class="math inline">\(F_z(a,b,c)\ne0\)</span>, the implicit
+function theorem guarantees that near <span class="math inline">\((a,b,c)\)</span> the surface can be written as
+<span class="math inline">\(z=f(x,y)\)</span>. Differentiating <span class="math inline">\(F(x,y,f(x,y))=0\)</span> gives <span class="math display">\[f_x=-\frac{F_x}{F_z},\qquad
+f_y=-\frac{F_y}{F_z}.\]</span></p>
+<div class="learning-box example"><p><strong>Example — A sphere.</strong> For <span class="math inline">\(F(x,y,z)=x^2+y^2+z^2-9\)</span>, at a point with
+<span class="math inline">\(z\ne0\)</span>, <span class="math display">\[z_x=-\frac{x}{z},\qquad
+z_y=-\frac{y}{z}.\]</span> At <span class="math inline">\((1,2,2)\)</span>, the tangent plane is <span class="math display">\[z-2=-\frac12(x-1)-(y-2),\]</span> which is
+equivalent to <span class="math inline">\(x+2y+2z=9\)</span>. The same
+plane is obtained directly from the normal vector <span class="math inline">\(\nabla F=(2x,2y,2z)\)</span>.</p></div>
+<div class="learning-box example"><p><strong>Remark.</strong> The condition <span class="math inline">\(F_z\ne0\)</span> is sufficient for a local
+representation as <span class="math inline">\(z=f(x,y)\)</span>, but it
+may fail at points where the surface remains perfectly smooth. At an
+equatorial point of a sphere, one can instead solve locally for <span class="math inline">\(x\)</span> or <span class="math inline">\(y\)</span> if the corresponding partial derivative
+is nonzero.</p></div>
+<h2 id="directional-derivatives-and-the-gradient">Directional
+derivatives and the gradient</h2>
+<p>A partial derivative measures change along a coordinate axis. A
+<em>directional derivative</em> measures change in any chosen
+direction.</p>
+<div class="learning-box example"><p><strong>Definition — Directional derivative.</strong> For a unit
+vector <span class="math inline">\(\boldsymbol{u}\in\mathbb{R}^n\)</span>, the
+directional derivative at <span class="math inline">\(\boldsymbol{a}\)</span> is <span class="math display">\[D_{\boldsymbol{u}}f(\boldsymbol{a})=\lim_{h\to0}\frac{f(\boldsymbol{a}+h\boldsymbol{u})-f(\boldsymbol{a})}{h},\]</span>
+provided the limit exists.</p></div>
+<div class="learning-box example"><p><strong>Theorem — Gradient formula.</strong> If <span class="math inline">\(f\)</span> is differentiable at <span class="math inline">\(\boldsymbol{a}\)</span>, then <span class="math display">\[D_{\boldsymbol{u}}f(\boldsymbol{a})=\nabla
+f(\boldsymbol{a})\cdot\boldsymbol{u},
+\qquad \nabla f=(f_{x_1},\ldots,f_{x_n}).\]</span></p></div>
+<div class="learning-box example"><p><strong>Proof.</strong> Apply the differentiability expansion with
+displacement <span class="math inline">\(h\boldsymbol{u}\)</span>. The
+linear part is <span class="math inline">\(h\nabla
+f(\boldsymbol{a})\cdot\boldsymbol{u}\)</span> and the remainder divided
+by <span class="math inline">\(h\)</span> tends to zero.</p></div>
+<p>By the Cauchy–Schwarz inequality, <span class="math inline">\(|D_{\boldsymbol{u}}f|\le\left\lVert \nabla
+f\right\rVert\)</span> for unit <span class="math inline">\(\boldsymbol{u}\)</span>. When the gradient is
+nonzero, the direction of greatest increase is <span class="math inline">\(\nabla f/\left\lVert \nabla f\right\rVert\)</span>
+and the maximal rate is <span class="math inline">\(\left\lVert \nabla
+f\right\rVert\)</span>. The direction of steepest decrease is the
+opposite unit vector.</p>
+<div class="learning-box example"><p><strong>Example — Computing a directional derivative.</strong> Let
+<span class="math inline">\(f(x,y)=x^2+2y^2\)</span> and <span class="math inline">\(P=(4/5,3/5)\)</span>. Then <span class="math inline">\(\nabla f(P)=(8/5,12/5)\)</span>. In the direction
+<span class="math inline">\(\boldsymbol{u}=(5,2)/\sqrt{29}\)</span>,
+<span class="math display">\[D_{\boldsymbol{u}}f(P)=\frac{8}{5}\frac5{\sqrt{29}}+\frac{12}{5}\frac2{\sqrt{29}}=\frac{64}{5\sqrt{29}}.\]</span>
+The rate depends on the chosen unit direction; the gradient magnitude
+gives the largest possible directional rate.</p></div>
+<figure>
+<img alt="The gradient points perpendicular to level curves in the direction of steepest increase. A directional derivative is the component of the gradient along the chosen unit direction." src="figures/ch3_directional.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">The gradient points perpendicular to
+level curves in the direction of steepest increase. A directional
+derivative is the component of the gradient along the chosen unit
+direction.</figcaption>
+</figure>
+<h3 id="gradients-are-normal-to-regular-level-sets">Gradients are normal
+to regular level sets</h3>
+<p>If a differentiable curve <span class="math inline">\(\boldsymbol{r}(t)\)</span> lies in a level set
+<span class="math inline">\(f(\boldsymbol{r}(t))=c\)</span>,
+differentiating gives <span class="math display">\[0=\frac{d}{dt}f(\boldsymbol{r}(t))=\nabla
+f(\boldsymbol{r}(t))\cdot\boldsymbol{r}'(t).\]</span> Thus <span class="math inline">\(\nabla f\)</span> is orthogonal to tangent
+directions at regular points. For a level surface <span class="math inline">\(F(x,y,z)=c\)</span> in <span class="math inline">\(\mathbb{R}^3\)</span>, the tangent plane at <span class="math inline">\(P\)</span> is <span class="math display">\[\nabla
+F(P)\cdot((x,y,z)-P)=0,\]</span> provided <span class="math inline">\(\nabla F(P)\ne\boldsymbol{0}\)</span>.</p>
+<h2 id="higher-derivatives-and-the-hessian">Higher derivatives and the
+Hessian</h2>
+<p>For a twice differentiable scalar function of <span class="math inline">\(n\)</span> variables, the Hessian is the matrix of
+second partial derivatives: <span class="math display">\[H_f(\boldsymbol{x})=\left[\frac{\partial^2f}{\partial
+x_i\partial x_j}\right]_{i,j=1}^n.\]</span> When mixed partial
+derivatives are continuous, the Hessian is symmetric. In two variables,
+<span class="math display">\[H_f=\begin{pmatrix}f_{xx}&amp;f_{xy}\\f_{yx}&amp;f_{yy}\end{pmatrix}.\]</span>
+It records the local change of the gradient and enters the second-order
+Taylor approximation <span class="math display">\[f(\boldsymbol{a}+\boldsymbol{h})=f(\boldsymbol{a})+\nabla
+f(\boldsymbol{a})\cdot\boldsymbol{h}+\tfrac12\boldsymbol{h}^T
+H_f(\boldsymbol{a})\boldsymbol{h}+o(\left\lVert
+\boldsymbol{h}\right\rVert^2).\]</span> A detailed study of critical
+points and constrained optimization appears in Chapter 4.</p>
+<div class="learning-box example"><p><strong>Example — Second-order structure.</strong> For <span class="math inline">\(f(x,y)=x^2+2y^2\)</span>, <span class="math inline">\(H_f=\operatorname{diag}(2,4)\)</span>. The
+quadratic Taylor polynomial is exact because all derivatives of order
+three and above vanish. The matrix also shows that the function bends
+twice as strongly in the <span class="math inline">\(y\)</span>
+direction as in the <span class="math inline">\(x\)</span>
+direction.</p></div>
+<h2 id="numerical-partial-derivatives-and-computational-error">Numerical
+partial derivatives and computational error</h2>
+<p>When an explicit symbolic formula is unavailable, derivatives can be
+approximated from function evaluations. For sufficiently smooth <span class="math inline">\(f\)</span>, the forward difference <span class="math display">\[\frac{f(a+h,b)-f(a,b)}{h}=f_x(a,b)+O(h)\]</span>
+has first-order truncation error, whereas the centered difference <span class="math display">\[\frac{f(a+h,b)-f(a-h,b)}{2h}=f_x(a,b)+O(h^2)\]</span>
+has second-order truncation error. Making <span class="math inline">\(h\)</span> arbitrarily small is not always
+beneficial because subtraction can amplify floating-point rounding
+error.</p>
+<div class="learning-box example"><p><strong>Remark — Computational follow-up.</strong> The same
+mathematical question is revisited with complete R and Python
+implementations in the paired laboratories later in this chapter.</p></div>
+<p><strong>Computational caution.</strong> A numerical derivative is an
+approximation, not a proof of differentiability. For nonsmooth
+functions, a small step size can conceal a cusp or a discontinuity.</p>
+<h2 id="applications-across-disciplines">Applications across
+disciplines</h2>
+<h3 id="marginal-response-in-a-two-input-model">Marginal response in a
+two-input model</h3>
+<p>Let <span class="math inline">\(P(x,y)=100x^{1/2}y^{1/2}\)</span> for
+<span class="math inline">\(x,y&gt;0\)</span>, representing a simplified
+production response. Then <span class="math display">\[P_x=50\sqrt{\frac
+yx},\qquad P_y=50\sqrt{\frac xy}.\]</span> At <span class="math inline">\((x,y)=(4,9)\)</span>, the marginal response to
+increasing <span class="math inline">\(x\)</span> while holding <span class="math inline">\(y\)</span> fixed is <span class="math inline">\(75\)</span> output units per input unit. A
+simultaneous change in both inputs is approximated by <span class="math inline">\(dP=P_x\,dx+P_y\,dy\)</span>. The model is only
+intended for positive inputs; applying its derivatives at the axes would
+require additional justification.</p>
+<h3 id="sensitivity-of-a-risk-score">Sensitivity of a risk score</h3>
+<p>Suppose <span class="math inline">\(R(a,b)=\exp(a+2b)/(1+\exp(a+2b))\)</span>. Its
+partial derivatives are <span class="math inline">\(R_a=R(1-R)\)</span>
+and <span class="math inline">\(R_b=2R(1-R)\)</span>. The score is twice
+as sensitive to a small change in <span class="math inline">\(b\)</span>
+as to an equal numerical change in <span class="math inline">\(a\)</span>, but this comparison is meaningful only
+if the input scales are comparable. Mathematical sensitivity does not
+establish causation.</p>
+<h2 id="additional-mathematical-examples-from-the-r-manuscript">Additional
+mathematical examples from the R manuscript</h2>
+<h3 id="temperature-derivatives-and-units">Temperature derivatives and
+units</h3>
+<p>For the model <span class="math inline">\(T(x,y)=20+3x-2y+xy^2\)</span> in degrees Celsius,
+with <span class="math inline">\(x,y\)</span> measured in meters, <span class="math display">\[T_x=3+y^2,\qquad T_y=-2+2xy.\]</span> At <span class="math inline">\((1,2)\)</span> these are <span class="math inline">\(7\)</span> and <span class="math inline">\(2\)</span> degrees Celsius per meter,
+respectively. Both represent coordinate rates, not the rate along a
+moving path. The distinction matters when interpreting physical
+sensors.</p>
+<h3 id="jacobian-and-local-area-distortion">Jacobian and local area
+distortion</h3>
+<p>Consider <span class="math inline">\(F(u,v)=(u^2-v^2,2uv)\)</span>.
+Its derivative matrix is <span class="math display">\[DF(u,v)=\begin{pmatrix}2u&amp;-2v\\2v&amp;2u\end{pmatrix},\qquad
+\det DF=4(u^2+v^2).\]</span> At <span class="math inline">\((1,2)\)</span> the determinant is <span class="math inline">\(20\)</span>; at <span class="math inline">\((0.1,0.2)\)</span> it is <span class="math inline">\(0.2\)</span>. The determinant measures signed
+local area scaling for a smooth planar transformation. At the origin it
+vanishes and the inverse-function theorem does not apply.</p>
+<h3 id="the-ideal-gas-law-and-sensitivity">The ideal-gas law and
+sensitivity</h3>
+<p>For fixed amount of gas <span class="math inline">\(n\)</span> and
+gas constant <span class="math inline">\(R_g\)</span>, the ideal-gas law
+gives <span class="math display">\[P(V,T)=\frac{nR_gT}{V},\quad
+P_V=-\frac{nR_gT}{V^2},\quad P_T=\frac{nR_g}{V}.\]</span> At <span class="math inline">\(n=1\)</span> mol, <span class="math inline">\(R_g=8.314\)</span> J/(mol K), <span class="math inline">\(V=0.025\)</span> m<span class="math inline">\(^3\)</span>, and <span class="math inline">\(T=300\)</span> K, the pressure is <span class="math inline">\(99{,}768\)</span> Pa. If <span class="math inline">\(\Delta V=0.0001\)</span> m<span class="math inline">\(^3\)</span> and <span class="math inline">\(\Delta
+T=2\)</span> K, the first-order prediction is <span class="math display">\[\Delta P\approx P_V\Delta V+P_T\Delta
+T=-399.072+665.12=266.048\ \mathrm{Pa}.\]</span> The actual pressure
+change is obtained by evaluating <span class="math inline">\(P(V+\Delta
+V,T+\Delta T)-P(V,T)\)</span>. This comparison illustrates the meaning
+and limitations of a total differential.</p>
+<h2 id="solving-the-mathematical-problems-using-r">Solving the
+mathematical problems using R</h2>
+<p>R can evaluate derivatives numerically, inspect path-dependent
+limits, and visualize scalar fields. These demonstrations deliberately
+reuse mathematical models introduced above. The executable companion
+file is <code>code/chapter03_paired.R</code>.</p>
+<h3 id="level-curves-and-a-temperature-field">Level curves and a
+temperature field</h3>
+<p>For <span class="math inline">\(T(x,y)=20+3x^2+2y^2\)</span>, the
+level <span class="math inline">\(T=26\)</span> is the ellipse <span class="math inline">\(3x^2+2y^2=6\)</span>. We plot several contours and
+verify the temperature at <span class="math inline">\((1,-2)\)</span>.</p>
+<div class="code-shell"><div class="code-bar">R<a href="code/chapter03-listing-01.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>Tfield &lt;- function(x,y) 20+3*x^2+2*y^2
+x &lt;- seq(-2,2,length.out=120)
+y &lt;- seq(-2,2,length.out=120)
+z &lt;- outer(x,y,Tfield)
+contour(x,y,z,levels=c(22,24,26,30,34),
+        xlab="x (m)",ylab="y (m)")
+stopifnot(Tfield(1,-2)==31)</code></pre></div>
+<h3 id="numerical-partial-derivatives-and-the-gradient">Numerical
+partial derivatives and the gradient</h3>
+<p>For <span class="math inline">\(f(x,y)=e^{xy}+x^3y\)</span>,
+differentiation by hand gives <span class="math inline">\(f_x=ye^{xy}+3x^2y\)</span> and <span class="math inline">\(f_y=xe^{xy}+x^3\)</span>. Compare with centered
+finite differences.</p>
+<div class="code-shell"><div class="code-bar">R<a href="code/chapter03-listing-02.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>f &lt;- function(x,y) exp(x*y)+x^3*y
+fx &lt;- function(x,y) y*exp(x*y)+3*x^2*y
+fy &lt;- function(x,y) x*exp(x*y)+x^3
+partial &lt;- function(f,x,y,axis="x",h=1e-5) {
+  if (axis=="x") (f(x+h,y)-f(x-h,y))/(2*h)
+  else (f(x,y+h)-f(x,y-h))/(2*h)
+}
+print(c(exact_x=fx(1,.5),numeric_x=partial(f,1,.5),
+        exact_y=fy(1,.5),numeric_y=partial(f,1,.5,"y")))</code></pre></div>
+<h3 id="path-diagnostics-cannot-prove-a-limit">Path diagnostics cannot
+prove a limit</h3>
+<p>For <span class="math inline">\(h(x,y)=xy/(x^2+y^2)\)</span>,
+evaluating along the axis and diagonal yields incompatible values near
+the origin. These computations support the algebraic counterexample but
+are not themselves a proof.</p>
+<div class="code-shell"><div class="code-bar">R<a href="code/chapter03-listing-03.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>h &lt;- function(x,y) x*y/(x*x+y*y)
+t &lt;- 10^(-seq(1,6))
+print(data.frame(t=t,axis=h(t,0),diagonal=h(t,t)))</code></pre></div>
+<h3 id="the-jacobian-and-ideal-gas-approximation">The Jacobian and
+ideal-gas approximation</h3>
+<div class="code-shell"><div class="code-bar">R<a href="code/chapter03-listing-04.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>J &lt;- function(u,v) matrix(c(2*u,2*v,-2*v,2*u),2,2)
+print(det(J(1,2)))
+Rg &lt;- 8.314; n &lt;- 1; V &lt;- .025; Temp &lt;- 300
+P &lt;- function(v,t) n*Rg*t/v
+dV &lt;- .0001; dT &lt;- 2
+linear &lt;- (-n*Rg*Temp/V^2)*dV + (n*Rg/V)*dT
+actual &lt;- P(V+dV,Temp+dT)-P(V,Temp)
+print(c(predicted=linear,actual=actual,error=actual-linear))</code></pre></div>
+<h2 id="solving-the-same-problems-using-python">Solving the same
+problems using Python</h2>
+<p>The Python solutions below use the identical formulas and input
+values. SymPy provides exact derivatives; NumPy and Matplotlib provide
+numerical evaluations and plots. The companion file is
+<code>code/chapter03_paired.py</code>.</p>
+<h3 id="the-same-temperature-field-and-contours">The same temperature
+field and contours</h3>
+<div class="code-shell"><div class="code-bar">Python<a href="code/chapter03-listing-05.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>import numpy as np
+import matplotlib.pyplot as plt
+x=np.linspace(-2,2,120); y=np.linspace(-2,2,120)
+X,Y=np.meshgrid(x,y)
+Z=20+3*X**2+2*Y**2
+plt.contour(X,Y,Z,levels=[22,24,26,30,34])
+plt.gca().set_aspect('equal'); plt.xlabel('x (m)')
+plt.ylabel('y (m)'); plt.tight_layout()
+assert 20+3*1**2+2*(-2)**2==31</code></pre></div>
+<h3 id="exact-and-numerical-derivatives">Exact and numerical
+derivatives</h3>
+<div class="code-shell"><div class="code-bar">Python<a href="code/chapter03-listing-06.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>import sympy as sp
+x,y=sp.symbols('x y',real=True)
+f=sp.exp(x*y)+x**3*y
+fx,fy=sp.diff(f,x),sp.diff(f,y)
+print(fx,fy)
+fnum=sp.lambdify((x,y),f,'numpy')
+h=1e-5
+numeric_x=(fnum(1+h,.5)-fnum(1-h,.5))/(2*h)
+print('exact:',float(fx.subs({x:1,y:.5})))
+print('numeric:',numeric_x)</code></pre></div>
+<h3 id="the-same-limit-jacobian-and-gas-law">The same limit, Jacobian,
+and gas law</h3>
+<div class="code-shell"><div class="code-bar">Python<a href="code/chapter03-listing-07.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>import numpy as np
+import sympy as sp
+u,v=sp.symbols('u v',real=True)
+F=sp.Matrix([u*u-v*v,2*u*v]); J=F.jacobian([u,v])
+assert sp.simplify(J.det()-4*(u*u+v*v))==0
+assert J.det().subs({u:1,v:2})==20
+Rg,n,V,Temp=8.314,1.,.025,300.
+P=lambda v,t:n*Rg*t/v
+dV,dT=.0001,2.
+linear=(-n*Rg*Temp/V**2)*dV+(n*Rg/V)*dT
+actual=P(V+dV,Temp+dT)-P(V,Temp)
+print('linear, actual, error:',linear,actual,actual-linear)
+t=10.**(-np.arange(1,7))
+print('axis:',np.zeros_like(t),'diagonal:',np.ones_like(t)/2)</code></pre></div>
+<h2 id="comparing-r-and-python">Comparing R and Python</h2>
+<p>The analytical derivatives, determinant, and gas-law prediction agree
+across the two environments. R uses vectorized numerical operations and
+<code>outer()</code> to generate grid values; NumPy uses
+<code>meshgrid()</code>. Both use finite differences for approximation,
+whereas SymPy can also return symbolic formulas. Numerical agreement is
+evidence of implementation consistency, not a substitute for a proof of
+a multivariable limit or differentiability.</p>
+<h2 id="real-world-application-pressure-monitoring-in-a-laboratory-vessel">Real-world
+application: pressure monitoring in a laboratory vessel</h2>
+<p>A sealed vessel is modeled by <span class="math inline">\(P(V,T)=nR_gT/V\)</span> over a short measurement
+interval. The model is appropriate only when the ideal-gas approximation
+and fixed-<span class="math inline">\(n\)</span> assumption are
+reasonable. The partial derivatives give the sensitivity of pressure to
+volume and temperature, with units Pa/m<span class="math inline">\(^3\)</span> and Pa/K. At the operating point
+above, the linear approximation predicts a pressure increase of
+approximately <span class="math inline">\(266.048\)</span> Pa; a direct
+nonlinear evaluation gives a slightly different value. Students should
+explain why an error may arise, compare the magnitude of the two
+perturbations, and investigate whether the linear approximation remains
+reliable for larger changes. Neither the model nor a numerical
+computation establishes how an actual vessel behaves without checking
+physical assumptions and measurement uncertainty.</p>
+<h2 id="a-deeper-look-at-differentiability-and-regularity">A deeper look
+at differentiability and regularity</h2>
+<p>The existence of coordinate-wise partial derivatives is weaker than
+the existence of a linear approximation. The distinction is important
+both mathematically and numerically: finite-difference code can return
+two plausible partial derivatives at a point where there is no valid
+tangent plane.</p>
+<div class="learning-box example"><p><strong>Definition — Differentiability in two variables.</strong> A
+function <span class="math inline">\(f\)</span> is differentiable at
+<span class="math inline">\(\boldsymbol{a}=(a,b)\)</span> if there is a
+linear map <span class="math inline">\(L:\mathbb{R}^2\to\mathbb{R}\)</span> such that
+<span class="math display">\[f(\boldsymbol{a}+\boldsymbol{h})=f(\boldsymbol{a})+L(\boldsymbol{h})+r(\boldsymbol{h}),\qquad
+\lim_{\boldsymbol{h}\to\boldsymbol{0}}\frac{|r(\boldsymbol{h})|}{\left\lVert
+\boldsymbol{h}\right\rVert}=0.\]</span> If the partial derivatives
+exist, the only possible linear map is <span class="math inline">\(L(h,k)=f_x(a,b)h+f_y(a,b)k\)</span>.</p></div>
+<div class="learning-box example"><p><strong>Theorem — A sufficient condition for
+differentiability.</strong> If <span class="math inline">\(f_x\)</span>
+and <span class="math inline">\(f_y\)</span> exist in a neighborhood of
+<span class="math inline">\((a,b)\)</span> and are continuous at <span class="math inline">\((a,b)\)</span>, then <span class="math inline">\(f\)</span> is differentiable at <span class="math inline">\((a,b)\)</span>.</p></div>
+<div class="learning-box example"><p><strong>Proof.</strong> Write the total increment as <span class="math display">\[f(a+h,b+k)-f(a,b)=[f(a+h,b+k)-f(a,b+k)]+[f(a,b+k)-f(a,b)].\]</span>
+Apply the one-variable mean value theorem to each bracket. For
+intermediate points <span class="math inline">\(\xi\)</span> and <span class="math inline">\(\eta\)</span>, the difference is <span class="math inline">\(f_x(\xi,b+k)h+f_y(a,\eta)k\)</span>. Subtract
+<span class="math inline">\(f_x(a,b)h+f_y(a,b)k\)</span> and bound the
+remainder by <span class="math display">\[|r(h,k)|\le
+|h|\,|f_x(\xi,b+k)-f_x(a,b)|+|k|\,|f_y(a,\eta)-f_y(a,b)|.\]</span>
+Continuity of the partial derivatives makes each coefficient tend to
+zero, while <span class="math inline">\(|h|,|k|\le\sqrt{h^2+k^2}\)</span>.</p></div>
+<div class="learning-box example"><p><strong>Example — A function with partial derivatives but no tangent
+plane.</strong> Let <span class="math inline">\(f(0,0)=0\)</span> and,
+for <span class="math inline">\((x,y)\ne(0,0)\)</span>, define <span class="math inline">\(f(x,y)=xy/\sqrt{x^2+y^2}\)</span>. Both coordinate
+partial derivatives at the origin equal zero, because <span class="math inline">\(f(h,0)=f(0,k)=0\)</span>. Yet along <span class="math inline">\(y=x&gt;0\)</span>, <span class="math inline">\(f(x,x)=x/\sqrt2\)</span> and <span class="math inline">\(\left\lVert (x,x)\right\rVert=\sqrt2x\)</span>, so
+<span class="math inline">\(f(x,x)/\left\lVert
+(x,x)\right\rVert=1/2\)</span>. The differentiability remainder does not
+tend to zero. The origin therefore has no valid linear approximation
+despite both partial derivatives existing.</p></div>
+<h2 id="error-bounds-for-local-approximations">Error bounds for local
+approximations</h2>
+<p>A first-order approximation should be accompanied by a statement of
+its accuracy. If <span class="math inline">\(f\)</span> has continuous
+second derivatives on a convex neighborhood of <span class="math inline">\(\boldsymbol{a}\)</span>, then for <span class="math inline">\(\boldsymbol{h}\)</span> remaining in that
+neighborhood, <span class="math display">\[f(\boldsymbol{a}+\boldsymbol{h})=f(\boldsymbol{a})+\nabla
+f(\boldsymbol{a})\cdot\boldsymbol{h}+\frac12\boldsymbol{h}^{\mathsf
+T}H_f(\boldsymbol{a}+t\boldsymbol{h})\boldsymbol{h}\]</span> for some
+<span class="math inline">\(t\in(0,1)\)</span>. Consequently, if the
+spectral norm of the Hessian is bounded above by <span class="math inline">\(M\)</span> on the segment, <span class="math display">\[\left|f(\boldsymbol{a}+\boldsymbol{h})-f(\boldsymbol{a})-\nabla
+f(\boldsymbol{a})\cdot\boldsymbol{h}\right|\le\frac M2\left\lVert
+\boldsymbol{h}\right\rVert^2.\]</span></p>
+<div class="learning-box example"><p><strong>Example — A quantitative tangent-plane error.</strong> For
+<span class="math inline">\(f(x,y)=x^2+2y^2\)</span> at <span class="math inline">\((1,1/2)\)</span>, the linearization is <span class="math inline">\(L(1+h,1/2+k)=3/2+2h+2k\)</span>. The exact
+remainder is <span class="math inline">\(h^2+2k^2\)</span>. Since the
+Hessian is <span class="math inline">\(\operatorname{diag}(2,4)\)</span>, its spectral
+norm is <span class="math inline">\(4\)</span>, and the bound <span class="math inline">\(|f-L|\le2(h^2+k^2)\)</span> follows. The
+inequality is sharp along the <span class="math inline">\(y\)</span>-direction.</p></div>
+<div class="learning-box check"><p><strong>Checkpoint.</strong> For <span class="math inline">\(f(x,y)=e^{x+y}\)</span>, calculate the tangent
+plane at the origin and explain why the first-order approximation error
+scales quadratically with sufficiently small displacement.</p></div>
+<h2 id="jacobians-local-invertibility-and-coordinate-changes">Jacobians,
+local invertibility, and coordinate changes</h2>
+<p>The Jacobian matrix is the best linear approximation to a
+differentiable vector-valued map. For <span class="math inline">\(\boldsymbol{F}:\mathbb{R}^2\to\mathbb{R}^2\)</span>,
+<span class="math display">\[D\boldsymbol{F}(a,b)=\begin{pmatrix}F_{1x}&amp;F_{1y}\\F_{2x}&amp;F_{2y}\end{pmatrix}_{(a,b)}.\]</span>
+Its determinant gives the signed local area-scaling factor. A nonzero
+determinant also implies that, under continuous differentiability, the
+map has a differentiable local inverse.</p>
+<div class="learning-box example"><p><strong>Example — A nonlinear deformation.</strong> Consider <span class="math inline">\(\boldsymbol{F}(x,y)=(x+y^2,\,y+x^2)\)</span>. Its
+Jacobian is <span class="math display">\[D\boldsymbol{F}(x,y)=\begin{pmatrix}1&amp;2y\\2x&amp;1\end{pmatrix},\qquad\det
+D\boldsymbol{F}(x,y)=1-4xy.\]</span> At <span class="math inline">\((1,1)\)</span> the determinant is <span class="math inline">\(-3\)</span>: nearby oriented areas are
+approximately multiplied by <span class="math inline">\(-3\)</span>. At
+<span class="math inline">\((1/2,1/2)\)</span> the determinant vanishes,
+so the inverse function theorem provides no local-invertibility
+guarantee there. A zero determinant does not, by itself, establish
+global non-injectivity.</p></div>
+<h3 id="why-the-absolute-determinant-appears-in-integration">Why the
+absolute determinant appears in integration</h3>
+<p>A small rectangle in input coordinates is mapped approximately to a
+parallelogram spanned by the columns of <span class="math inline">\(D\boldsymbol{F}\)</span>; its area is the absolute
+determinant times the original area. Thus, under appropriate one-to-one
+and regularity assumptions, <span class="math display">\[\iint_{\boldsymbol{F}(U)}g(u,v)\,du\,dv=\iint_U
+g(\boldsymbol{F}(x,y))\,|\det D\boldsymbol{F}(x,y)|\,dx\,dy.\]</span>
+This anticipates the change-of-variables formula developed
+systematically in Chapter 5.</p>
+<h2 id="sensitivity-analysis-with-units-and-relative-changes">Sensitivity
+analysis with units and relative changes</h2>
+<p>In an applied model, a derivative has units: if <span class="math inline">\(f\)</span> is pressure in kilopascals and <span class="math inline">\(x\)</span> is temperature in kelvin, then <span class="math inline">\(f_x\)</span> has units of kilopascals per kelvin.
+The differential <span class="math display">\[\Delta f\approx f_x\Delta
+x+f_y\Delta y\]</span> quantifies the effect of small absolute changes.
+When inputs have different scales, a dimensionless elasticity can be
+more informative: <span class="math display">\[E_x=\frac{x}{f}\frac{\partial f}{\partial
+x},\qquad E_y=\frac{y}{f}\frac{\partial f}{\partial y}.\]</span></p>
+<div class="learning-box example"><p><strong>Example — Ideal-gas elasticities.</strong> For <span class="math inline">\(P(n,T,V)=nRT/V\)</span> with fixed <span class="math inline">\(R\)</span>, the elasticities are <span class="math inline">\(E_n=1\)</span>, <span class="math inline">\(E_T=1\)</span>, and <span class="math inline">\(E_V=-1\)</span>. Thus a 1% increase in
+temperature, holding other inputs fixed, produces approximately a 1%
+increase in pressure; a 1% increase in volume produces approximately a
+1% decrease. These are local statements, not exact finite-change
+identities.</p></div>
+<h3 id="worst-case-versus-independent-measurement-errors">Worst-case
+versus independent measurement errors</h3>
+<p>Suppose measurements of <span class="math inline">\(x\)</span> and
+<span class="math inline">\(y\)</span> have absolute error bounds <span class="math inline">\(|\Delta x|\le\varepsilon_x\)</span> and <span class="math inline">\(|\Delta y|\le\varepsilon_y\)</span>. The
+linearized worst-case bound is <span class="math display">\[|\Delta
+f|\lesssim |f_x|\varepsilon_x+|f_y|\varepsilon_y.\]</span> If instead
+measurement errors are centered, independent random variables with
+standard deviations <span class="math inline">\(\sigma_x,\sigma_y\)</span>, then the first-order
+variance approximation is <span class="math display">\[\operatorname{Var}(f(X,Y))\approx
+f_x^2\sigma_x^2+f_y^2\sigma_y^2.\]</span> These two expressions answer
+different questions and should not be interchanged. Correlated errors
+require an additional covariance term <span class="math inline">\(2f_xf_y\operatorname{Cov}(X,Y)\)</span>.</p>
+<h2 id="computational-laboratory-verifying-an-approximation-bound">Computational
+laboratory: verifying an approximation bound</h2>
+<p>We now test a mathematical statement rather than relying on a plot.
+For <span class="math inline">\(f(x,y)=x^2+2y^2\)</span>, the remainder
+about <span class="math inline">\((1,1/2)\)</span> is exactly <span class="math inline">\(h^2+2k^2\)</span>. Compare the remainder with the
+quadratic upper bound <span class="math inline">\(2(h^2+k^2)\)</span>
+for several displacements.</p>
+<h3 id="r-implementation">R implementation</h3>
+<div class="code-shell"><div class="code-bar">R<a href="code/chapter03-listing-08.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>f &lt;- function(x, y) x^2 + 2*y^2
+linear &lt;- function(h, k) 1.5 + 2*h + 2*k
+h &lt;- c(0.2, 0.1, 0.05, 0.025)
+k &lt;- h / 2
+actual &lt;- f(1+h, 0.5+k)
+error &lt;- abs(actual - linear(h, k))
+bound &lt;- 2*(h^2 + k^2)
+print(data.frame(h, k, error, bound))
+stopifnot(all(error &lt;= bound + 1e-12))</code></pre></div>
+<h3 id="python-implementation">Python implementation</h3>
+<div class="code-shell"><div class="code-bar">Python<a href="code/chapter03-listing-09.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>import numpy as np
+
+def f(x, y):
+    return x**2 + 2*y**2
+
+h = np.array([0.2, 0.1, 0.05, 0.025])
+k = h / 2
+linear = 1.5 + 2*h + 2*k
+error = np.abs(f(1+h, 0.5+k) - linear)
+bound = 2*(h*h + k*k)
+print(np.column_stack((h, k, error, bound)))
+assert np.all(error &lt;= bound + 1e-12)</code></pre></div>
+<p>Both programs calculate the same mathematical quantities. Halving
+both increments should divide the quadratic error by four. This provides
+an interpretable computational check of the analytic remainder
+formula.</p>
+<h2 id="extended-problems-proof-computation-and-interpretation">Extended
+problems: proof, computation, and interpretation</h2>
+<ol type="1">
+<li><p>Prove directly from the definition that <span class="math inline">\(f(x,y)=x^2+2y^2\)</span> is differentiable at
+every point of <span class="math inline">\(\mathbb{R}^2\)</span>.
+Identify its derivative as a linear map.</p></li>
+<li><p>Construct a function whose partial derivatives at the origin both
+exist but which is discontinuous there. Show the relevant limits
+explicitly.</p></li>
+<li><p>For <span class="math inline">\(f(x,y)=e^{x+2y}\)</span>,
+calculate the gradient and Hessian at the origin. Bound the first-order
+approximation error on the disk <span class="math inline">\(x^2+y^2\le0.01\)</span>.</p></li>
+<li><p>For <span class="math inline">\(\boldsymbol{F}(x,y)=(x+y^2,y+x^2)\)</span>,
+identify the curve where the Jacobian determinant is zero. Explain what
+can and cannot be inferred about local invertibility.</p></li>
+<li><p>Derive the elasticities of <span class="math inline">\(A=\pi
+r^2\)</span> with respect to <span class="math inline">\(r\)</span> and
+of <span class="math inline">\(V=\pi r^2h\)</span> with respect to both
+<span class="math inline">\(r\)</span> and <span class="math inline">\(h\)</span>. Interpret a 2% measurement error in
+each input.</p></li>
+<li><p>Adapt the paired computational laboratory to the function <span class="math inline">\(f(x,y)=3x^2+xy+y^2\)</span> at <span class="math inline">\((1,-1)\)</span>. Compare the exact remainder with
+a Hessian-based bound.</p></li>
+<li><p>Write an R function and a Python function that compute the
+centered-difference approximation to <span class="math inline">\(f_x(x,y)\)</span>. Test step sizes from <span class="math inline">\(10^{-1}\)</span> to <span class="math inline">\(10^{-8}\)</span> and explain why errors eventually
+stop decreasing.</p></li>
+<li><p>A measured pressure depends on temperature and volume according
+to <span class="math inline">\(P=cT/V\)</span>. Compare the worst-case
+error bound with the independent-error standard-deviation approximation,
+specifying reasonable units and measurement uncertainties.</p></li>
+</ol>
+<h2 id="chapter-synthesis">Chapter synthesis</h2>
+<p>Partial derivatives measure coordinate-direction change, while
+differentiability requires a single linear approximation valid for all
+small displacements. The chain rule composes derivative matrices; the
+Jacobian quantifies local transformations; and the gradient organizes
+directional rates. R and Python help verify and visualize these results,
+but a mathematical argument remains essential.</p>
+<h2 id="exercises">Exercises</h2>
+<p><strong>Instructions.</strong> Unless a question explicitly requests
+a numerical method, provide exact expressions and justify your
+reasoning. Python is encouraged as a verification tool, not as a
+substitute for explanations.</p>
+<ol type="1">
+<li><p>Find and sketch the domain of <span class="math inline">\(\sqrt{16-x^2-4y^2}\)</span>.</p></li>
+<li><p>Describe the domain of <span class="math inline">\(\log(y-x^2)/(x-1)\)</span>, including excluded
+boundary curves.</p></li>
+<li><p>Identify the level curves of <span class="math inline">\(f(x,y)=x^2+4y^2\)</span> for <span class="math inline">\(c=0,1,4,9\)</span>.</p></li>
+<li><p>Describe the level surfaces of <span class="math inline">\(F(x,y,z)=x^2+y^2-z^2\)</span> for <span class="math inline">\(c=0,1,-1\)</span>.</p></li>
+<li><p>Find the traces of <span class="math inline">\(z=xy+x^2\)</span>
+in the planes <span class="math inline">\(y=0\)</span>, <span class="math inline">\(y=1\)</span>, and <span class="math inline">\(x=-1\)</span>.</p></li>
+<li><p>Prove that <span class="math inline">\(\lim_{(x,y)\to(0,0)}x^2y/(x^2+y^2)=0\)</span>
+using a bound.</p></li>
+<li><p>Determine whether <span class="math inline">\(\lim_{(x,y)\to(0,0)}(x^2-y^2)/(x^2+y^2)\)</span>
+exists.</p></li>
+<li><p>Examine <span class="math inline">\(\lim_{(x,y)\to(0,0)}x^2y/(x^4+y^2)\)</span> along
+lines and the curve <span class="math inline">\(y=x^2\)</span>.</p></li>
+<li><p>Show that <span class="math inline">\(\lim_{(x,y)\to(0,0)}x^2y^2/(x^2+y^2)=0\)</span>.</p></li>
+<li><p>Test the continuity at the origin of <span class="math inline">\(f(x,y)=xy/\sqrt{x^2+y^2}\)</span> for nonzero
+<span class="math inline">\((x,y)\)</span> and <span class="math inline">\(f(0,0)=0\)</span>.</p></li>
+<li><p>Compute <span class="math inline">\(f_x,f_y\)</span> for <span class="math inline">\(f(x,y)=x^3y^2+\cos(xy)\)</span>.</p></li>
+<li><p>Compute <span class="math inline">\(f_x,f_y\)</span> for <span class="math inline">\(f(x,y)=\log(1+x^2+y^2)\)</span>.</p></li>
+<li><p>Find <span class="math inline">\(f_{xx},f_{xy},f_{yx},f_{yy}\)</span> for <span class="math inline">\(f(x,y)=x^2e^{xy}\)</span>.</p></li>
+<li><p>Verify equality of mixed partial derivatives for <span class="math inline">\(f(x,y)=\sin(xy)+x^3y\)</span>.</p></li>
+<li><p>Calculate the partial derivatives of <span class="math inline">\(F(x,y,z)=xyz+e^{x-z}\)</span>.</p></li>
+<li><p>Find the tangent plane to <span class="math inline">\(z=x^2+3y^2\)</span> at <span class="math inline">\((1,-1,4)\)</span>.</p></li>
+<li><p>Construct the linear approximation to <span class="math inline">\(f(x,y)=\sqrt{4+x+2y}\)</span> at <span class="math inline">\((0,0)\)</span>.</p></li>
+<li><p>Use a differential to approximate the change in <span class="math inline">\(V(r,h)=\pi r^2h\)</span> when <span class="math inline">\(r\)</span> increases by <span class="math inline">\(0.5\%\)</span> and <span class="math inline">\(h\)</span> decreases by <span class="math inline">\(1\%\)</span>.</p></li>
+<li><p>Prove that the function <span class="math inline">\(f(x,y)=xy/\sqrt{x^2+y^2}\)</span>, extended by
+zero at the origin, has both coordinate partial derivatives there but is
+not differentiable there.</p></li>
+<li><p>If <span class="math inline">\(z=x^2y\)</span> with <span class="math inline">\(x=t^2\)</span> and <span class="math inline">\(y=e^t\)</span>, compute <span class="math inline">\(dz/dt\)</span> in two ways.</p></li>
+<li><p>If <span class="math inline">\(z=e^{xy}\)</span>, <span class="math inline">\(x=s+t\)</span>, and <span class="math inline">\(y=s-t\)</span>, compute <span class="math inline">\(z_s\)</span> and <span class="math inline">\(z_t\)</span>.</p></li>
+<li><p>Write the Jacobian of <span class="math inline">\((u,v)=(x^2-y^2,2xy)\)</span> and find its
+determinant.</p></li>
+<li><p>Verify the matrix chain rule for <span class="math inline">\(\boldsymbol{F}(u,v)=(u+v,uv)\)</span> and <span class="math inline">\(\boldsymbol{G}(s,t)=(s^2,t^2)\)</span>.</p></li>
+<li><p>For <span class="math inline">\(x^2+y^2+z^2=25\)</span>, find
+<span class="math inline">\(z_x\)</span> and <span class="math inline">\(z_y\)</span> near <span class="math inline">\((3,0,4)\)</span>.</p></li>
+<li><p>Find the tangent plane to <span class="math inline">\(x^2+2y^2+3z^2=12\)</span> at <span class="math inline">\((1,2,1)\)</span>.</p></li>
+<li><p>Compute the directional derivative of <span class="math inline">\(f(x,y)=xy^2\)</span> at <span class="math inline">\((1,2)\)</span> in direction <span class="math inline">\((3,4)\)</span>, properly normalized.</p></li>
+<li><p>Determine the direction of greatest increase of <span class="math inline">\(f(x,y)=e^{x-y}+x^2\)</span> at <span class="math inline">\((0,0)\)</span>.</p></li>
+<li><p>Prove that the gradient is orthogonal to the tangent of a regular
+level curve.</p></li>
+<li><p>Compute the Hessian of <span class="math inline">\(f(x,y)=x^4+x^2y^2+y^4\)</span>.</p></li>
+<li><p>Obtain the second-order Taylor polynomial of <span class="math inline">\(f(x,y)=e^{x+y}\)</span> at <span class="math inline">\((0,0)\)</span>.</p></li>
+<li><p>Compare forward and centered difference approximations to <span class="math inline">\(\partial_x\sin(xy)\)</span> at <span class="math inline">\((1,2)\)</span> for <span class="math inline">\(h=10^{-1},10^{-2},10^{-3}\)</span>.</p></li>
+<li><p>Explain why agreement along all lines through the origin is
+insufficient to establish a multivariable limit; supply an explicit
+example.</p></li>
+<li><p>For <span class="math inline">\(T(x,y)=15+2x^2+3y^2\)</span>,
+find the rate of temperature change along <span class="math inline">\(\boldsymbol{r}(t)=(t,2t)\)</span> at <span class="math inline">\(t=1\)</span>.</p></li>
+<li><p>For <span class="math inline">\(f(x,y)=\sqrt{x^2+y^2}\)</span>,
+determine where the gradient exists and explain the behavior at the
+origin.</p></li>
+<li><p>Compute <span class="math inline">\(D_{\boldsymbol{u}}f(1,1)\)</span> for <span class="math inline">\(f(x,y)=\log(x^2+y^2)\)</span> and <span class="math inline">\(\boldsymbol{u}=(1,-1)/\sqrt2\)</span>.</p></li>
+<li><p><strong>Python investigation.</strong> Create a 3D graph and
+contour plot for <span class="math inline">\(f(x,y)=x^2-2y^2\)</span>.
+Explain how the contour geometry reflects the saddle shape.</p></li>
+<li><p><strong>Python investigation.</strong> Use SymPy to calculate all
+first and second partial derivatives of <span class="math inline">\(f(x,y)=e^{xy}\cos x\)</span>; compare with hand
+differentiation.</p></li>
+<li><p><strong>Python investigation.</strong> Approximate <span class="math inline">\(f_x(0.8,0.6)\)</span> for <span class="math inline">\(f=x^2+2y^2\)</span> using forward and centered
+differences. Plot absolute error versus step size on logarithmic axes
+and discuss floating-point behavior.</p></li>
+<li><p><strong>Python investigation.</strong> Plot <span class="math inline">\(xy/(x^2+y^2)\)</span> on a punctured square near
+the origin. Compare what the graph suggests with a rigorous path
+argument.</p></li>
+<li><p><strong>Modeling challenge.</strong> Design a smooth two-input
+cost or response model, explain its domain and units, derive the
+gradient, and interpret a local linear approximation at a meaningful
+operating point.</p></li>
+</ol>
+<h2 id="chapter-project-sensitivity-and-approximation-in-two-languages">Chapter
+project: sensitivity and approximation in two languages</h2>
+<p><strong>Research question.</strong> How accurately does a tangent
+plane predict a nonlinear surface near a selected point, and how does
+the error depend on direction and distance? Use <span class="math display">\[f(x,y)=\sin x\cos y+\tfrac14x^2,\qquad
+P=(0,0).\]</span></p>
+<ol type="1">
+<li><p>Derive the gradient and Hessian by hand and evaluate them at
+<span class="math inline">\(P\)</span>. Construct the first- and
+second-order Taylor polynomials.</p></li>
+<li><p>In both R and Python, sample <span class="math inline">\((r\cos\theta,r\sin\theta)\)</span> for at least
+four radii and twelve angles. Compute absolute errors of both
+approximations.</p></li>
+<li><p>Plot maximum error over angles versus radius on log–log axes in
+each language. Compare slopes and explain expected error
+orders.</p></li>
+<li><p>Produce a labeled surface and contour visualization and discuss
+where the tangent plane is most accurate.</p></li>
+<li><p>Include a comparison table of R and Python numerical results, and
+distinguish empirical evidence from mathematical proof.</p></li>
+<li><p>Submit a report with model, mathematical derivations,
+reproducible R and Python code, figures, interpretation, and
+limitations.</p></li>
+</ol>
+<p><strong>Suggested assessment rubric (100 points):</strong>
+mathematical derivations (30); correct R implementation (20); correct
+Python implementation (20); figures and reproducibility (15);
+comparison, interpretation, and limitations (15).
+<strong>Extensions.</strong> Repeat the investigation with a nonlinear
+biological-response or thermodynamic model, clearly stating its
+assumptions and variable units.</p>
+<footer><a href="chapter02.html">2. Curves, Surfaces, and Coordinate Systems ←</a><a href="chapter04.html">4. Gradients, Taylor Approximations, and Optimization →</a></footer></main><aside class="chapter-toc"><strong>On this page</strong><ul><li><a href="#interactive-investigation">Interactive investigation</a></li><li><a href="#from-one-input-to-many">From one input to many</a></li><li><a href="#domains-and-boundary-behavior">Domains and boundary
+behavior</a></li><li><a href="#level-curves-level-surfaces-and-traces">Level curves, level
+surfaces, and traces</a></li><li><a href="#computational-preview-graphs-and-contours">Computational preview:
+graphs and contours</a></li><li><a href="#limits-in-more-than-one-dimension">Limits in more than one
+dimension</a></li><li><a href="#why-a-successful-path-test-is-not-a-proof">Why a successful path
+test is not a proof</a></li><li><a href="#proving-a-limit-with-inequalities">Proving a limit with
+inequalities</a></li><li><a href="#polar-coordinates-as-a-limit-tool">Polar coordinates as a limit
+tool</a></li><li><a href="#continuity-and-compositions">Continuity and compositions</a></li><li><a href="#partial-derivatives">Partial derivatives</a></li><li><a href="#second-and-mixed-partial-derivatives">Second and mixed partial
+derivatives</a></li><li><a href="#differentiability-and-local-linear-models">Differentiability and
+local linear models</a></li><li><a href="#why-partial-derivatives-alone-can-fail">Why partial derivatives
+alone can fail</a></li><li><a href="#the-differential-and-uncertainty-propagation">The differential
+and uncertainty propagation</a></li><li><a href="#the-multivariable-chain-rule">The multivariable chain rule</a></li><li><a href="#two-independent-parameters">Two independent parameters</a></li><li><a href="#implicit-differentiation">Implicit differentiation</a></li><li><a href="#directional-derivatives-and-the-gradient">Directional
+derivatives and the gradient</a></li><li><a href="#gradients-are-normal-to-regular-level-sets">Gradients are normal
+to regular level sets</a></li><li><a href="#higher-derivatives-and-the-hessian">Higher derivatives and the
+Hessian</a></li><li><a href="#numerical-partial-derivatives-and-computational-error">Numerical
+partial derivatives and computational error</a></li><li><a href="#applications-across-disciplines">Applications across
+disciplines</a></li><li><a href="#marginal-response-in-a-two-input-model">Marginal response in a
+two-input model</a></li><li><a href="#sensitivity-of-a-risk-score">Sensitivity of a risk score</a></li><li><a href="#additional-mathematical-examples-from-the-r-manuscript">Additional
+mathematical examples from the R manuscript</a></li><li><a href="#temperature-derivatives-and-units">Temperature derivatives and
+units</a></li><li><a href="#jacobian-and-local-area-distortion">Jacobian and local area
+distortion</a></li><li><a href="#the-ideal-gas-law-and-sensitivity">The ideal-gas law and
+sensitivity</a></li><li><a href="#solving-the-mathematical-problems-using-r">Solving the
+mathematical problems using R</a></li><li><a href="#level-curves-and-a-temperature-field">Level curves and a
+temperature field</a></li><li><a href="#numerical-partial-derivatives-and-the-gradient">Numerical
+partial derivatives and the gradient</a></li><li><a href="#path-diagnostics-cannot-prove-a-limit">Path diagnostics cannot
+prove a limit</a></li><li><a href="#the-jacobian-and-ideal-gas-approximation">The Jacobian and
+ideal-gas approximation</a></li><li><a href="#solving-the-same-problems-using-python">Solving the same
+problems using Python</a></li><li><a href="#the-same-temperature-field-and-contours">The same temperature
+field and contours</a></li><li><a href="#exact-and-numerical-derivatives">Exact and numerical
+derivatives</a></li><li><a href="#the-same-limit-jacobian-and-gas-law">The same limit, Jacobian,
+and gas law</a></li><li><a href="#comparing-r-and-python">Comparing R and Python</a></li><li><a href="#real-world-application-pressure-monitoring-in-a-laboratory-vessel">Real-world
+application: pressure monitoring in a laboratory vessel</a></li><li><a href="#a-deeper-look-at-differentiability-and-regularity">A deeper look
+at differentiability and regularity</a></li><li><a href="#error-bounds-for-local-approximations">Error bounds for local
+approximations</a></li><li><a href="#jacobians-local-invertibility-and-coordinate-changes">Jacobians,
+local invertibility, and coordinate changes</a></li><li><a href="#why-the-absolute-determinant-appears-in-integration">Why the
+absolute determinant appears in integration</a></li><li><a href="#sensitivity-analysis-with-units-and-relative-changes">Sensitivity
+analysis with units and relative changes</a></li><li><a href="#worst-case-versus-independent-measurement-errors">Worst-case
+versus independent measurement errors</a></li><li><a href="#computational-laboratory-verifying-an-approximation-bound">Computational
+laboratory: verifying an approximation bound</a></li><li><a href="#r-implementation">R implementation</a></li><li><a href="#python-implementation">Python implementation</a></li><li><a href="#extended-problems-proof-computation-and-interpretation">Extended
+problems: proof, computation, and interpretation</a></li><li><a href="#chapter-synthesis">Chapter synthesis</a></li><li><a href="#exercises">Exercises</a></li><li><a href="#chapter-project-sensitivity-and-approximation-in-two-languages">Chapter
+project: sensitivity and approximation in two languages</a></li></ul></aside></div><script src="search-index.js"></script><script src="site.js"></script><script src="investigations.js"></script></body></html>

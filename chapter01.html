@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><title>Vectors and Geometry in Three-Dimensional Space | Applied Multivariate Calculus Using R and Python</title><link href="site.css" rel="stylesheet"/><script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]}};</script><script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script></head><body><a class="skip" href="#main">Skip to content</a><nav aria-label="Book navigation" class="site-nav"><a class="brand" href="index.html">Applied Multivariate Calculus Using R and Python</a><p class="subtitle">Volume III · Abraham Ayebo</p><label for="book-search">Search book</label><input id="book-search" placeholder="Search chapters" type="search"/><div aria-live="polite" class="search-results" id="search-results"></div><div class="nav-label">Contents</div><a href="index.html">Welcome</a><a aria-current="page" class="active" href="chapter01.html">1. Vectors and Geometry in Three-Dimensional Space</a><a href="chapter02.html">2. Curves, Surfaces, and Coordinate Systems</a><a href="chapter03.html">3. Functions of Several Variables and Partial Differentiation</a><a href="chapter04.html">4. Gradients, Taylor Approximations, and Optimization</a><a href="chapter05.html">5. Multiple Integration and Applications</a><a href="chapter06.html">6. Vector Fields and Integral Theorems</a><a href="chapter07.html">7. Introduction to Tensor Calculus and Differential Geometry</a><a href="chapter08.html">8. Partial Differential Equations and Computational Methods</a><a href="appendix-a.html">Appendix A. Introduction to R and RStudio</a><a href="appendix-b.html">Appendix B. Introduction to Python and Jupyter</a><a href="resources.html">Computational resources</a><a href="about.html">About this book</a><div class="nav-label">Series</div><a href="https://aayebo.github.io/applied-precalculus/">Volume I · Applied Precalculus</a><a href="https://aayebo.github.io/applied-calculus/">Volume II · Applied Calculus</a></nav><header class="topbar"><button aria-expanded="false" class="menu">Contents</button><span>Applied Mathematics · Volume III</span><span class="spacer"></span><a href="resources.html">Code &amp; resources</a></header><div class="page-grid"><main id="main"><h1>1. Vectors and Geometry in Three-Dimensional Space</h1><div class="learning-box example"><p><strong>Learning.</strong> After completing this chapter, you should
+be able to distinguish points from vectors; perform vector operations in
+<span class="math inline">\(\mathbb{R}^2\)</span> and <span class="math inline">\(\mathbb{R}^3\)</span>; interpret dot and cross
+products geometrically; compute projections, angles, areas, and volumes;
+derive equations of lines and planes; solve distance problems; and
+verify geometric results using Python.</p></div>
+<section class="mv-lab" id="interactive-investigation"><h2>Interactive investigation: Vector projection</h2><p>Adjust the direction of a unit vector u and project v=(3,2) onto it.</p><div data-mv-lab="1"></div><p><strong>Explore:</strong> When is the projection zero? When is its length largest?</p><noscript>Enable JavaScript to use this investigation.</noscript></section><h2 id="why-three-dimensional-geometry-matters">Why three-dimensional
+geometry matters</h2>
+<p>The physical world offers countless reasons to study geometry in
+three dimensions. A drone changes its position while the wind alters its
+velocity. A sensor reports three orthogonal components of acceleration.
+A structural engineer needs a direction perpendicular to a sloping roof.
+A geologist represents a rock layer by a plane, while a
+computer-graphics program represents a surface using small oriented
+triangles. The same mathematical language supports all of these
+settings.</p>
+<p>We start with a distinction that will recur throughout the book. A
+<em>point</em> describes a location; a <em>vector</em> describes a
+displacement, direction, or quantity with components. Their coordinate
+representations can look identical, but their roles are different. Once
+an origin is chosen, the point <span class="math inline">\(P=(p_1,p_2,p_3)\)</span> determines a position
+vector <span class="math inline">\(\overrightarrow{OP}=\langle
+p_1,p_2,p_3\rangle\)</span>. Changing the origin changes this position
+vector, whereas a displacement between two points does not.</p>
+<h3 id="cartesian-coordinates-and-distance">Cartesian coordinates and
+distance</h3>
+<p>Let <span class="math inline">\(P=(x_1,y_1,z_1)\)</span> and <span class="math inline">\(Q=(x_2,y_2,z_2)\)</span>. The displacement from
+<span class="math inline">\(P\)</span> to <span class="math inline">\(Q\)</span> is <span class="math display">\[\label{eq:displacement}
+\overrightarrow{PQ}=\langle x_2-x_1,\ y_2-y_1,\ z_2-z_1\rangle.\]</span>
+Repeated use of the Pythagorean theorem gives the distance formula <span class="math display">\[\label{eq:distance}
+d(P,Q)=\sqrt{(x_2-x_1)^2+(y_2-y_1)^2+(z_2-z_1)^2}.\]</span> The three
+coordinate planes are <span class="math inline">\(x=0\)</span>, <span class="math inline">\(y=0\)</span>, and <span class="math inline">\(z=0\)</span>. The planes divide space into eight
+octants. For example, <span class="math inline">\((2,-1,3)\)</span> lies
+in the octant with positive <span class="math inline">\(x\)</span> and
+<span class="math inline">\(z\)</span> and negative <span class="math inline">\(y\)</span>.</p>
+<div class="learning-box example"><p><strong>Example — Displacement and distance.</strong> A monitoring
+station is at <span class="math inline">\(A=(1,-2,4)\)</span> and a
+drone is at <span class="math inline">\(B=(5,1,2)\)</span>, with
+coordinates measured in kilometers. The displacement is <span class="math inline">\(\overrightarrow{AB}=\langle4,3,-2\rangle\)</span>
+km. The straight-line distance is <span class="math inline">\(\sqrt{4^2+3^2+(-2)^2}=\sqrt{29}\)</span> km,
+approximately <span class="math inline">\(5.385\)</span> km. The
+displacement carries directional information that the distance alone
+does not.</p></div>
+<div class="learning-box check"><p><strong>Checkpoint.</strong> Why is the displacement from <span class="math inline">\(B\)</span> to <span class="math inline">\(A\)</span> the negative of the displacement from
+<span class="math inline">\(A\)</span> to <span class="math inline">\(B\)</span>, while the distance remains
+unchanged?</p></div>
+<h2 id="vectors-arithmetic-and-geometric-meaning">Vectors, arithmetic,
+and geometric meaning</h2>
+<div class="learning-box example"><p><strong>Definition.</strong> A vector in <span class="math inline">\(\mathbb{R}^3\)</span> is an ordered triple <span class="math inline">\(\boldsymbol{v}=\langle
+v_1,v_2,v_3\rangle\)</span>. Two vectors are equal when their
+corresponding components are equal. Addition and scalar multiplication
+are defined componentwise: <span class="math display">\[\boldsymbol{u}+\boldsymbol{v}=\langle
+u_1+v_1,u_2+v_2,u_3+v_3\rangle,\qquad c\boldsymbol{v}=\langle
+cv_1,cv_2,cv_3\rangle.\]</span></p></div>
+<p>A vector can be drawn as an arrow whose length and direction encode
+its components. Translating the arrow without rotating or changing its
+length does not change the vector. To add two vectors geometrically,
+place the tail of the second at the head of the first. The resultant
+joins the initial tail to the final head. This is the <em>head-to-tail
+rule</em>. A parallelogram construction yields the same resultant.</p>
+<figure id="fig:add">
+<img alt="Vector addition in \mathbb{R}^3. Dashed translated edges complete the parallelogram. Generated with Matplotlib; see code/chapter01_figures.py." src="figures/vector_addition.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">Vector addition in <span class="math inline">\(\mathbb{R}^3\)</span>. Dashed translated edges
+complete the parallelogram. Generated with Matplotlib; see
+<code>code/chapter01_figures.py</code>.</figcaption>
+</figure>
+<div class="learning-box example"><p><strong>Proposition — Algebraic laws.</strong> For <span class="math inline">\(\boldsymbol{u},\boldsymbol{v},\boldsymbol{w}\in\mathbb{R}^3\)</span>
+and scalars <span class="math inline">\(a,b\)</span>, vector addition is
+commutative and associative; <span class="math inline">\(\boldsymbol{0}\)</span> is an additive identity;
+<span class="math inline">\(-\boldsymbol{v}\)</span> is an additive
+inverse; and <span class="math display">\[a(\boldsymbol{u}+\boldsymbol{v})=a\boldsymbol{u}+a\boldsymbol{v},\quad
+(a+b)\boldsymbol{v}=a\boldsymbol{v}+b\boldsymbol{v},\quad
+a(b\boldsymbol{v})=(ab)\boldsymbol{v}.\]</span></p></div>
+<div class="learning-box example"><p><strong>Proof.</strong> Each identity follows from the corresponding
+real-number identity in each coordinate. For example, the first
+component of <span class="math inline">\(a(\boldsymbol{u}+\boldsymbol{v})\)</span> is <span class="math inline">\(a(u_1+v_1)=au_1+av_1\)</span>, which is the first
+component of <span class="math inline">\(a\boldsymbol{u}+a\boldsymbol{v}\)</span>. The
+other components agree similarly.</p></div>
+<h3 id="length-and-unit-vectors">Length and unit vectors</h3>
+<p>The Euclidean length, or norm, of <span class="math inline">\(\boldsymbol{v}=\langle v_1,v_2,v_3\rangle\)</span>
+is <span class="math display">\[\left\lVert
+\boldsymbol{v}\right\rVert=\sqrt{v_1^2+v_2^2+v_3^2}.\]</span> When <span class="math inline">\(\boldsymbol{v}\neq\boldsymbol{0}\)</span>, its
+normalized version <span class="math inline">\(\widehat{\boldsymbol{v}}=\boldsymbol{v}/\left\lVert
+\boldsymbol{v}\right\rVert\)</span> has length one. The standard basis
+vectors are <span class="math inline">\(\boldsymbol{i}=\langle1,0,0\rangle\)</span>, <span class="math inline">\(\boldsymbol{j}=\langle0,1,0\rangle\)</span>, and
+<span class="math inline">\(\boldsymbol{k}=\langle0,0,1\rangle\)</span>,
+so <span class="math inline">\(\boldsymbol{v}=v_1\boldsymbol{i}+v_2\boldsymbol{j}+v_3\boldsymbol{k}\)</span>.</p>
+<div class="learning-box example"><p><strong>Example — Constructing a prescribed displacement.</strong>
+Find a vector of length <span class="math inline">\(10\)</span> pointing
+in the direction <span class="math inline">\(\langle2,-1,2\rangle\)</span>. Since <span class="math inline">\(\sqrt{4+1+4}=3\)</span>, the unit direction is
+<span class="math inline">\(\langle2/3,-1/3,2/3\rangle\)</span>.
+Multiplying by <span class="math inline">\(10\)</span> gives <span class="math inline">\(\langle20/3,-10/3,20/3\rangle\)</span>.</p></div>
+<h3 id="norm-inequalities">Norm inequalities</h3>
+<p>The triangle inequality states that <span class="math inline">\(\left\lVert
+\boldsymbol{u}+\boldsymbol{v}\right\rVert\leq\left\lVert
+\boldsymbol{u}\right\rVert+\left\lVert
+\boldsymbol{v}\right\rVert\)</span>. Geometrically, the direct route
+between two points is no longer than a route through an intermediate
+point. We will prove this inequality after developing the dot product.
+Another useful inequality follows immediately: <span class="math inline">\(|\left\lVert
+\boldsymbol{u}\right\rVert-\left\lVert
+\boldsymbol{v}\right\rVert|\leq\left\lVert
+\boldsymbol{u}-\boldsymbol{v}\right\rVert\)</span>, called the
+<em>reverse triangle inequality</em>.</p>
+<h3 id="python-laboratory-vector-operations">Python laboratory: vector
+operations</h3>
+<p>NumPy represents a vector as a one-dimensional array. The operations
+<code>+</code>, <code>-</code>, and <code>*</code> act componentwise,
+and <code>np.linalg.norm</code> computes its Euclidean length.</p>
+<div class="learning-box example"><p><strong>Remark — Computational follow-up.</strong> The corresponding
+R and Python implementations are developed in the paired computational
+sections after the mathematical foundations.</p></div>
+<p>An array with integer entries can represent exact integers, but
+division typically creates floating-point results. Floating-point values
+approximate real numbers and may differ from exact values in their last
+displayed digits. In later chapters we will use SymPy for symbolic
+calculations and NumPy for numerical ones.</p>
+<h2 id="the-dot-product-angles-and-orthogonality">The dot product,
+angles, and orthogonality</h2>
+<div class="learning-box example"><p><strong>Definition.</strong> For <span class="math inline">\(\boldsymbol{u},\boldsymbol{v}\in\mathbb{R}^3\)</span>,
+the dot product is <span class="math display">\[\label{eq:dot}
+\boldsymbol{u}\cdot\boldsymbol{v}=u_1v_1+u_2v_2+u_3v_3.\]</span></p></div>
+<p>The dot product turns two vectors into a scalar. Its geometric
+meaning is obtained from the law of cosines. If <span class="math inline">\(\theta\in[0,\pi]\)</span> is the angle between two
+nonzero vectors, the triangle with sides <span class="math inline">\(\left\lVert \boldsymbol{u}\right\rVert\)</span>,
+<span class="math inline">\(\left\lVert
+\boldsymbol{v}\right\rVert\)</span>, and <span class="math inline">\(\left\lVert
+\boldsymbol{u}-\boldsymbol{v}\right\rVert\)</span> satisfies <span class="math display">\[\left\lVert
+\boldsymbol{u}-\boldsymbol{v}\right\rVert^2=\left\lVert
+\boldsymbol{u}\right\rVert^2+\left\lVert
+\boldsymbol{v}\right\rVert^2-2\left\lVert
+\boldsymbol{u}\right\rVert\left\lVert
+\boldsymbol{v}\right\rVert\cos\theta.\]</span> Expanding the left side
+using components yields <span class="math inline">\(\left\lVert
+\boldsymbol{u}\right\rVert^2+\left\lVert
+\boldsymbol{v}\right\rVert^2-2\boldsymbol{u}\cdot\boldsymbol{v}\)</span>.
+Therefore, <span class="math display">\[\label{eq:angle}
+\boldsymbol{u}\cdot\boldsymbol{v}=\left\lVert
+\boldsymbol{u}\right\rVert\left\lVert
+\boldsymbol{v}\right\rVert\cos\theta.\]</span> This formula has three
+immediate consequences. A positive dot product indicates an acute angle;
+a negative dot product indicates an obtuse angle; and a zero dot product
+indicates perpendicular vectors (provided both vectors are nonzero).</p>
+<div class="learning-box example"><p><strong>Theorem — Cauchy–Schwarz inequality.</strong> For any <span class="math inline">\(\boldsymbol{u},\boldsymbol{v}\in\mathbb{R}^3\)</span>,
+<span class="math display">\[|\boldsymbol{u}\cdot\boldsymbol{v}|\leq\left\lVert
+\boldsymbol{u}\right\rVert\left\lVert
+\boldsymbol{v}\right\rVert.\]</span> Equality holds precisely when the
+vectors are linearly dependent, including the case where one vector is
+zero.</p></div>
+<div class="learning-box example"><p><strong>Proof.</strong> If <span class="math inline">\(\boldsymbol{v}=\boldsymbol{0}\)</span>, both sides
+vanish. Otherwise, for every real <span class="math inline">\(t\)</span>, <span class="math display">\[0\leq\left\lVert
+\boldsymbol{u}-t\boldsymbol{v}\right\rVert^2=\left\lVert
+\boldsymbol{v}\right\rVert^2t^2-2(\boldsymbol{u}\cdot\boldsymbol{v})t+\left\lVert
+\boldsymbol{u}\right\rVert^2.\]</span> This quadratic is nonnegative for
+all <span class="math inline">\(t\)</span>, so its discriminant cannot
+be positive. Thus <span class="math inline">\(4(\boldsymbol{u}\cdot\boldsymbol{v})^2-4\left\lVert
+\boldsymbol{u}\right\rVert^2\left\lVert
+\boldsymbol{v}\right\rVert^2\leq0\)</span>. Taking square roots gives
+the result. Equality occurs when the quadratic attains zero,
+equivalently <span class="math inline">\(\boldsymbol{u}=t\boldsymbol{v}\)</span> for some
+<span class="math inline">\(t\)</span>.</p></div>
+<div class="learning-box example"><p><strong>Theorem — Triangle inequality.</strong> For all <span class="math inline">\(\boldsymbol{u},\boldsymbol{v}\in\mathbb{R}^3\)</span>,
+<span class="math inline">\(\left\lVert
+\boldsymbol{u}+\boldsymbol{v}\right\rVert\leq\left\lVert
+\boldsymbol{u}\right\rVert+\left\lVert
+\boldsymbol{v}\right\rVert\)</span>.</p></div>
+<div class="learning-box example"><p><strong>Proof.</strong> By Cauchy–Schwarz, <span class="math display">\[\left\lVert
+\boldsymbol{u}+\boldsymbol{v}\right\rVert^2=\left\lVert
+\boldsymbol{u}\right\rVert^2+2\boldsymbol{u}\cdot\boldsymbol{v}+\left\lVert
+\boldsymbol{v}\right\rVert^2\leq(\left\lVert
+\boldsymbol{u}\right\rVert+\left\lVert
+\boldsymbol{v}\right\rVert)^2.\]</span> Both sides are nonnegative, so
+taking square roots completes the proof.</p></div>
+<div class="learning-box example"><p><strong>Example — Angle between directions.</strong> For <span class="math inline">\(\boldsymbol{u}=\langle1,2,2\rangle\)</span> and
+<span class="math inline">\(\boldsymbol{v}=\langle2,0,1\rangle\)</span>,
+the dot product is <span class="math inline">\(4\)</span>, while <span class="math inline">\(\left\lVert \boldsymbol{u}\right\rVert=3\)</span>
+and <span class="math inline">\(\left\lVert
+\boldsymbol{v}\right\rVert=\sqrt5\)</span>. Hence <span class="math inline">\(\cos\theta=4/(3\sqrt5)\)</span> and <span class="math inline">\(\theta=\arccos(4/(3\sqrt5))\)</span>, about <span class="math inline">\(53.4^\circ\)</span>. Notice that a numerical angle
+is a rounded interpretation of an exact inverse-trigonometric
+expression.</p></div>
+<h3 id="projection-and-decomposition">Projection and decomposition</h3>
+<p>Suppose <span class="math inline">\(\boldsymbol{u}\neq\boldsymbol{0}\)</span>. We can
+split <span class="math inline">\(\boldsymbol{v}\)</span> into a
+component parallel to <span class="math inline">\(\boldsymbol{u}\)</span> and a component
+perpendicular to it. Seek a scalar <span class="math inline">\(c\)</span> such that <span class="math inline">\(\boldsymbol{v}-c\boldsymbol{u}\)</span> is
+perpendicular to <span class="math inline">\(\boldsymbol{u}\)</span>.
+Taking a dot product gives <span class="math display">\[(\boldsymbol{v}-c\boldsymbol{u})\cdot\boldsymbol{u}=0\quad\Longrightarrow\quad
+c=\frac{\boldsymbol{v}\cdot\boldsymbol{u}}{\boldsymbol{u}\cdot\boldsymbol{u}}.\]</span>
+Therefore the vector projection is <span class="math display">\[\label{eq:proj}
+\operatorname{proj}_{\boldsymbol{u}}\boldsymbol{v}=\frac{\boldsymbol{v}\cdot\boldsymbol{u}}{\left\lVert
+\boldsymbol{u}\right\rVert^2}\boldsymbol{u}.\]</span> The perpendicular
+component is <span class="math inline">\(\boldsymbol{v}-\operatorname{proj}_{\boldsymbol{u}}\boldsymbol{v}\)</span>.
+The scalar projection, which can be negative, is <span class="math inline">\((\boldsymbol{v}\cdot\boldsymbol{u})/\left\lVert
+\boldsymbol{u}\right\rVert\)</span>.</p>
+<figure>
+<img alt="The projection of \boldsymbol{v} onto \boldsymbol{u} is the nearest vector to \boldsymbol{v} on the line through \boldsymbol{u}. The dashed segment is perpendicular to \boldsymbol{u}." src="figures/projection.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">The projection of <span class="math inline">\(\boldsymbol{v}\)</span> onto <span class="math inline">\(\boldsymbol{u}\)</span> is the nearest vector to
+<span class="math inline">\(\boldsymbol{v}\)</span> on the line through
+<span class="math inline">\(\boldsymbol{u}\)</span>. The dashed segment
+is perpendicular to <span class="math inline">\(\boldsymbol{u}\)</span>.</figcaption>
+</figure>
+<div class="learning-box example"><p><strong>Example — A force along an incline.</strong> A force <span class="math inline">\(\boldsymbol{F}=\langle12,5\rangle\)</span> newtons
+acts on an object constrained to move in the unit direction <span class="math inline">\(\boldsymbol{e}=\langle3/5,4/5\rangle\)</span>. The
+component of force along the motion is <span class="math inline">\(\boldsymbol{F}\cdot\boldsymbol{e}=36/5+20/5=56/5\)</span>
+N. The force vector parallel to the motion is <span class="math inline">\((56/5)\boldsymbol{e}=\langle168/25,224/25\rangle\)</span>
+N. The perpendicular component does no work during motion along the
+specified line.</p></div>
+<h3 id="python-laboratory-exact-and-numerical-angles">Python laboratory:
+exact and numerical angles</h3>
+<div class="learning-box example"><p><strong>Remark — Computational follow-up.</strong> The corresponding
+R and Python implementations are developed in the paired computational
+sections after the mathematical foundations.</p></div>
+<p>The call to <code>np.clip</code> protects against tiny floating-point
+errors that could otherwise place a computed cosine just outside <span class="math inline">\([-1,1]\)</span>.</p>
+<h2 id="the-cross-product-and-oriented-area">The cross product and
+oriented area</h2>
+<p>The dot product measures alignment; the cross product creates a
+vector perpendicular to a pair of vectors. For <span class="math inline">\(\boldsymbol{u}=\langle u_1,u_2,u_3\rangle\)</span>
+and <span class="math inline">\(\boldsymbol{v}=\langle
+v_1,v_2,v_3\rangle\)</span>, define <span class="math display">\[\label{eq:cross}
+\boldsymbol{u}\times\boldsymbol{v}=\langle u_2v_3-u_3v_2,\
+u_3v_1-u_1v_3,\ u_1v_2-u_2v_1\rangle.\]</span> A mnemonic is the formal
+determinant <span class="math display">\[\boldsymbol{u}\times\boldsymbol{v}=\begin{vmatrix}\boldsymbol{i}&amp;\boldsymbol{j}&amp;\boldsymbol{k}\\u_1&amp;u_2&amp;u_3\\v_1&amp;v_2&amp;v_3\end{vmatrix},\]</span>
+expanded along the first row. This notation is a mnemonic for the
+component formula, not an ordinary determinant with scalar entries in
+every position.</p>
+<div class="learning-box example"><p><strong>Proposition — Cross-product properties.</strong> For <span class="math inline">\(\boldsymbol{u},\boldsymbol{v},\boldsymbol{w}\in\mathbb{R}^3\)</span>
+and a scalar <span class="math inline">\(c\)</span>, <span class="math display">\[\boldsymbol{u}\times\boldsymbol{v}=-(\boldsymbol{v}\times\boldsymbol{u}),\quad
+\boldsymbol{u}\times(\boldsymbol{v}+\boldsymbol{w})=\boldsymbol{u}\times\boldsymbol{v}+\boldsymbol{u}\times\boldsymbol{w},\quad
+(c\boldsymbol{u})\times\boldsymbol{v}=c(\boldsymbol{u}\times\boldsymbol{v}).\]</span>
+Furthermore, <span class="math inline">\((\boldsymbol{u}\times\boldsymbol{v})\cdot\boldsymbol{u}=(\boldsymbol{u}\times\boldsymbol{v})\cdot\boldsymbol{v}=0\)</span>.</p></div>
+<div class="learning-box example"><p><strong>Proof.</strong> The first three identities follow by
+expanding the component formula. For perpendicularity, substitute
+Equation <a data-reference="eq:cross" data-reference-type="eqref" href="#eq:cross">[eq:cross]</a> into the dot product with <span class="math inline">\(\boldsymbol{u}\)</span>: each product <span class="math inline">\(u_1u_2v_3\)</span>, <span class="math inline">\(u_1u_3v_2\)</span>, and <span class="math inline">\(u_2u_3v_1\)</span> appears once positively and
+once negatively, so the sum vanishes. The calculation with <span class="math inline">\(\boldsymbol{v}\)</span> is analogous.</p></div>
+<h3 id="magnitude-area-and-orientation">Magnitude, area, and
+orientation</h3>
+<p>If <span class="math inline">\(\theta\)</span> is the angle between
+nonzero vectors, then <span class="math display">\[\label{eq:crossarea}
+\left\lVert \boldsymbol{u}\times\boldsymbol{v}\right\rVert=\left\lVert
+\boldsymbol{u}\right\rVert\left\lVert
+\boldsymbol{v}\right\rVert\sin\theta.\]</span> The right side is base
+times height of the parallelogram spanned by the two vectors. Thus the
+parallelogram area is <span class="math inline">\(\left\lVert
+\boldsymbol{u}\times\boldsymbol{v}\right\rVert\)</span>, and the area of
+the corresponding triangle is half as large. The direction of the cross
+product is determined by the right-hand rule. Swapping the factors
+reverses this direction but preserves the area.</p>
+<figure>
+<img alt="The cross product determines a normal direction to the parallelogram. Its magnitude equals the parallelogram’s area." src="figures/cross_product.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">The cross product determines a normal
+direction to the parallelogram. Its magnitude equals the parallelogram’s
+area.</figcaption>
+</figure>
+<div class="learning-box example"><p><strong>Example — Area of a spatial triangle.</strong> Let <span class="math inline">\(A=(1,0,0)\)</span>, <span class="math inline">\(B=(3,1,0)\)</span>, and <span class="math inline">\(C=(1,2,2)\)</span>. The side vectors are <span class="math inline">\(\overrightarrow{AB}=\langle2,1,0\rangle\)</span>
+and <span class="math inline">\(\overrightarrow{AC}=\langle0,2,2\rangle\)</span>.
+Their cross product is <span class="math inline">\(\langle2,-4,4\rangle\)</span>, with norm <span class="math inline">\(6\)</span>. The triangle’s area is therefore <span class="math inline">\(3\)</span> square units.</p></div>
+<h3 id="lagranges-identity">Lagrange’s identity</h3>
+<p>A useful identity connects dot and cross products: <span class="math display">\[\label{eq:lagrange}
+\left\lVert \boldsymbol{u}\times\boldsymbol{v}\right\rVert^2=\left\lVert
+\boldsymbol{u}\right\rVert^2\left\lVert
+\boldsymbol{v}\right\rVert^2-(\boldsymbol{u}\cdot\boldsymbol{v})^2.\]</span></p>
+<div class="learning-box example"><p><strong>Proof.</strong> Expand the squares of the three components of
+<span class="math inline">\(\boldsymbol{u}\times\boldsymbol{v}\)</span>.
+Terms involving <span class="math inline">\(u_i^2v_j^2\)</span> with
+<span class="math inline">\(i\neq j\)</span> remain positive, while each
+mixed product <span class="math inline">\(u_iu_jv_iv_j\)</span> occurs
+with coefficient <span class="math inline">\(-2\)</span>. Expanding
+<span class="math inline">\(\left(\sum u_i^2\right)\left(\sum
+v_j^2\right)-\left(\sum u_iv_i\right)^2\)</span> produces exactly the
+same terms.</p></div>
+<p>Combining Equation <a data-reference="eq:lagrange" data-reference-type="eqref" href="#eq:lagrange">[eq:lagrange]</a> with Equation <a data-reference="eq:angle" data-reference-type="eqref" href="#eq:angle">[eq:angle]</a> gives Equation <a data-reference="eq:crossarea" data-reference-type="eqref" href="#eq:crossarea">[eq:crossarea]</a>, because <span class="math inline">\(\sin\theta\geq0\)</span> on <span class="math inline">\([0,\pi]\)</span>. In particular, <span class="math inline">\(\boldsymbol{u}\times\boldsymbol{v}=\boldsymbol{0}\)</span>
+precisely when the two vectors are linearly dependent.</p>
+<h3 id="torque-as-an-application">Torque as an application</h3>
+<p>A force <span class="math inline">\(\boldsymbol{F}\)</span> applied
+at a displacement <span class="math inline">\(\boldsymbol{r}\)</span>
+from a pivot produces torque <span class="math inline">\(\boldsymbol{\tau}=\boldsymbol{r}\times\boldsymbol{F}\)</span>.
+Its magnitude is <span class="math inline">\(\left\lVert
+\boldsymbol{r}\right\rVert\left\lVert
+\boldsymbol{F}\right\rVert\sin\theta\)</span>, so only the component of
+force perpendicular to the lever arm contributes. The direction
+describes the axis of the induced rotational tendency. For <span class="math inline">\(\boldsymbol{r}=\langle2,0,0\rangle\)</span> meters
+and <span class="math inline">\(\boldsymbol{F}=\langle0,3,4\rangle\)</span>
+newtons, <span class="math inline">\(\boldsymbol{\tau}=\langle0,-8,6\rangle\)</span>
+N<span class="math inline">\(\cdot\)</span>m and <span class="math inline">\(\left\lVert
+\boldsymbol{\tau}\right\rVert=10\)</span> N<span class="math inline">\(\cdot\)</span>m.</p>
+<div class="learning-box example"><p><strong>Remark — Computational follow-up.</strong> The corresponding
+R and Python implementations are developed in the paired computational
+sections after the mathematical foundations.</p></div>
+<h2 id="scalar-triple-products-and-spatial-volume">Scalar triple
+products and spatial volume</h2>
+<p>Given three vectors, the scalar triple product is <span class="math inline">\(\boldsymbol{u}\cdot(\boldsymbol{v}\times\boldsymbol{w})\)</span>.
+In coordinates it equals the determinant of the matrix whose rows are
+the three vectors: <span class="math display">\[\label{eq:triple}
+\boldsymbol{u}\cdot(\boldsymbol{v}\times\boldsymbol{w})=
+\begin{vmatrix}u_1&amp;u_2&amp;u_3\\v_1&amp;v_2&amp;v_3\\w_1&amp;w_2&amp;w_3\end{vmatrix}.\]</span>
+The absolute value is the volume of the parallelepiped with edge vectors
+<span class="math inline">\(\boldsymbol{u}\)</span>, <span class="math inline">\(\boldsymbol{v}\)</span>, and <span class="math inline">\(\boldsymbol{w}\)</span>. To see this, take the
+parallelogram spanned by <span class="math inline">\(\boldsymbol{v}\)</span> and <span class="math inline">\(\boldsymbol{w}\)</span> as the base. Its area is
+<span class="math inline">\(\left\lVert
+\boldsymbol{v}\times\boldsymbol{w}\right\rVert\)</span>, and the
+perpendicular height is the absolute scalar projection of <span class="math inline">\(\boldsymbol{u}\)</span> onto the unit normal <span class="math inline">\((\boldsymbol{v}\times\boldsymbol{w})/\left\lVert
+\boldsymbol{v}\times\boldsymbol{w}\right\rVert\)</span>. Their product
+simplifies to <span class="math inline">\(|\boldsymbol{u}\cdot(\boldsymbol{v}\times\boldsymbol{w})|\)</span>.
+The same expression vanishes if and only if the three vectors are
+coplanar (linearly dependent).</p>
+<div class="learning-box example"><p><strong>Example — Volume and orientation.</strong> Let <span class="math inline">\(\boldsymbol{u}=\langle1,0,2\rangle\)</span>, <span class="math inline">\(\boldsymbol{v}=\langle0,2,1\rangle\)</span>, and
+<span class="math inline">\(\boldsymbol{w}=\langle2,1,0\rangle\)</span>.
+Since <span class="math inline">\(\boldsymbol{v}\times\boldsymbol{w}=\langle-1,2,-4\rangle\)</span>,
+the triple product is <span class="math inline">\(-9\)</span>. The
+volume is <span class="math inline">\(9\)</span> cubic units. The
+negative sign records orientation, not negative physical volume. A
+tetrahedron with the same three edge vectors from one vertex has volume
+<span class="math inline">\(9/6=3/2\)</span> cubic units.</p></div>
+<h3 id="computational-verification">Computational verification</h3>
+<div class="learning-box example"><p><strong>Remark — Computational follow-up.</strong> The corresponding
+R and Python implementations are developed in the paired computational
+sections after the mathematical foundations.</p></div>
+<p>The numerical determinant may be represented by a floating-point
+value extremely close to an integer. In a numerical computation, test
+approximate equality with a tolerance rather than using <code>==</code>
+indiscriminately.</p>
+<h2 id="lines-in-space">Lines in space</h2>
+<p>A line is specified by a point <span class="math inline">\(P_0=(x_0,y_0,z_0)\)</span> and a nonzero direction
+vector <span class="math inline">\(\boldsymbol{d}=\langle
+a,b,c\rangle\)</span>. A point <span class="math inline">\(P\)</span>
+belongs to the line exactly when <span class="math inline">\(\overrightarrow{P_0P}\)</span> is a scalar
+multiple of <span class="math inline">\(\boldsymbol{d}\)</span>. Thus
+its vector equation is <span class="math display">\[\label{eq:line}
+\boldsymbol{r}(t)=\boldsymbol{r}_0+t\boldsymbol{d},\qquad
+t\in\mathbb{R}.\]</span> The corresponding parametric equations are
+<span class="math inline">\(x=x_0+at\)</span>, <span class="math inline">\(y=y_0+bt\)</span>, and <span class="math inline">\(z=z_0+ct\)</span>. If <span class="math inline">\(a,b,c\)</span> are all nonzero, eliminating <span class="math inline">\(t\)</span> gives <span class="math inline">\((x-x_0)/a=(y-y_0)/b=(z-z_0)/c\)</span>. If a
+direction component is zero, its coordinate remains constant, and
+division by that component is not permitted.</p>
+<div class="learning-box example"><p><strong>Example — Line through two points.</strong> Find a line
+through <span class="math inline">\(A=(1,2,-1)\)</span> and <span class="math inline">\(B=(3,-2,5)\)</span>. The direction <span class="math inline">\(\overrightarrow{AB}=\langle2,-4,6\rangle\)</span>
+may be simplified to <span class="math inline">\(\langle1,-2,3\rangle\)</span>. Hence <span class="math inline">\(\boldsymbol{r}(t)=\langle1,2,-1\rangle+t\langle1,-2,3\rangle\)</span>.
+The point <span class="math inline">\(B\)</span> corresponds to <span class="math inline">\(t=2\)</span> in this parametrization. Infinitely
+many parametrizations describe the same line; changing the direction
+vector by a nonzero scalar changes only the parameter scale.</p></div>
+<h3 id="relative-positions-of-two-lines">Relative positions of two
+lines</h3>
+<p>Two lines in <span class="math inline">\(\mathbb{R}^3\)</span> may
+intersect, be parallel, coincide, or be skew (neither parallel nor
+intersecting). Suppose <span class="math display">\[L_1:\
+\boldsymbol{r}=\boldsymbol{p}+s\boldsymbol{u},\qquad L_2:\
+\boldsymbol{r}=\boldsymbol{q}+t\boldsymbol{v}.\]</span> They intersect
+if and only if there exist real <span class="math inline">\(s,t\)</span>
+satisfying <span class="math inline">\(\boldsymbol{p}+s\boldsymbol{u}=\boldsymbol{q}+t\boldsymbol{v}\)</span>.
+This is a system of three equations in two unknowns; consistency must be
+checked in all three coordinates. If <span class="math inline">\(\boldsymbol{u}\times\boldsymbol{v}\neq\boldsymbol{0}\)</span>,
+the lines are not parallel, but they can still be skew.</p>
+<div class="learning-box example"><p><strong>Example — Skew lines.</strong> Consider <span class="math inline">\(L_1: (x,y,z)=(t,0,0)\)</span> and <span class="math inline">\(L_2:(x,y,z)=(0,s,1)\)</span>. The first lies on
+the <span class="math inline">\(x\)</span>-axis, while the second lies
+one unit above the <span class="math inline">\(xy\)</span>-plane and
+points in the <span class="math inline">\(y\)</span>-direction. They are
+not parallel, but every point of <span class="math inline">\(L_1\)</span> has <span class="math inline">\(z=0\)</span> and every point of <span class="math inline">\(L_2\)</span> has <span class="math inline">\(z=1\)</span>. Therefore they do not intersect: the
+lines are skew.</p></div>
+<h3 id="distance-from-a-point-to-a-line">Distance from a point to a
+line</h3>
+<p>Let <span class="math inline">\(P\)</span> be a point, and let the
+line pass through <span class="math inline">\(A\)</span> with direction
+<span class="math inline">\(\boldsymbol{d}\neq\boldsymbol{0}\)</span>.
+The perpendicular component of <span class="math inline">\(\overrightarrow{AP}\)</span> is the shortest
+displacement from the line to <span class="math inline">\(P\)</span>. By
+the area interpretation of the cross product, <span class="math display">\[\label{eq:pointline}
+\operatorname{dist}(P,L)=\frac{\left\lVert
+\overrightarrow{AP}\times\boldsymbol{d}\right\rVert}{\left\lVert
+\boldsymbol{d}\right\rVert}.\]</span> Alternatively, compute <span class="math inline">\(\overrightarrow{AP}-\operatorname{proj}_{\boldsymbol{d}}\overrightarrow{AP}\)</span>
+and take its norm. These expressions agree by Lagrange’s identity.</p>
+<div class="learning-box example"><p><strong>Example — Distance to a line.</strong> Find the distance from
+<span class="math inline">\(P=(1,2,3)\)</span> to the <span class="math inline">\(z\)</span>-axis. Choose <span class="math inline">\(A=(0,0,0)\)</span> and <span class="math inline">\(\boldsymbol{d}=\langle0,0,1\rangle\)</span>. Then
+<span class="math inline">\(\overrightarrow{AP}\times\boldsymbol{d}=\langle2,-1,0\rangle\)</span>,
+so the distance is <span class="math inline">\(\sqrt5\)</span>. This
+agrees with the horizontal distance <span class="math inline">\(\sqrt{x^2+y^2}\)</span> from <span class="math inline">\((1,2,3)\)</span> to <span class="math inline">\((0,0,3)\)</span>.</p></div>
+<h2 id="planes-and-their-normal-vectors">Planes and their normal
+vectors</h2>
+<p>A plane through <span class="math inline">\(P_0=(x_0,y_0,z_0)\)</span> with nonzero normal
+vector <span class="math inline">\(\boldsymbol{n}=\langle
+a,b,c\rangle\)</span> consists of points <span class="math inline">\(P\)</span> for which <span class="math inline">\(\overrightarrow{P_0P}\)</span> is perpendicular to
+<span class="math inline">\(\boldsymbol{n}\)</span>. Thus <span class="math display">\[\label{eq:plane}
+\boldsymbol{n}\cdot(\boldsymbol{r}-\boldsymbol{r}_0)=0
+\quad\Longleftrightarrow\quad a(x-x_0)+b(y-y_0)+c(z-z_0)=0.\]</span>
+Collecting constants gives <span class="math inline">\(ax+by+cz=d\)</span>, where <span class="math inline">\(d=ax_0+by_0+cz_0\)</span>. The normal vector
+determines the orientation of the plane, while <span class="math inline">\(d\)</span> controls its position relative to the
+origin.</p>
+<figure>
+<img alt="A plane and one of its normal vectors. Every displacement between two points on the plane is perpendicular to the normal." src="figures/plane_normal.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">A plane and one of its normal vectors.
+Every displacement between two points on the plane is perpendicular to
+the normal.</figcaption>
+</figure>
+<div class="learning-box example"><p><strong>Example — Plane through three points.</strong> Find the plane
+through <span class="math inline">\(A=(1,0,1)\)</span>, <span class="math inline">\(B=(2,1,1)\)</span>, and <span class="math inline">\(C=(1,2,3)\)</span>. Two in-plane directions are
+<span class="math inline">\(\overrightarrow{AB}=\langle1,1,0\rangle\)</span>
+and <span class="math inline">\(\overrightarrow{AC}=\langle0,2,2\rangle\)</span>.
+Their cross product is <span class="math inline">\(\langle2,-2,2\rangle\)</span>, so a simpler normal
+is <span class="math inline">\(\langle1,-1,1\rangle\)</span>. Using
+point <span class="math inline">\(A\)</span>, the plane equation is
+<span class="math inline">\((x-1)-y+(z-1)=0\)</span>, or <span class="math inline">\(x-y+z=2\)</span>. Substitution confirms that all
+three given points satisfy the equation.</p></div>
+<h3 id="angles-between-planes-and-lines">Angles between planes and
+lines</h3>
+<p>The acute angle between two planes is the acute angle between their
+normal vectors. If the normals are <span class="math inline">\(\boldsymbol{n}_1\)</span> and <span class="math inline">\(\boldsymbol{n}_2\)</span>, then <span class="math display">\[\cos\phi=\frac{|\boldsymbol{n}_1\cdot\boldsymbol{n}_2|}{\left\lVert
+\boldsymbol{n}_1\right\rVert\left\lVert
+\boldsymbol{n}_2\right\rVert},\qquad0\leq\phi\leq\frac\pi2.\]</span> For
+a line with direction <span class="math inline">\(\boldsymbol{d}\)</span> and a plane with normal
+<span class="math inline">\(\boldsymbol{n}\)</span>, the acute angle
+<span class="math inline">\(\alpha\)</span> between the line and the
+plane satisfies <span class="math display">\[\sin\alpha=\frac{|\boldsymbol{d}\cdot\boldsymbol{n}|}{\left\lVert
+\boldsymbol{d}\right\rVert\left\lVert
+\boldsymbol{n}\right\rVert}.\]</span> The sine appears because the
+line–plane angle is complementary to the acute angle between the line
+direction and the plane normal.</p>
+<h3 id="distance-from-a-point-to-a-plane">Distance from a point to a
+plane</h3>
+<p>For the plane <span class="math inline">\(ax+by+cz=d\)</span> and
+point <span class="math inline">\(P=(x_1,y_1,z_1)\)</span>, the signed
+displacement along the unit normal is <span class="math inline">\((ax_1+by_1+cz_1-d)/\sqrt{a^2+b^2+c^2}\)</span>.
+Taking the absolute value yields <span class="math display">\[\label{eq:pointplane}
+\operatorname{dist}(P,\Pi)=\frac{|ax_1+by_1+cz_1-d|}{\sqrt{a^2+b^2+c^2}}.\]</span></p>
+<div class="learning-box example"><p><strong>Proof.</strong> Choose any point <span class="math inline">\(Q\)</span> on the plane and let <span class="math inline">\(\boldsymbol{n}=\langle a,b,c\rangle\)</span>. The
+component of <span class="math inline">\(\overrightarrow{QP}\)</span> in
+the normal direction is <span class="math inline">\(\overrightarrow{QP}\cdot\boldsymbol{n}/\left\lVert
+\boldsymbol{n}\right\rVert\)</span>. Because <span class="math inline">\(\boldsymbol{n}\cdot\boldsymbol{q}=d\)</span>, its
+numerator is <span class="math inline">\(\boldsymbol{n}\cdot\boldsymbol{p}-d\)</span>. The
+perpendicular segment has the least possible length, since every other
+segment from <span class="math inline">\(P\)</span> to the plane
+includes an additional tangential component. This gives the formula.</p></div>
+<figure>
+<img alt="A two-dimensional cross-section illustrates why the shortest distance from a point to a plane is measured perpendicular to the plane." src="figures/point_plane_distance.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">A two-dimensional cross-section
+illustrates why the shortest distance from a point to a plane is
+measured perpendicular to the plane.</figcaption>
+</figure>
+<div class="learning-box example"><p><strong>Example — Point-to-plane distance.</strong> For <span class="math inline">\(P=(1,2,3)\)</span> and <span class="math inline">\(\Pi:2x-y+2z=5\)</span>, the numerator is <span class="math inline">\(|2-2+6-5|=1\)</span>, and the normal length is
+<span class="math inline">\(\sqrt{4+1+4}=3\)</span>. Thus the distance
+is <span class="math inline">\(1/3\)</span>. The closest point is <span class="math inline">\(P-(1/9)\langle2,-1,2\rangle=(7/9,19/9,25/9)\)</span>;
+substitution confirms that it lies on the plane.</p></div>
+<h3 id="python-laboratory-symbolic-plane-geometry">Python laboratory:
+symbolic plane geometry</h3>
+<div class="learning-box example"><p><strong>Remark — Computational follow-up.</strong> The corresponding
+R and Python implementations are developed in the paired computational
+sections after the mathematical foundations.</p></div>
+<p>Here the plane is the one through <span class="math inline">\(A,B,C\)</span>, namely <span class="math inline">\(x-y+z=2\)</span>; the code computes the distance
+from <span class="math inline">\(P\)</span> to that plane. Do not
+confuse this computational example with the preceding worked example,
+which uses a different plane.</p>
+<h2 id="intersections-and-linear-systems">Intersections and linear
+systems</h2>
+<p>Intersections of planes are naturally solved by linear algebra. Two
+nonparallel planes typically meet in a line. Three planes may meet at
+one point, a line, or not at all. Their equations can be organized as a
+matrix system <span class="math inline">\(A\boldsymbol{x}=\boldsymbol{b}\)</span>. When
+<span class="math inline">\(A\)</span> is square and invertible, the
+solution is unique. When <span class="math inline">\(A\)</span> is
+singular, further consistency checks are required.</p>
+<div class="learning-box example"><p><strong>Example — Three planes meeting at a point.</strong> Solve
+<span class="math inline">\(x+y+z=6\)</span>, <span class="math inline">\(x-y+z=2\)</span>, and <span class="math inline">\(2x+y-z=1\)</span>. Subtracting the second equation
+from the first gives <span class="math inline">\(2y=4\)</span>, hence
+<span class="math inline">\(y=2\)</span>. The first equation then gives
+<span class="math inline">\(x+z=4\)</span>, and the third gives <span class="math inline">\(2x-z=-1\)</span>. Adding twice the first reduced
+equation to the last gives <span class="math inline">\(3x=3\)</span>, so
+<span class="math inline">\(x=1\)</span> and <span class="math inline">\(z=3\)</span>. The intersection point is <span class="math inline">\((1,2,3)\)</span>.</p></div>
+<div class="learning-box example"><p><strong>Remark — Computational follow-up.</strong> The corresponding
+R and Python implementations are developed in the paired computational
+sections after the mathematical foundations.</p></div>
+<p>The residual <span class="math inline">\(A\boldsymbol{x}-\boldsymbol{b}\)</span> quantifies
+how closely a numerical solution satisfies the original equations. A
+small residual is useful evidence of consistency, but by itself it does
+not establish the accuracy of a computed solution for every poorly
+conditioned system.</p>
+<h2 id="applications-navigation-work-and-geometric-modeling">Applications:
+navigation, work, and geometric modeling</h2>
+<p>The same geometric operations appear across disciplines. This section
+develops three representative applications, each emphasizing a different
+mathematical idea.</p>
+<h3 id="navigation-and-relative-velocity">Navigation and relative
+velocity</h3>
+<p>Suppose an aircraft has air-relative velocity <span class="math inline">\(\boldsymbol{v}_a=\langle180,40,10\rangle\)</span>
+km/h and a wind velocity <span class="math inline">\(\boldsymbol{v}_w=\langle-20,30,0\rangle\)</span>
+km/h. Its ground-relative velocity is <span class="math inline">\(\boldsymbol{v}_g=\boldsymbol{v}_a+\boldsymbol{v}_w=\langle160,70,10\rangle\)</span>
+km/h. The ground speed is <span class="math inline">\(\sqrt{160^2+70^2+10^2}=\sqrt{30600}\approx174.93\)</span>
+km/h. Over a constant-velocity interval of <span class="math inline">\(0.25\)</span> h, the displacement is <span class="math inline">\(\langle40,17.5,2.5\rangle\)</span> km. A vector
+model clarifies why speeds cannot simply be added as scalars when
+directions differ.</p>
+<h3 id="work-as-a-dot-product">Work as a dot product</h3>
+<p>If a constant force <span class="math inline">\(\boldsymbol{F}\)</span> acts on an object
+undergoing displacement <span class="math inline">\(\boldsymbol{d}\)</span>, the work is <span class="math inline">\(W=\boldsymbol{F}\cdot\boldsymbol{d}\)</span>. For
+<span class="math inline">\(\boldsymbol{F}=\langle8,-2,4\rangle\)</span>
+N and <span class="math inline">\(\boldsymbol{d}=\langle3,1,2\rangle\)</span> m, the
+work is <span class="math inline">\(24-2+8=30\)</span> joules. A force
+perpendicular to the displacement contributes no work. This
+interpretation prepares us for line integrals, in which the force or
+direction of motion can vary along a path.</p>
+<h3 id="fitting-a-plane-to-measured-data">Fitting a plane to measured
+data</h3>
+<p>A collection of noisy points need not lie on one exact plane. In
+practice, a least-squares model <span class="math inline">\(z=ax+by+c\)</span> can summarize an approximately
+planar surface. For observations <span class="math inline">\((x_i,y_i,z_i)\)</span>, the coefficients minimize
+<span class="math inline">\(\sum_i(z_i-ax_i-by_i-c)^2\)</span>. If the
+design matrix <span class="math inline">\(X\)</span> has rows <span class="math inline">\((x_i,y_i,1)\)</span> and <span class="math inline">\(\boldsymbol{z}\)</span> collects the observed
+heights, a numerical least-squares solver finds the coefficients without
+requiring manual solution of the normal equations.</p>
+<div class="learning-box example"><p><strong>Remark — Computational follow-up.</strong> The corresponding
+R and Python implementations are developed in the paired computational
+sections after the mathematical foundations.</p></div>
+<p>This is an early preview of optimization. In a later chapter we will
+study gradients and least-squares geometry more systematically. The
+fitted plane is not necessarily an exact plane through every
+observation, and it should not be confused with the unique plane through
+three noncollinear points.</p>
+<h2 id="a-guided-computational-investigation">A guided computational
+investigation</h2>
+<p><strong>Question.</strong> How can the same geometric problem be
+solved analytically, symbolically, and numerically? Consider three
+sensor locations <span class="math inline">\(A=(1,0,1)\)</span>, <span class="math inline">\(B=(2,1,1)\)</span>, and <span class="math inline">\(C=(1,2,3)\)</span>. They determine a plane. A
+fourth sensor at <span class="math inline">\(P=(3,1,4)\)</span> is not
+necessarily on it. Determine a normal, the plane equation, the shortest
+distance from <span class="math inline">\(P\)</span> to the plane, and
+the closest point <span class="math inline">\(Q\)</span> on the
+plane.</p>
+<h5 id="step-1-hand-calculation.">Step 1: hand calculation.</h5>
+<p>Compute <span class="math inline">\(\overrightarrow{AB}=\langle1,1,0\rangle\)</span>
+and <span class="math inline">\(\overrightarrow{AC}=\langle0,2,2\rangle\)</span>.
+Their cross product is <span class="math inline">\(\langle2,-2,2\rangle\)</span>, so use <span class="math inline">\(\boldsymbol{n}=\langle1,-1,1\rangle\)</span>. The
+plane is <span class="math inline">\(x-y+z=2\)</span>. At <span class="math inline">\(P\)</span>, the signed plane residual is <span class="math inline">\(3-1+4-2=4\)</span>, so the distance is <span class="math inline">\(4/\sqrt3\)</span>. The closest point is <span class="math display">\[Q=P-\frac{4}{\left\lVert
+\boldsymbol{n}\right\rVert^2}\boldsymbol{n}
+=\left(\frac53,\frac73,\frac83\right).\]</span> Indeed <span class="math inline">\(5/3-7/3+8/3=2\)</span>.</p>
+<h5 id="step-2-symbolic-verification.">Step 2: symbolic
+verification.</h5>
+<p>Use SymPy matrices and exact rational arithmetic:</p>
+<div class="learning-box example"><p><strong>Remark — Computational follow-up.</strong> The corresponding
+R and Python implementations are developed in the paired computational
+sections after the mathematical foundations.</p></div>
+<h5 id="step-3-numerical-verification.">Step 3: numerical
+verification.</h5>
+<p>Convert the exact quantities to NumPy arrays. Check that <span class="math inline">\(Q\)</span> lies on the plane and that <span class="math inline">\(P-Q\)</span> is parallel to the normal. Then
+perturb the coordinates of <span class="math inline">\(P\)</span> and
+describe how the distance changes. What changes if the normal vector is
+multiplied by <span class="math inline">\(-3\)</span>? What stays
+invariant?</p>
+<h5 id="step-4-interpretation.">Step 4: interpretation.</h5>
+<p>Explain in a paragraph why the nearest point is found by moving along
+the normal rather than along an arbitrary direction. Include units if
+the coordinates represent physical distances. Finally, use the supplied
+figure-generation script to produce a plane-and-normal plot and identify
+which parts of the visualization are mathematical objects and which are
+viewing choices (camera angle, axis limits, and transparency).</p>
+<h2 id="common-misconceptions-and-mathematical-habits">Common
+misconceptions and mathematical habits</h2>
+<ol type="1">
+<li><p><strong>Point versus vector.</strong> A location and a
+displacement may use the same numerical triple but have different
+meanings.</p></li>
+<li><p><strong>Angle conventions.</strong> The angle between nonzero
+vectors lies in <span class="math inline">\([0,\pi]\)</span>; the acute
+angle between two unoriented planes lies in <span class="math inline">\([0,\pi/2]\)</span>.</p></li>
+<li><p><strong>Dot versus cross product.</strong> A dot product is a
+scalar; a cross product is a vector in <span class="math inline">\(\mathbb{R}^3\)</span>.</p></li>
+<li><p><strong>Direction versus magnitude.</strong> The sign of a scalar
+triple product encodes orientation, not a negative geometric
+volume.</p></li>
+<li><p><strong>Zero denominators.</strong> Symmetric line equations must
+not divide by zero direction components.</p></li>
+<li><p><strong>Numerical versus exact.</strong> Decimal approximations
+should not silently replace exact radicals or rational values.</p></li>
+<li><p><strong>Visual evidence versus proof.</strong> A plot can reveal
+an error or suggest a pattern, but cannot prove a universal
+statement.</p></li>
+</ol>
+<h2 id="chapter-summary">Chapter summary</h2>
+<p>The principal formulas are collected below. They are best understood
+as consequences of geometry rather than memorized in isolation.</p>
+<div class="center">
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Quantity</th>
+<th style="text-align: left;">Formula</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Distance</td>
+<td style="text-align: left;"><span class="math inline">\(d(P,Q)=\left\lVert
+\overrightarrow{PQ}\right\rVert\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Dot product</td>
+<td style="text-align: left;"><span class="math inline">\(\boldsymbol{u}\cdot\boldsymbol{v}=\sum_i
+u_iv_i=\left\lVert \boldsymbol{u}\right\rVert\left\lVert
+\boldsymbol{v}\right\rVert\cos\theta\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Projection onto <span class="math inline">\(\boldsymbol{u}\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(\operatorname{proj}_{\boldsymbol{u}}\boldsymbol{v}=(\boldsymbol{v}\cdot\boldsymbol{u})\boldsymbol{u}/\left\lVert
+\boldsymbol{u}\right\rVert^2\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Parallelogram area</td>
+<td style="text-align: left;"><span class="math inline">\(\left\lVert
+\boldsymbol{u}\times\boldsymbol{v}\right\rVert\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Parallelepiped volume</td>
+<td style="text-align: left;"><span class="math inline">\(|\boldsymbol{u}\cdot(\boldsymbol{v}\times\boldsymbol{w})|\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Line</td>
+<td style="text-align: left;"><span class="math inline">\(\boldsymbol{r}(t)=\boldsymbol{r}_0+t\boldsymbol{d}\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Plane</td>
+<td style="text-align: left;"><span class="math inline">\(\boldsymbol{n}\cdot(\boldsymbol{r}-\boldsymbol{r}_0)=0\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Point-to-line distance</td>
+<td style="text-align: left;"><span class="math inline">\(\left\lVert
+\overrightarrow{AP}\times\boldsymbol{d}\right\rVert/\left\lVert
+\boldsymbol{d}\right\rVert\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Point-to-plane distance</td>
+<td style="text-align: left;"><span class="math inline">\(|ax_1+by_1+cz_1-d|/\sqrt{a^2+b^2+c^2}\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="further-mathematical-foundations-affine-geometry-and-orientation">Further
+mathematical foundations: affine geometry and orientation</h2>
+<h3 id="why-points-cannot-be-added-without-a-choice-of-origin">Why
+points cannot be added without a choice of origin</h3>
+<p>The difference <span class="math inline">\(Q-P\)</span> of two points
+is a vector and does not depend on the origin. By contrast, the
+coordinate expression <span class="math inline">\(P+Q\)</span> is not an
+intrinsic point operation. The midpoint <span class="math inline">\((P+Q)/2\)</span> is meaningful because its
+coefficients sum to one. More generally, for points <span class="math inline">\(P_1,\ldots,P_m\)</span> and scalars <span class="math inline">\(\lambda_i\)</span> satisfying <span class="math inline">\(\sum_i\lambda_i=1\)</span>, the affine combination
+<span class="math inline">\(\sum_i\lambda_iP_i\)</span> is independent
+of a change of origin. Indeed, shifting the origin changes every
+coordinate representation by the same vector <span class="math inline">\(\boldsymbol{a}\)</span>, and the combination
+changes by <span class="math inline">\(\sum_i\lambda_i\boldsymbol{a}=\boldsymbol{a}\)</span>.
+This is exactly the coordinate change expected of a point.</p>
+<div class="learning-box example"><p><strong>Example — Barycentric coordinates in a triangle.</strong> Let
+<span class="math inline">\(A=(1,0,0)\)</span>, <span class="math inline">\(B=(0,2,0)\)</span>, and <span class="math inline">\(C=(0,0,3)\)</span>. The point <span class="math inline">\(P=\frac12A+\frac13B+\frac16C\)</span> has
+coordinates <span class="math inline">\((1/2,2/3,1/2)\)</span>. The
+coefficients are nonnegative and sum to one, so <span class="math inline">\(P\)</span> lies in the filled triangle with
+vertices <span class="math inline">\(A,B,C\)</span>. Verify directly
+that <span class="math inline">\(P-A=\frac13(B-A)+\frac16(C-A)\)</span>.</p></div>
+<h3 id="orthonormal-bases-and-coordinate-invariance">Orthonormal bases
+and coordinate invariance</h3>
+<p>A collection of three mutually perpendicular unit vectors <span class="math inline">\(\boldsymbol{e}_1,\boldsymbol{e}_2,\boldsymbol{e}_3\)</span>
+is an orthonormal basis of <span class="math inline">\(\mathbb{R}^3\)</span>. For <span class="math inline">\(\boldsymbol{v}=\sum_i
+v_i\boldsymbol{e}_i\)</span>, orthonormality gives <span class="math inline">\(\left\lVert \boldsymbol{v}\right\rVert^2=\sum_i
+v_i^2\)</span>. Thus the distance formula is valid in every orthonormal
+coordinate system, not only the standard one. If <span class="math inline">\(Q\)</span> is an orthogonal <span class="math inline">\(3\times3\)</span> matrix, then <span class="math inline">\(Q^TQ=I\)</span> and <span class="math display">\[\left\lVert
+Q\boldsymbol{v}\right\rVert^2=(Q\boldsymbol{v})^T(Q\boldsymbol{v})=\boldsymbol{v}^TQ^TQ\boldsymbol{v}=\left\lVert
+\boldsymbol{v}\right\rVert^2.\]</span> Orthogonal transformations
+preserve dot products and angles. Their determinant is <span class="math inline">\(+1\)</span> for an orientation-preserving rotation
+and <span class="math inline">\(-1\)</span> for an orientation-reversing
+reflection.</p>
+<div class="learning-box example"><p><strong>Example — Rotating a measured displacement.</strong> A sensor
+reports <span class="math inline">\(\boldsymbol{v}=(3,4,2)\)</span> in
+its local coordinates. Rotating the sensor axes through <span class="math inline">\(90^\circ\)</span> about the vertical axis maps the
+vector to <span class="math inline">\((-4,3,2)\)</span>. Both coordinate
+descriptions have length <span class="math inline">\(\sqrt{29}\)</span>.
+The components change, but the physical displacement does not.</p></div>
+<h3 id="determinants-orientation-and-degeneracy">Determinants,
+orientation, and degeneracy</h3>
+<p>For three vectors <span class="math inline">\(\boldsymbol{a},\boldsymbol{b},\boldsymbol{c}\)</span>,
+the determinant <span class="math inline">\(\det[\boldsymbol{a}\
+\boldsymbol{b}\ \boldsymbol{c}]\)</span> is their signed volume.
+Reversing two columns reverses the sign; a zero determinant means the
+three vectors are linearly dependent. In particular, points <span class="math inline">\(A,B,C,D\)</span> are coplanar if and only if <span class="math display">\[\det[\overrightarrow{AB}\ \overrightarrow{AC}\
+\overrightarrow{AD}]=0.\]</span> This provides a coordinate-free
+criterion once the displacement vectors are formed.</p>
+<div class="learning-box example"><p><strong>Example — Testing coplanarity.</strong> Let <span class="math inline">\(A=(0,0,0)\)</span>, <span class="math inline">\(B=(1,0,1)\)</span>, <span class="math inline">\(C=(0,2,1)\)</span>, and <span class="math inline">\(D=(2,2,3)\)</span>. Since <span class="math inline">\(\overrightarrow{AD}=2\overrightarrow{AB}+\overrightarrow{AC}\)</span>,
+the determinant vanishes and the four points lie in one plane. The plane
+normal <span class="math inline">\(\overrightarrow{AB}\times\overrightarrow{AC}=(-2,-1,2)\)</span>
+confirms that <span class="math inline">\(D\)</span> satisfies <span class="math inline">\(-2x-y+2z=0\)</span>.</p></div>
+<h2 id="additional-geometric-derivations-and-worked-problems">Additional
+geometric derivations and worked problems</h2>
+<h3 id="deriving-the-point-to-line-distance-formula">Deriving the
+point-to-line distance formula</h3>
+<p>Let the line be <span class="math inline">\(L=\{A+t\boldsymbol{d}:t\in\mathbb{R}\}\)</span>
+with <span class="math inline">\(\boldsymbol{d}\ne\boldsymbol{0}\)</span>. For any
+point <span class="math inline">\(P\)</span>, set <span class="math inline">\(\boldsymbol{w}=P-A\)</span>. The closest point on
+the line is the orthogonal projection <span class="math inline">\(A+t_*\boldsymbol{d}\)</span>, where <span class="math display">\[t_*=\frac{\boldsymbol{w}\cdot\boldsymbol{d}}{\boldsymbol{d}\cdot\boldsymbol{d}}.\]</span>
+To justify the minimizer, expand <span class="math display">\[\left\lVert
+\boldsymbol{w}-t\boldsymbol{d}\right\rVert^2=\left\lVert
+\boldsymbol{d}\right\rVert^2(t-t_*)^2+\left\lVert
+\boldsymbol{w}\right\rVert^2-\frac{(\boldsymbol{w}\cdot\boldsymbol{d})^2}{\left\lVert
+\boldsymbol{d}\right\rVert^2}.\]</span> The first term is nonnegative
+and vanishes only at <span class="math inline">\(t=t_*\)</span>. Using
+<span class="math inline">\(\left\lVert
+\boldsymbol{w}\times\boldsymbol{d}\right\rVert^2=\left\lVert
+\boldsymbol{w}\right\rVert^2\left\lVert
+\boldsymbol{d}\right\rVert^2-(\boldsymbol{w}\cdot\boldsymbol{d})^2\)</span>
+gives the familiar equivalent formula <span class="math display">\[d(P,L)=\frac{\left\lVert
+\boldsymbol{w}\times\boldsymbol{d}\right\rVert}{\left\lVert
+\boldsymbol{d}\right\rVert}.\]</span></p>
+<div class="learning-box example"><p><strong>Example — A nearest point on a spatial line.</strong> Find
+the nearest point to <span class="math inline">\(P=(1,2,3)\)</span> on
+<span class="math inline">\(L:A=(0,0,1)+t(1,1,0)\)</span>. Here <span class="math inline">\(\boldsymbol{w}=(1,2,2)\)</span>, <span class="math inline">\(\boldsymbol{d}=(1,1,0)\)</span>, and <span class="math inline">\(t_*=(1+2)/2=3/2\)</span>. The foot is <span class="math inline">\(H=(3/2,3/2,1)\)</span> and the distance is <span class="math inline">\(\left\lVert
+P-H\right\rVert=\sqrt{(1/2)^2+(1/2)^2+2^2}=3/\sqrt2\)</span>.</p></div>
+<h3 id="distance-between-skew-lines">Distance between skew lines</h3>
+<p>Consider <span class="math inline">\(L_1:A+s\boldsymbol{u}\)</span>
+and <span class="math inline">\(L_2:B+t\boldsymbol{v}\)</span>, with
+nonparallel directions <span class="math inline">\(\boldsymbol{u},\boldsymbol{v}\)</span>. Their
+common perpendicular direction is <span class="math inline">\(\boldsymbol{n}=\boldsymbol{u}\times\boldsymbol{v}\)</span>.
+The displacement between arbitrary points on the two lines is <span class="math inline">\((B-A)+t\boldsymbol{v}-s\boldsymbol{u}\)</span>.
+Its component along <span class="math inline">\(\boldsymbol{n}\)</span>
+is independent of <span class="math inline">\(s,t\)</span>; consequently
+the shortest possible separation is <span class="math display">\[d(L_1,L_2)=\frac{|(B-A)\cdot(\boldsymbol{u}\times\boldsymbol{v})|}{\left\lVert
+\boldsymbol{u}\times\boldsymbol{v}\right\rVert}.\]</span> The formula
+requires <span class="math inline">\(\boldsymbol{u}\times\boldsymbol{v}\ne\boldsymbol{0}\)</span>.
+Parallel lines must be handled using the point-to-line formula
+instead.</p>
+<div class="learning-box example"><p><strong>Example — Distance between skew lines.</strong> Let <span class="math inline">\(L_1:(0,0,0)+s(1,0,0)\)</span> and <span class="math inline">\(L_2:(0,1,1)+t(0,1,0)\)</span>. The cross product
+of the directions is <span class="math inline">\((0,0,1)\)</span>, so
+the distance is <span class="math inline">\(|(0,1,1)\cdot(0,0,1)|=1\)</span>. The nearest pair
+occurs at <span class="math inline">\((0,0,0)\)</span> on the first line
+and <span class="math inline">\((0,0,1)\)</span> on the second (take
+<span class="math inline">\(t=-1\)</span>).</p></div>
+<h3 id="distance-from-a-point-to-a-plane-a-projection-proof">Distance
+from a point to a plane: a projection proof</h3>
+<p>For a plane <span class="math inline">\(\boldsymbol{n}\cdot\boldsymbol{x}=d\)</span> with
+<span class="math inline">\(\boldsymbol{n}\ne\boldsymbol{0}\)</span>,
+choose any point <span class="math inline">\(A\)</span> on the plane.
+The signed normal displacement from <span class="math inline">\(A\)</span> to <span class="math inline">\(P\)</span> is <span class="math inline">\((\boldsymbol{n}\cdot(P-A))/\left\lVert
+\boldsymbol{n}\right\rVert\)</span>. Since <span class="math inline">\(\boldsymbol{n}\cdot A=d\)</span>, the unsigned
+shortest distance is <span class="math display">\[d(P,\Pi)=\frac{|\boldsymbol{n}\cdot
+P-d|}{\left\lVert \boldsymbol{n}\right\rVert}.\]</span> The nearest
+point is <span class="math inline">\(H=P-\frac{\boldsymbol{n}\cdot
+P-d}{\left\lVert \boldsymbol{n}\right\rVert^2}\boldsymbol{n}\)</span>.
+Substitution shows <span class="math inline">\(\boldsymbol{n}\cdot
+H=d\)</span>, and <span class="math inline">\(P-H\)</span> is normal to
+the plane.</p>
+<div class="learning-box example"><p><strong>Example — Foot of the perpendicular.</strong> For <span class="math inline">\(P=(2,1,4)\)</span> and <span class="math inline">\(2x-y+2z=3\)</span>, we have <span class="math inline">\(\boldsymbol{n}=(2,-1,2)\)</span> and <span class="math inline">\(\boldsymbol{n}\cdot P-d=8\)</span>. Hence <span class="math inline">\(H=P-(8/9)(2,-1,2)=(2/9,17/9,20/9)\)</span> and
+<span class="math inline">\(d(P,\Pi)=8/3\)</span>. Checking <span class="math inline">\(2(2/9)-17/9+2(20/9)=3\)</span> verifies that <span class="math inline">\(H\)</span> lies on the plane.</p></div>
+<h3 id="conditioning-and-measurement-error">Conditioning and measurement
+error</h3>
+<p>If measured coordinates have small perturbations <span class="math inline">\(\delta\boldsymbol{u}\)</span> and <span class="math inline">\(\delta\boldsymbol{v}\)</span>, then the reverse
+triangle inequality yields <span class="math display">\[\big|\left\lVert
+\boldsymbol{u}+\delta\boldsymbol{u}\right\rVert-\left\lVert
+\boldsymbol{u}\right\rVert\big|\le\left\lVert
+\delta\boldsymbol{u}\right\rVert.\]</span> Likewise, bilinearity of the
+dot product gives <span class="math display">\[(\boldsymbol{u}+\delta\boldsymbol{u})\cdot(\boldsymbol{v}+\delta\boldsymbol{v})-\boldsymbol{u}\cdot\boldsymbol{v}
+=\delta\boldsymbol{u}\cdot\boldsymbol{v}+\boldsymbol{u}\cdot\delta\boldsymbol{v}+\delta\boldsymbol{u}\cdot\delta\boldsymbol{v}.\]</span>
+Cauchy–Schwarz bounds the absolute error by <span class="math inline">\(\left\lVert
+\delta\boldsymbol{u}\right\rVert\left\lVert
+\boldsymbol{v}\right\rVert+\left\lVert
+\boldsymbol{u}\right\rVert\left\lVert
+\delta\boldsymbol{v}\right\rVert+\left\lVert
+\delta\boldsymbol{u}\right\rVert\left\lVert
+\delta\boldsymbol{v}\right\rVert\)</span>. These inequalities explain
+why calculations involving almost parallel directions require extra
+care: the cross-product magnitude approaches zero, amplifying relative
+errors in normalized cross products.</p>
+<div class="learning-box check"><p><strong>Checkpoint.</strong> Why should a program reject a zero
+direction vector when defining a line? Why should it warn when the cross
+product of two direction vectors is nearly zero?</p></div>
+<h2 id="source-specific-examples-retained-for-conceptual-comparison">Source-specific
+examples retained for conceptual comparison</h2>
+<p>The two original manuscripts occasionally use different numerical
+data to illuminate the same geometric concept. We retain those as
+distinct examples rather than collapsing them merely because their
+headings match.</p>
+<div class="learning-box example"><p><strong>Example — An R-source orthogonality test.</strong> The R
+manuscript uses <span class="math inline">\(\boldsymbol{a}=(1,2,-1)\)</span> and <span class="math inline">\(\boldsymbol{b}=(2,0,2)\)</span>. Their dot product
+is <span class="math inline">\(2+0-2=0\)</span>, so they are
+perpendicular. This is a particularly useful test case for automated
+vector functions because the expected dot product is exactly zero.</p></div>
+<div class="learning-box example"><p><strong>Example — A Python-source angle calculation.</strong> Let
+<span class="math inline">\(\boldsymbol{u}=(1,2,0)\)</span> and <span class="math inline">\(\boldsymbol{v}=(2,1,2)\)</span>. Then <span class="math inline">\(\boldsymbol{u}\cdot\boldsymbol{v}=4\)</span>,
+<span class="math inline">\(\left\lVert
+\boldsymbol{u}\right\rVert=\sqrt5\)</span>, and <span class="math inline">\(\left\lVert \boldsymbol{v}\right\rVert=3\)</span>.
+The angle is <span class="math inline">\(\theta=\arccos(4/(3\sqrt5))\)</span>. Unlike the
+preceding orthogonality example, this tests a non-right angle and the
+conversion from radians to degrees.</p></div>
+<div class="learning-box example"><p><strong>Example — A line–plane intersection.</strong> Intersect <span class="math inline">\(\boldsymbol{r}(t)=(1,0,2)+t(2,1,-1)\)</span> with
+the plane <span class="math inline">\(x+2y+z=6\)</span>. Substitution
+gives <span class="math inline">\((1+2t)+2t+(2-t)=3+3t=6\)</span>, so
+<span class="math inline">\(t=1\)</span> and the intersection is <span class="math inline">\((3,1,1)\)</span>. A line is parallel to the plane
+precisely when its direction has zero dot product with the plane normal;
+it lies entirely in the plane only if one of its points also satisfies
+the plane equation.</p></div>
+<h2 id="proof-focused-exercises-and-conceptual-extensions">Proof-focused
+exercises and conceptual extensions</h2>
+<ol type="1">
+<li><p>Prove that every affine combination of points whose coefficients
+sum to one transforms correctly under a change of origin. Give a
+counterexample when the sum is not one.</p></li>
+<li><p>Prove the Lagrange identity <span class="math inline">\(\left\lVert
+\boldsymbol{u}\times\boldsymbol{v}\right\rVert^2=\left\lVert
+\boldsymbol{u}\right\rVert^2\left\lVert
+\boldsymbol{v}\right\rVert^2-(\boldsymbol{u}\cdot\boldsymbol{v})^2\)</span>
+by expanding both sides in components.</p></li>
+<li><p>Derive the equation of the perpendicular bisector plane of two
+distinct points <span class="math inline">\(A\)</span> and <span class="math inline">\(B\)</span> by equating squared distances.</p></li>
+<li><p>Derive the closest point on a line using minimization of a
+quadratic function; explain why the minimizer is unique.</p></li>
+<li><p>Derive the distance between skew lines and explain what fails if
+their directions are parallel.</p></li>
+<li><p>Show that an orthogonal matrix preserves dot products, distances,
+and angles; determine how its determinant affects orientation.</p></li>
+<li><p>Explain the difference between a mathematically zero determinant
+and a small floating-point determinant. Propose a scale-aware
+tolerance.</p></li>
+<li><p>For three noncollinear points, derive the plane normal using a
+cross product and verify the equation by substitution.</p></li>
+<li><p>Construct a real-world example in which a signed triple product
+is more informative than its absolute value.</p></li>
+<li><p>Prove that the nearest point <span class="math inline">\(H\)</span> on a plane satisfies <span class="math inline">\(P-H\)</span> parallel to the normal, and implement
+the formula in R and Python.</p></li>
+</ol>
+<h2 id="solving-vector-and-geometry-problems-using-r">Solving Vector and
+Geometry Problems Using R</h2>
+<p>R represents a vector as a numeric vector created with
+<code>c()</code>. We distinguish componentwise multiplication from the
+scalar product and use matrix operations when orientation matters. These
+computational examples preserve distinct scenarios from the original R
+manuscript.</p>
+<h3 id="r-laboratory-1-source-example-and-implementation">R laboratory
+1: source example and implementation</h3>
+<div class="learning-box example"><p><strong>Example — Distance and midpoint.</strong> Let <span class="math inline">\(P=(1,-2,4)\)</span> and <span class="math inline">\(Q=(5,1,-2)\)</span>. Then <span class="math inline">\(Q-P=(4,3,-6)\)</span>, so <span class="math inline">\(d(P,Q)=\sqrt{16+9+36}=\sqrt{61}\)</span>. Their
+midpoint is <span class="math inline">\(M=\frac12(P+Q)=(3,-\frac12,1)\)</span>.</p></div>
+<div class="code-shell"><div class="code-bar">R<a href="code/chapter01-listing-01.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>P &lt;- c(1, -2, 4)
+Q &lt;- c(5, 1, -2)
+displacement &lt;- Q - P
+distance &lt;- sqrt(sum(displacement^2))
+midpoint &lt;- (P + Q) / 2
+print(displacement)
+print(distance)
+print(midpoint)</code></pre></div>
+<h3 id="r-laboratory-2-source-example-and-implementation">R laboratory
+2: source example and implementation</h3>
+<div class="learning-box example"><p><strong>Example — A linear combination.</strong> If <span class="math inline">\(\boldsymbol{u}=(2,-1,3)\)</span> and <span class="math inline">\(\boldsymbol{v}=(-1,4,2)\)</span>, then <span class="math inline">\(2\boldsymbol{u}-3\boldsymbol{v}=(7,-14,0)\)</span>.</p></div>
+<div class="code-shell"><div class="code-bar">R<a href="code/chapter01-listing-02.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>u &lt;- c(2, -1, 3)
+v &lt;- c(-1, 4, 2)
+2 * u - 3 * v</code></pre></div>
+<h3 id="r-laboratory-3-source-example-and-implementation">R laboratory
+3: source example and implementation</h3>
+<div class="learning-box example"><p><strong>Example — Resolve a force.</strong> A force <span class="math inline">\(\boldsymbol{F}=(6,2,3)\)</span> acts on an object
+constrained to move along the direction <span class="math inline">\(\boldsymbol{d}=(2,1,0)\)</span>. The component of
+force in the direction of travel is <span class="math inline">\(\boldsymbol{F}\cdot\boldsymbol{d}/\left\lVert
+\boldsymbol{d}\right\rVert=14/\sqrt5\)</span>. Its vector projection is
+<span class="math inline">\((14/5)(2,1,0)=(28/5,14/5,0)\)</span>.</p></div>
+<div class="code-shell"><div class="code-bar">R<a href="code/chapter01-listing-03.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>project_onto &lt;- function(u, v) {
+  denom &lt;- dot3(v, v)
+  if (denom == 0) stop("Cannot project onto zero vector")
+  dot3(u, v) / denom * v
+}
+F &lt;- c(6, 2, 3)
+d &lt;- c(2, 1, 0)
+parallel &lt;- project_onto(F, d)
+perpendicular &lt;- F - parallel
+print(parallel)
+print(dot3(perpendicular, d)) # approximately 0</code></pre></div>
+<h3 id="r-laboratory-4-source-example-and-implementation">R laboratory
+4: source example and implementation</h3>
+<div class="learning-box example"><p><strong>Example — Area from vertices.</strong> Take <span class="math inline">\(A=(0,0,0)\)</span>, <span class="math inline">\(B=(1,0,2)\)</span>, and <span class="math inline">\(C=(0,3,1)\)</span>. Then <span class="math inline">\(\overrightarrow{AB}\times\overrightarrow{AC}=(-6,-1,3)\)</span>,
+so the triangle area is <span class="math inline">\(\sqrt{46}/2\)</span>.</p></div>
+<div class="code-shell"><div class="code-bar">R<a href="code/chapter01-listing-04.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>A &lt;- c(0, 0, 0)
+B &lt;- c(1, 0, 2)
+C &lt;- c(0, 3, 1)
+AB &lt;- B - A; AC &lt;- C - A
+cross3 &lt;- function(u, v) c(u[2]*v[3]-u[3]*v[2],
+                            u[3]*v[1]-u[1]*v[3],
+                            u[1]*v[2]-u[2]*v[1])
+area &lt;- sqrt(sum(cross3(AB, AC)^2))/2
+stopifnot(isTRUE(all.equal(area, sqrt(46)/2)))
+print(area)</code></pre></div>
+<h3 id="r-laboratory-5-source-example-and-implementation">R laboratory
+5: source example and implementation</h3>
+<div class="learning-box example"><p><strong>Example — Line through two points.</strong> For <span class="math inline">\(P=(2,-1,0)\)</span> and <span class="math inline">\(Q=(4,3,5)\)</span>, the direction is <span class="math inline">\(Q-P=(2,4,5)\)</span> and the line is <span class="math inline">\(\boldsymbol{r}(t)=(2,-1,0)+t(2,4,5)\)</span>.</p></div>
+<div class="code-shell"><div class="code-bar">R<a href="code/chapter01-listing-05.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>P &lt;- c(2, -1, 0)
+Q &lt;- c(4, 3, 5)
+direction &lt;- Q - P
+point_on_line &lt;- function(t) P + t * direction
+point_on_line(0)
+point_on_line(0.5)
+point_on_line(1)</code></pre></div>
+<h3 id="r-laboratory-6-source-example-and-implementation">R laboratory
+6: source example and implementation</h3>
+<div class="learning-box example"><p><strong>Example — Distance to a plane.</strong> Find the distance
+from <span class="math inline">\(Q=(2,1,4)\)</span> to <span class="math inline">\(2x-y+2z=3\)</span>. The normal is <span class="math inline">\((2,-1,2)\)</span> with norm <span class="math inline">\(3\)</span>, while <span class="math inline">\(2(2)-1+2(4)-3=8\)</span>. Therefore the distance
+is <span class="math inline">\(8/3\)</span>.</p></div>
+<div class="code-shell"><div class="code-bar">R<a href="code/chapter01-listing-06.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>plane_distance &lt;- function(Q, n, d) {
+  if (norm3(n) == 0) stop("Plane normal must be nonzero")
+  abs(dot3(Q, n) - d) / norm3(n)
+}
+plane_distance(c(2, 1, 4), c(2, -1, 2), 3)</code></pre></div>
+<h3 id="a-reusable-vector-toolkit-in-r">A reusable vector toolkit in
+R</h3>
+<div class="code-shell"><div class="code-bar">R<a href="code/chapter01-listing-07.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>vec_norm &lt;- function(v) sqrt(sum(v^2))
+dot &lt;- function(u, v) {
+  stopifnot(length(u) == length(v))
+  sum(u * v)
+}
+cross3 &lt;- function(u, v) {
+  stopifnot(length(u) == 3, length(v) == 3)
+  c(u[2]*v[3] - u[3]*v[2],
+    u[3]*v[1] - u[1]*v[3],
+    u[1]*v[2] - u[2]*v[1])
+}
+project &lt;- function(v, onto) {
+  d &lt;- dot(onto, onto)
+  if (d == 0) stop("Projection onto zero vector")
+  dot(v, onto) / d * onto
+}
+u &lt;- c(2, -1, 2); v &lt;- c(1, 3, -2)
+print(vec_norm(u)); print(dot(u, v))
+print(cross3(u, v)); print(project(v, u))</code></pre></div>
+<h2 id="solving-the-same-problems-using-python">Solving the Same
+Problems Using Python</h2>
+<p>The following laboratories consolidate the original Python
+computations after the mathematical development. Numerical arrays are
+handled by NumPy; exact algebraic checks use SymPy. The plotting source
+files accompanying this chapter reproduce its five original figures.</p>
+<h3 id="python-laboratory-1">Python laboratory 1</h3>
+<div class="code-shell"><div class="code-bar">Python<a href="code/chapter01-listing-08.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>import numpy as np
+u = np.array([2.0, -1.0, 2.0])
+v = np.array([1.0, 3.0, -2.0])
+print('u + v =', u + v)
+print('2u - v =', 2*u - v)
+print('||u|| =', np.linalg.norm(u))
+print('unit u =', u / np.linalg.norm(u))
+assert np.isclose(np.linalg.norm(u / np.linalg.norm(u)), 1)</code></pre></div>
+<h3 id="python-laboratory-2">Python laboratory 2</h3>
+<div class="code-shell"><div class="code-bar">Python<a href="code/chapter01-listing-09.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>import numpy as np
+import sympy as sp
+u = sp.Matrix([1, 2, 2])
+v = sp.Matrix([2, 0, 1])
+cos_theta = sp.simplify(u.dot(v) / (u.norm()*v.norm()))
+print('Exact cosine:', cos_theta)
+print('Angle (degrees):', float(sp.acos(cos_theta)*180/sp.pi))
+u_np = np.array([1., 2., 2.])
+v_np = np.array([2., 0., 1.])
+cos_numeric = np.dot(u_np, v_np) / (
+    np.linalg.norm(u_np)*np.linalg.norm(v_np))
+angle = np.degrees(np.arccos(np.clip(cos_numeric, -1, 1)))
+print('Numerical angle:', angle)</code></pre></div>
+<h3 id="python-laboratory-3">Python laboratory 3</h3>
+<div class="code-shell"><div class="code-bar">Python<a href="code/chapter01-listing-10.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>import numpy as np
+r = np.array([2., 0., 0.])
+force = np.array([0., 3., 4.])
+torque = np.cross(r, force)
+print('Torque vector:', torque)
+print('Torque magnitude:', np.linalg.norm(torque))
+assert np.isclose(np.dot(torque, r), 0.0)
+assert np.isclose(np.dot(torque, force), 0.0)</code></pre></div>
+<h3 id="python-laboratory-4">Python laboratory 4</h3>
+<div class="code-shell"><div class="code-bar">Python<a href="code/chapter01-listing-11.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>import numpy as np
+u = np.array([1, 0, 2])
+v = np.array([0, 2, 1])
+w = np.array([2, 1, 0])
+triple = np.dot(u, np.cross(v, w))
+volume = abs(triple)
+M = np.stack([u, v, w], axis=0)
+print('Triple product:', triple)
+print('Volume:', volume)
+print('Determinant:', np.linalg.det(M))
+assert np.isclose(triple, np.linalg.det(M))</code></pre></div>
+<h3 id="python-laboratory-5">Python laboratory 5</h3>
+<div class="code-shell"><div class="code-bar">Python<a href="code/chapter01-listing-12.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>import sympy as sp
+A = sp.Matrix([1, 0, 1])
+B = sp.Matrix([2, 1, 1])
+C = sp.Matrix([1, 2, 3])
+n = (B-A).cross(C-A)
+print('Plane normal:', n)
+P = sp.Matrix([1, 2, 3])
+d = n.dot(A)
+distance = sp.simplify(abs(n.dot(P)-d) / sp.sqrt(n.dot(n)))
+print('Exact point-to-plane distance:', distance)</code></pre></div>
+<h3 id="python-laboratory-6">Python laboratory 6</h3>
+<div class="code-shell"><div class="code-bar">Python<a href="code/chapter01-listing-13.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>import numpy as np
+A = np.array([[1, 1, 1], [1, -1, 1], [2, 1, -1]], dtype=float)
+b = np.array([6, 2, 1], dtype=float)
+solution = np.linalg.solve(A, b)
+print(solution)  # [1. 2. 3.]
+print('Residual norm:', np.linalg.norm(A @ solution - b))</code></pre></div>
+<h3 id="python-laboratory-7">Python laboratory 7</h3>
+<div class="code-shell"><div class="code-bar">Python<a href="code/chapter01-listing-14.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>import numpy as np
+points = np.array([
+    [0, 0, 1.0], [1, 0, 3.1], [0, 1, 0.1],
+    [1, 1, 2.0], [2, 1, 4.2], [1, 2, 1.0]
+])
+X = np.column_stack((points[:, 0], points[:, 1],
+                     np.ones(len(points))))
+coeff, residuals, rank, s = np.linalg.lstsq(
+    X, points[:, 2], rcond=None)
+a, b, c = coeff
+print(f'Fitted plane: z = {a:.3f}x + {b:.3f}y + {c:.3f}')
+print('Residual norm:', np.linalg.norm(X @ coeff - points[:, 2]))</code></pre></div>
+<h3 id="python-laboratory-8">Python laboratory 8</h3>
+<div class="code-shell"><div class="code-bar">Python<a href="code/chapter01-listing-15.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>import sympy as sp
+A, B, C = (sp.Matrix(v) for v in [(1,0,1),(2,1,1),(1,2,3)])
+P = sp.Matrix([3, 1, 4])
+n = (B-A).cross(C-A) / 2  # primitive normal (1,-1,1)
+d = n.dot(A)
+signed = sp.simplify(n.dot(P) - d)
+Q = sp.simplify(P - signed/n.dot(n)*n)
+distance = sp.simplify(abs(signed)/sp.sqrt(n.dot(n)))
+print('Normal:', n.T, 'plane constant:', d)
+print('Closest point:', Q.T)
+print('Exact distance:', distance)
+assert sp.simplify(n.dot(Q)-d) == 0
+assert sp.simplify((P-Q).cross(n)) == sp.zeros(3, 1)</code></pre></div>
+<h2 id="comparing-r-and-python">Comparing R and Python</h2>
+<p>Both languages compute the same Euclidean geometry, but their data
+structures and syntax differ. In R, <code>sum(u*v)</code> is a dot
+product; in Python, <code>numpy.dot(u,v)</code> provides the
+corresponding operation. R’s <code>crossprod()</code> computes matrix
+cross-products (inner products), <em>not</em> the three-dimensional
+vector cross product; use the explicit <code>cross3()</code> function
+above. Python provides <code>numpy.cross()</code>. In both languages, a
+floating-point result should be compared with a tolerance rather than
+demanding exact binary equality.</p>
+<div class="learning-box example"><p><strong>Example — A matched cross-language computation.</strong> For
+<span class="math inline">\(\boldsymbol{u}=(2,-1,2)\)</span> and <span class="math inline">\(\boldsymbol{v}=(1,3,-2)\)</span>, the exact scalar
+product is <span class="math inline">\(2-3-4=-5\)</span>, the vector
+cross product is <span class="math inline">\(\boldsymbol{u}\times\boldsymbol{v}=(-4,6,7)\)</span>,
+and <span class="math inline">\(\|\boldsymbol{u}\|=3\)</span>. Both
+implementations must return these values, up to floating-point
+representation.</p></div>
+<div class="code-shell"><div class="code-bar">R<a href="code/chapter01-listing-16.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>u &lt;- c(2,-1,2); v &lt;- c(1,3,-2)
+print(sum(u*v))
+print(cross3(u,v))
+print(sqrt(sum(u^2)))</code></pre></div>
+<div class="code-shell"><div class="code-bar">Python<a href="code/chapter01-listing-17.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>import numpy as np
+u = np.array([2.,-1.,2.]); v = np.array([1.,3.,-2.])
+print(np.dot(u,v))
+print(np.cross(u,v))
+print(np.linalg.norm(u))</code></pre></div>
+<h2 id="real-world-application-navigation-with-wind">Real-World
+Application: Navigation with Wind</h2>
+<p>A rescue drone moves with air-relative velocity <span class="math inline">\(\boldsymbol{v}_a=(12,5,0)\)</span> m/s, while a
+steady wind adds <span class="math inline">\(\boldsymbol{v}_w=(-2,3,0)\)</span> m/s. The ground
+velocity is <span class="math inline">\(\boldsymbol{v}_g=(10,8,0)\)</span> m/s, and its
+speed is <span class="math inline">\(\sqrt{164}\approx12.806\)</span>
+m/s. After <span class="math inline">\(45\)</span> seconds, its
+displacement is <span class="math inline">\((450,360,0)\)</span> meters.
+This elementary model assumes constant velocity and wind; real
+operations require acceleration, airspace constraints, and changing
+weather. A second question is whether a target displacement <span class="math inline">\(\boldsymbol{d}=(450,360,0)\)</span> is parallel to
+the resultant velocity; the cross product vanishes in this idealized
+case.</p>
+<div class="code-shell"><div class="code-bar">R<a href="code/chapter01-listing-18.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>air &lt;- c(12,5,0); wind &lt;- c(-2,3,0)
+ground &lt;- air + wind
+print(ground); print(sqrt(sum(ground^2)))
+print(45 * ground)</code></pre></div>
+<div class="code-shell"><div class="code-bar">Python<a href="code/chapter01-listing-19.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>import numpy as np
+air = np.array([12.,5.,0.]); wind = np.array([-2.,3.,0.])
+ground = air + wind
+print(ground, np.linalg.norm(ground), 45*ground)</code></pre></div>
+<h2 id="exercises">Exercises</h2>
+<ol type="1">
+<li><p>Compute the midpoint and distance between <span class="math inline">\((1,-2,4)\)</span> and <span class="math inline">\((5,1,-2)\)</span>; verify using both
+languages.</p></li>
+<li><p>Prove the Cauchy–Schwarz inequality for <span class="math inline">\(\mathbb R^3\)</span> and demonstrate numerically
+with five randomly selected vector pairs.</p></li>
+<li><p>Find the projection of <span class="math inline">\((3,4,1)\)</span> onto <span class="math inline">\((1,0,1)\)</span>, analytically and
+computationally.</p></li>
+<li><p>Calculate the area of the triangle with vertices <span class="math inline">\((0,0,0)\)</span>, <span class="math inline">\((1,2,0)\)</span>, and <span class="math inline">\((0,1,3)\)</span>.</p></li>
+<li><p>Determine a plane through <span class="math inline">\((0,1,0)\)</span>, <span class="math inline">\((1,0,0)\)</span>, and <span class="math inline">\((0,0,2)\)</span>; check the equation
+numerically.</p></li>
+<li><p>Derive the point-to-plane distance formula by orthogonal
+projection.</p></li>
+<li><p>Construct two skew lines and explain algebraically why they do
+not intersect.</p></li>
+<li><p>Compare the behavior of R’s <code>crossprod()</code> with
+Python’s <code>numpy.cross()</code>; explain why their names do not
+indicate equivalent operations.</p></li>
+<li><p>Fit a plane to at least six measured or simulated points using
+least squares in R and Python. Compare residuals.</p></li>
+<li><p>Extend the drone model to a time-varying wind vector and estimate
+displacement over a finite sequence of intervals.</p></li>
+</ol>
+<h2 id="chapter-project-three-dimensional-navigation-and-measurement">Chapter
+Project: Three-Dimensional Navigation and Measurement</h2>
+<h3 class="unnumbered" id="scenario-and-objectives">Scenario and
+objectives</h3>
+<p>A drone travels between observation stations in a three-dimensional
+coordinate system. Model a flight from <span class="math inline">\(A=(1,-2,4)\)</span> km to <span class="math inline">\(B=(5,1,2)\)</span> km, then to <span class="math inline">\(C=(7,4,3)\)</span> km. A fixed observation plane
+is <span class="math inline">\(2x-y+2z=9\)</span>. Analyze its geometry
+and assess how measurement errors might change the interpretation.</p>
+<h3 class="unnumbered" id="required-mathematical-analysis">Required
+mathematical analysis</h3>
+<p>Compute displacement vectors, segment lengths, total path length,
+straight-line distance, turning angle, and shortest distance from <span class="math inline">\(B\)</span> to the plane. Prove the formulas used
+for the angle and plane distance. State the units and assumptions
+explicitly.</p>
+<h3 class="unnumbered" id="r-and-python-implementation">R and Python
+implementation</h3>
+<p>Implement both analyses independently. Include reusable functions for
+distance, angle, and point-to-plane distance, with input validation.
+Check each computational result against the analytical calculation.
+Generate a labeled 3D plot in Python and a comparable visualization in R
+(base graphics or an optional 3D package).</p>
+<h3 class="unnumbered" id="interpretation-and-extension">Interpretation
+and extension</h3>
+<p>Explain the difference between path length and straight-line
+distance. Perturb each coordinate of <span class="math inline">\(B\)</span> by a small amount and investigate
+sensitivity. Discuss how coordinate uncertainty affects distance
+calculations.</p>
+<h3 class="unnumbered" id="deliverables-and-suggested-rubric">Deliverables and suggested
+rubric</h3>
+<p>Submit a 4–6 page report, annotated R script, annotated Python
+script, two visualizations, and a reproducibility note. Suggested
+scoring: mathematical derivations (30%), R implementation (20%), Python
+implementation (20%), visualization and interpretation (20%),
+reproducibility and clarity (10%).</p>
+<footer><a href="index.html">Welcome ←</a><a href="chapter02.html">2. Curves, Surfaces, and Coordinate Systems →</a></footer></main><aside class="chapter-toc"><strong>On this page</strong><ul><li><a href="#interactive-investigation">Interactive investigation</a></li><li><a href="#why-three-dimensional-geometry-matters">Why three-dimensional
+geometry matters</a></li><li><a href="#cartesian-coordinates-and-distance">Cartesian coordinates and
+distance</a></li><li><a href="#vectors-arithmetic-and-geometric-meaning">Vectors, arithmetic,
+and geometric meaning</a></li><li><a href="#length-and-unit-vectors">Length and unit vectors</a></li><li><a href="#norm-inequalities">Norm inequalities</a></li><li><a href="#python-laboratory-vector-operations">Python laboratory: vector
+operations</a></li><li><a href="#the-dot-product-angles-and-orthogonality">The dot product,
+angles, and orthogonality</a></li><li><a href="#projection-and-decomposition">Projection and decomposition</a></li><li><a href="#python-laboratory-exact-and-numerical-angles">Python laboratory:
+exact and numerical angles</a></li><li><a href="#the-cross-product-and-oriented-area">The cross product and
+oriented area</a></li><li><a href="#magnitude-area-and-orientation">Magnitude, area, and
+orientation</a></li><li><a href="#lagranges-identity">Lagrange’s identity</a></li><li><a href="#torque-as-an-application">Torque as an application</a></li><li><a href="#scalar-triple-products-and-spatial-volume">Scalar triple
+products and spatial volume</a></li><li><a href="#computational-verification">Computational verification</a></li><li><a href="#lines-in-space">Lines in space</a></li><li><a href="#relative-positions-of-two-lines">Relative positions of two
+lines</a></li><li><a href="#distance-from-a-point-to-a-line">Distance from a point to a
+line</a></li><li><a href="#planes-and-their-normal-vectors">Planes and their normal
+vectors</a></li><li><a href="#angles-between-planes-and-lines">Angles between planes and
+lines</a></li><li><a href="#distance-from-a-point-to-a-plane">Distance from a point to a
+plane</a></li><li><a href="#python-laboratory-symbolic-plane-geometry">Python laboratory:
+symbolic plane geometry</a></li><li><a href="#intersections-and-linear-systems">Intersections and linear
+systems</a></li><li><a href="#applications-navigation-work-and-geometric-modeling">Applications:
+navigation, work, and geometric modeling</a></li><li><a href="#navigation-and-relative-velocity">Navigation and relative
+velocity</a></li><li><a href="#work-as-a-dot-product">Work as a dot product</a></li><li><a href="#fitting-a-plane-to-measured-data">Fitting a plane to measured
+data</a></li><li><a href="#a-guided-computational-investigation">A guided computational
+investigation</a></li><li><a href="#common-misconceptions-and-mathematical-habits">Common
+misconceptions and mathematical habits</a></li><li><a href="#chapter-summary">Chapter summary</a></li><li><a href="#further-mathematical-foundations-affine-geometry-and-orientation">Further
+mathematical foundations: affine geometry and orientation</a></li><li><a href="#why-points-cannot-be-added-without-a-choice-of-origin">Why
+points cannot be added without a choice of origin</a></li><li><a href="#orthonormal-bases-and-coordinate-invariance">Orthonormal bases
+and coordinate invariance</a></li><li><a href="#determinants-orientation-and-degeneracy">Determinants,
+orientation, and degeneracy</a></li><li><a href="#additional-geometric-derivations-and-worked-problems">Additional
+geometric derivations and worked problems</a></li><li><a href="#deriving-the-point-to-line-distance-formula">Deriving the
+point-to-line distance formula</a></li><li><a href="#distance-between-skew-lines">Distance between skew lines</a></li><li><a href="#distance-from-a-point-to-a-plane-a-projection-proof">Distance
+from a point to a plane: a projection proof</a></li><li><a href="#conditioning-and-measurement-error">Conditioning and measurement
+error</a></li><li><a href="#source-specific-examples-retained-for-conceptual-comparison">Source-specific
+examples retained for conceptual comparison</a></li><li><a href="#proof-focused-exercises-and-conceptual-extensions">Proof-focused
+exercises and conceptual extensions</a></li><li><a href="#solving-vector-and-geometry-problems-using-r">Solving Vector and
+Geometry Problems Using R</a></li><li><a href="#r-laboratory-1-source-example-and-implementation">R laboratory
+1: source example and implementation</a></li><li><a href="#r-laboratory-2-source-example-and-implementation">R laboratory
+2: source example and implementation</a></li><li><a href="#r-laboratory-3-source-example-and-implementation">R laboratory
+3: source example and implementation</a></li><li><a href="#r-laboratory-4-source-example-and-implementation">R laboratory
+4: source example and implementation</a></li><li><a href="#r-laboratory-5-source-example-and-implementation">R laboratory
+5: source example and implementation</a></li><li><a href="#r-laboratory-6-source-example-and-implementation">R laboratory
+6: source example and implementation</a></li><li><a href="#a-reusable-vector-toolkit-in-r">A reusable vector toolkit in
+R</a></li><li><a href="#solving-the-same-problems-using-python">Solving the Same
+Problems Using Python</a></li><li><a href="#python-laboratory-1">Python laboratory 1</a></li><li><a href="#python-laboratory-2">Python laboratory 2</a></li><li><a href="#python-laboratory-3">Python laboratory 3</a></li><li><a href="#python-laboratory-4">Python laboratory 4</a></li><li><a href="#python-laboratory-5">Python laboratory 5</a></li><li><a href="#python-laboratory-6">Python laboratory 6</a></li><li><a href="#python-laboratory-7">Python laboratory 7</a></li><li><a href="#python-laboratory-8">Python laboratory 8</a></li><li><a href="#comparing-r-and-python">Comparing R and Python</a></li><li><a href="#real-world-application-navigation-with-wind">Real-World
+Application: Navigation with Wind</a></li><li><a href="#exercises">Exercises</a></li><li><a href="#chapter-project-three-dimensional-navigation-and-measurement">Chapter
+Project: Three-Dimensional Navigation and Measurement</a></li><li><a href="#scenario-and-objectives">Scenario and
+objectives</a></li><li><a href="#required-mathematical-analysis">Required
+mathematical analysis</a></li><li><a href="#r-and-python-implementation">R and Python
+implementation</a></li><li><a href="#interpretation-and-extension">Interpretation
+and extension</a></li><li><a href="#deliverables-and-suggested-rubric">Deliverables and suggested
+rubric</a></li></ul></aside></div><script src="search-index.js"></script><script src="site.js"></script><script src="investigations.js"></script></body></html>

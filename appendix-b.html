@@ -1,0 +1,756 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Introduction to Python and Jupyter | Applied Multivariate Calculus Using R and Python</title><link rel="stylesheet" href="site.css"><script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script></head><body><a class="skip" href="#main">Skip to content</a><nav class="site-nav" aria-label="Book navigation"><a class="brand" href="index.html">Applied Multivariate Calculus Using R and Python</a><p class="subtitle">Volume III · Abraham Ayebo</p><label for="book-search">Search book</label><input id="book-search" type="search" placeholder="Search chapters"><div id="search-results" class="search-results" aria-live="polite"></div><div class="nav-label">Contents</div><a href="index.html">Welcome</a><a href="chapter01.html">1. Vectors and Geometry in Three-Dimensional Space</a><a href="chapter02.html">2. Curves, Surfaces, and Coordinate Systems</a><a href="chapter03.html">3. Functions of Several Variables and Partial Differentiation</a><a href="chapter04.html">4. Gradients, Taylor Approximations, and Optimization</a><a href="chapter05.html">5. Multiple Integration and Applications</a><a href="chapter06.html">6. Vector Fields and Integral Theorems</a><a href="chapter07.html">7. Introduction to Tensor Calculus and Differential Geometry</a><a href="chapter08.html">8. Partial Differential Equations and Computational Methods</a><a href="appendix-a.html">Appendix A. Introduction to R and RStudio</a><a href="appendix-b.html" class="active" aria-current="page">Appendix B. Introduction to Python and Jupyter</a><a href="resources.html">Computational resources</a><a href="about.html">About this book</a><div class="nav-label">Series</div><a href="https://aayebo.github.io/applied-precalculus/">Volume I · Applied Precalculus</a><a href="https://aayebo.github.io/applied-calculus/">Volume II · Applied Calculus</a></nav><header class="topbar"><button class="menu" aria-expanded="false">Contents</button><span>Applied Mathematics · Volume III</span><span class="spacer"></span><a href="resources.html">Code &amp; resources</a></header><div class="page-grid"><main id="main"><h1>Appendix B. Introduction to Python and Jupyter</h1><p><span id="app:python" label="app:python"></span></p>
+<div class="learning-box example"><p><strong>Learning.</strong> After completing this appendix, you should
+be able to install and use Python in JupyterLab or Jupyter Notebook;
+distinguish notebooks from reusable scripts; work with numerical data
+and arrays; write reliable functions; visualize curves, surfaces, and
+vector fields; compute derivatives, integrals, and optimizers; implement
+numerical methods for ordinary and partial differential equations; and
+reproduce representative calculations from Chapters 1–8. Throughout, you
+will connect each computational result to its mathematical
+justification.</p></div>
+<h2 id="the-role-of-python-in-this-textbook">The role of Python in this
+textbook</h2>
+<p>Python is a general-purpose programming language. The scientific
+Python ecosystem supplies numerical arrays (NumPy), plotting
+(Matplotlib), symbolic algebra (SymPy), numerical algorithms (SciPy),
+and data tables (pandas). Jupyter is an interactive environment for
+writing code, explanatory text, equations, and figures in a single
+notebook. These are different components: Python executes the program;
+Jupyter provides one convenient interface.</p>
+<p>The guiding sequence is <em>derive, implement, verify,
+interpret</em>. For example, to compute the curvature of a space curve,
+first establish the formula <span class="math inline">\(\kappa=\|\boldsymbol{r}'\times\boldsymbol{r}''\|/\|\boldsymbol{r}'\|^3\)</span>,
+then write code, check it against a known case, and explain the
+geometry. A numerical output is evidence about a computation, not a
+proof of a mathematical identity.</p>
+<h2 id="installation-notebooks-and-project-organization">Installation,
+notebooks, and project organization</h2>
+<h3 id="choosing-an-environment">Choosing an environment</h3>
+<p>Install a supported Python 3 release from <a class="uri" href="https://www.python.org/">https://www.python.org/</a>
+or use a managed distribution. Install JupyterLab and the scientific
+packages in an isolated environment. The following terminal commands
+illustrate a common cross-platform workflow; activation syntax differs
+across operating systems.</p>
+<div class="code-shell"><div class="code-bar">Python<a href="code/appendix-b-listing-01.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>python -m venv .venv
+# Windows PowerShell: .venv\\Scripts\\Activate.ps1
+# macOS/Linux: source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install jupyterlab numpy matplotlib scipy sympy pandas
+python -m jupyter lab</code></pre></div>
+<p>If your institution provides JupyterHub or another managed
+environment, follow its directions instead. Packages and menus change
+over time; the conceptual workflow remains the same. Use
+<code>python -m pip</code> to reduce the risk of installing packages
+into a different Python interpreter.</p>
+<h3 id="understanding-the-notebook-interface">Understanding the notebook
+interface</h3>
+<p>A Jupyter notebook is a file ending in <code>.ipynb</code>. <em>Code
+cells</em> execute Python, while <em>Markdown cells</em> hold prose and
+mathematical notation. Run a cell with Shift+Enter. A number beside a
+cell records execution order, not its location on the page. Notebook
+variables persist in the active kernel, so running cells out of order
+can produce misleading results. To test reproducibility, restart the
+kernel and run all cells from the beginning.</p>
+<div class="learning-box check"><p><strong>Checkpoint.</strong> Create a notebook named
+<code>first_steps.ipynb</code>. Add a Markdown cell describing the dot
+product and a code cell computing <code>np.dot([1,2,3],[4,5,6])</code>.
+Restart the kernel and run all cells. Record the result and explain why
+the restart matters.</p></div>
+<h3 id="a-reproducible-folder-structure">A reproducible folder
+structure</h3>
+<p>Use a project folder with <code>notebooks/</code>,
+<code>scripts/</code>, <code>data/</code>, <code>figures/</code>, and
+<code>results/</code>. Store reusable numerical functions in
+<code>scripts/</code> and use notebooks to develop explanations and
+visualizations. Avoid hard-coded personal file paths. Record package
+versions with <code>python -m pip freeze</code> or a curated
+requirements file. Share the source notebook as well as exported figures
+and conclusions.</p>
+<h2 id="first-calculations-syntax-names-and-types">First calculations:
+syntax, names, and types</h2>
+<div class="code-shell"><div class="code-bar">Python<a href="code/appendix-b-listing-02.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>import math
+radius = 3.0
+height = 8.0
+volume = math.pi * radius**2 * height
+print(f"Cylinder volume: {volume:.3f} cubic units")</code></pre></div>
+<p>Python uses <code>=</code> for assignment and <code>==</code> for an
+equality test. Exponentiation is <code>**</code>, whereas <code>^</code>
+is <em>not</em> exponentiation. Comments begin with <code>#</code>;
+indentation defines blocks in functions and conditional statements. The
+built-in types include <code>int</code>, <code>float</code>,
+<code>bool</code>, <code>str</code>, <code>list</code>,
+<code>tuple</code>, and <code>dict</code>. Scientific computations
+commonly use NumPy arrays rather than Python lists.</p>
+<div class="center">
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Mathematical operation</th>
+<th style="text-align: left;">Python expression</th>
+<th style="text-align: left;">Caution</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(a+b\)</span>,
+<span class="math inline">\(ab\)</span>, <span class="math inline">\(a/b\)</span></td>
+<td style="text-align: left;"><code>a+b</code>, <code>a*b</code>,
+<code>a/b</code></td>
+<td style="text-align: left;"><code>/</code> returns floating-point</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\(a^p\)</span></td>
+<td style="text-align: left;"><code>a**p</code></td>
+<td style="text-align: left;">Not <code>ap̂</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(\sqrt
+a\)</span></td>
+<td style="text-align: left;"><code>math.sqrt(a)</code></td>
+<td style="text-align: left;">Scalar function</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\(\sin
+t\)</span>, <span class="math inline">\(\cos t\)</span></td>
+<td style="text-align: left;"><code>np.sin(t)</code>,
+<code>np.cos(t)</code></td>
+<td style="text-align: left;">Angles in radians</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(\pi\)</span></td>
+<td style="text-align: left;"><code>np.pi</code></td>
+<td style="text-align: left;">Numerical approximation</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\(AB\)</span></td>
+<td style="text-align: left;"><code>A @ B</code></td>
+<td style="text-align: left;">Matrix multiplication</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(a=b\)</span>
+test</td>
+<td style="text-align: left;"><code>a == b</code></td>
+<td style="text-align: left;">Floating-point tolerance preferred</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3 id="floating-point-arithmetic-and-validation">Floating-point
+arithmetic and validation</h3>
+<p>Decimal numbers generally cannot be represented exactly in binary
+floating point. Instead of asserting <code>0.1+0.2 == 0.3</code>, use
+<code>np.isclose(0.1+0.2,0.3)</code>. For arrays, use
+<code>np.allclose</code>. State a tolerance that is appropriate for the
+scale of the problem. Avoid confusing rounding the <em>display</em> with
+improving the accuracy of a calculation.</p>
+<h2 id="arrays-indexing-broadcasting-and-linear-algebra">Arrays,
+indexing, broadcasting, and linear algebra</h2>
+<h3 id="vectors-and-arrays">Vectors and arrays</h3>
+<div class="code-shell"><div class="code-bar">Python<a href="code/appendix-b-listing-03.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>import numpy as np
+v = np.array([2.0, -1.0, 4.0])
+w = np.array([1.0, 3.0, -2.0])
+print(v[0])              # first entry: Python indexing starts at 0
+print(v + w)             # componentwise sum
+print(3 * v)             # scalar multiplication
+print(np.dot(v, w))      # scalar dot product
+print(np.cross(v, w))    # cross product in R^3
+print(np.linalg.norm(v)) # Euclidean norm</code></pre></div>
+<p>Unlike ordinary Python lists, NumPy arrays support elementwise
+arithmetic. The expression <code>v*w</code> multiplies corresponding
+components; <code>np.dot(v,w)</code> computes their dot product. NumPy
+uses zero-based indexing: <code>v[0]</code> is the first component,
+whereas R uses <code>v[1]</code>. A slice <code>v[0:2]</code> includes
+indices 0 and 1 but excludes 2.</p>
+<h3 id="matrices-and-systems-of-equations">Matrices and systems of
+equations</h3>
+<p>For <span class="math inline">\(A\boldsymbol{x}=\boldsymbol{b}\)</span>, solve the
+system with a factorization-based routine rather than explicitly
+computing <span class="math inline">\(A^{-1}\)</span>.</p>
+<div class="code-shell"><div class="code-bar">Python<a href="code/appendix-b-listing-04.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>A = np.array([[3.0, 1.0], [1.0, 2.0]])
+b = np.array([9.0, 8.0])
+x = np.linalg.solve(A, b)
+print(x)                 # [2., 3.]
+print(np.allclose(A @ x, b))
+print(np.linalg.det(A))
+print(np.linalg.eigvalsh(A))</code></pre></div>
+<p>The <code>@</code> operator performs matrix multiplication.
+<code>A*B</code> performs elementwise multiplication. A matrix with
+shape <code>(m,n)</code> has <span class="math inline">\(m\)</span> rows
+and <span class="math inline">\(n\)</span> columns; <code>A.T</code>
+transposes a matrix. Broadcasting allows arrays with compatible shapes
+to interact, but an accidental mismatch may produce a plausible-looking
+wrong result. Check <code>shape</code> before trusting a
+calculation.</p>
+<div class="learning-box check"><p><strong>Checkpoint.</strong> Compute <span class="math inline">\(\boldsymbol{a}\cdot\boldsymbol{b}\)</span>, <span class="math inline">\(\boldsymbol{a}\times\boldsymbol{b}\)</span>, and
+the angle between <span class="math inline">\(\boldsymbol{a}=(1,2,2)\)</span> and <span class="math inline">\(\boldsymbol{b}=(2,-1,2)\)</span>. Derive the angle
+formula before writing Python. Confirm that the computed cross product
+is orthogonal to both vectors.</p></div>
+<h2 id="functions-loops-conditionals-and-reusable-code">Functions,
+loops, conditionals, and reusable code</h2>
+<div class="code-shell"><div class="code-bar">Python<a href="code/appendix-b-listing-05.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>def unit_vector(v):
+    """Return v/||v|| for a nonzero numerical vector."""
+    v = np.asarray(v, dtype=float)
+    magnitude = np.linalg.norm(v)
+    if magnitude == 0:
+        raise ValueError("The zero vector has no unit direction")
+    return v / magnitude
+
+print(unit_vector([3, 4, 0]))</code></pre></div>
+<p>A <code>def</code> statement introduces a function. The indented body
+defines its work; <code>return</code> sends the result to the caller.
+Use functions for repeated calculations and test edge cases such as
+zero-length vectors, invalid domains, and singular matrices. A
+<code>for</code> loop is useful for iterations, although vectorized
+array operations are often clearer and faster.</p>
+<div class="code-shell"><div class="code-bar">Python<a href="code/appendix-b-listing-06.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>def partial_x(f, x, y, h=1e-5):
+    return (f(x+h, y) - f(x-h, y)) / (2*h)
+
+f = lambda x, y: x*x*y + np.sin(y)
+print(partial_x(f, 2.0, 0.5))</code></pre></div>
+<p>The central difference is <span class="math inline">\([f(x+h,y)-f(x-h,y)]/(2h)\)</span> and has <span class="math inline">\(O(h^2)\)</span> truncation error when <span class="math inline">\(f\)</span> is sufficiently smooth. Extremely small
+<span class="math inline">\(h\)</span> can increase floating-point
+cancellation. Numerical differentiation is an approximation; symbolic
+differentiation or an analytical derivative is preferable when
+available.</p>
+<h2 id="visualization-with-matplotlib">Visualization with
+Matplotlib</h2>
+<h3 id="two-dimensional-plots">Two-dimensional plots</h3>
+<div class="code-shell"><div class="code-bar">Python<a href="code/appendix-b-listing-07.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>import matplotlib.pyplot as plt
+t = np.linspace(0, 2*np.pi, 400)
+fig, ax = plt.subplots()
+ax.plot(np.cos(t), np.sin(t), label="unit circle")
+ax.set_aspect("equal", adjustable="box")
+ax.set_xlabel("x")
+ax.set_ylabel("y")
+ax.set_title("A parametrized circle")
+ax.legend()
+fig.tight_layout()
+plt.show()</code></pre></div>
+<p>Labels, units, aspect ratio, and meaningful titles matter as much as
+plotting commands. The circle is not visually circular unless the axis
+scaling is equal. For publication, save the figure with
+<code>fig.savefig("figures/circle.pdf", bbox_inches="tight")</code>
+before closing it.</p>
+<h3 id="three-dimensional-curves-surfaces-and-contours">Three-dimensional
+curves, surfaces, and contours</h3>
+<div class="code-shell"><div class="code-bar">Python<a href="code/appendix-b-listing-08.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>t = np.linspace(0, 4*np.pi, 500)
+fig = plt.figure()
+ax = fig.add_subplot(111, projection="3d")
+ax.plot(np.cos(t), np.sin(t), 0.2*t)
+ax.set(xlabel="x", ylabel="y", zlabel="z", title="Helix")
+plt.show()
+
+x = np.linspace(-2, 2, 100)
+y = np.linspace(-2, 2, 100)
+X, Y = np.meshgrid(x, y)
+Z = X**2 + Y**2
+fig, ax = plt.subplots()
+cs = ax.contour(X, Y, Z, levels=12)
+ax.clabel(cs)
+ax.set_aspect("equal")
+plt.show()</code></pre></div>
+<p><code>meshgrid</code> constructs coordinates on a rectangular grid. A
+contour plot displays level curves <span class="math inline">\(f(x,y)=c\)</span>, while a three-dimensional
+surface plot displays the height <span class="math inline">\(z=f(x,y)\)</span>. Do not infer geometric
+properties from a distorted perspective or unsuitable axis scaling.</p>
+<h2 id="symbolic-differentiation-and-multivariable-calculus-with-sympy">Symbolic
+differentiation and multivariable calculus with SymPy</h2>
+<p>NumPy evaluates expressions numerically. SymPy can manipulate exact
+symbolic expressions when an exact representation exists.</p>
+<div class="code-shell"><div class="code-bar">Python<a href="code/appendix-b-listing-09.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>import sympy as sp
+x, y, t = sp.symbols("x y t", real=True)
+f = x**2*y + sp.sin(y)
+grad_f = sp.Matrix([sp.diff(f, x), sp.diff(f, y)])
+H = sp.hessian(f, (x, y))
+print(grad_f)
+print(H)
+print(grad_f.subs({x: 2, y: 0}))</code></pre></div>
+<p>For <span class="math inline">\(f(x,y)=x^2y+\sin y\)</span>, the
+gradient is <span class="math inline">\((2xy,x^2+\cos y)\)</span> and
+the Hessian is <span class="math inline">\(\begin{pmatrix}2y&amp;2x\\2x&amp;-\sin
+y\end{pmatrix}\)</span>. The code should reproduce these expressions.
+SymPy’s <code>lambdify</code> converts a symbolic expression into a
+numerical function; specify NumPy when evaluating on arrays.</p>
+<h3 id="the-chain-rule-and-jacobian-matrices">The chain rule and
+Jacobian matrices</h3>
+<p>For <span class="math inline">\(\boldsymbol{F}(u,v)=(u^2-v,uv)\)</span>, the
+Jacobian is <span class="math display">\[D\boldsymbol{F}(u,v)=\begin{pmatrix}2u&amp;-1\\v&amp;u\end{pmatrix}.\]</span></p>
+<div class="code-shell"><div class="code-bar">Python<a href="code/appendix-b-listing-10.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>u, v = sp.symbols("u v")
+F = sp.Matrix([u**2 - v, u*v])
+J = F.jacobian([u, v])
+print(J)
+print(J.det())</code></pre></div>
+<p>The determinant <span class="math inline">\(2u^2+v\)</span> measures
+local oriented area scaling. It may be zero where the mapping loses
+local invertibility. The Jacobian matrix is a derivative, not merely a
+table of numbers: identify the input and output variables and their
+order.</p>
+<h2 id="chapter-1-laboratory-vector-geometry-and-projections">Chapter 1
+laboratory: vector geometry and projections</h2>
+<p>Let <span class="math inline">\(\boldsymbol{a}=(2,-1,4)\)</span> and
+<span class="math inline">\(\boldsymbol{b}=(1,3,-2)\)</span>. The
+projection of <span class="math inline">\(\boldsymbol{a}\)</span> onto
+<span class="math inline">\(\boldsymbol{b}\)</span> is <span class="math display">\[\operatorname{proj}_{\boldsymbol{b}}\boldsymbol{a}=\frac{\boldsymbol{a}\cdot\boldsymbol{b}}{\boldsymbol{b}\cdot\boldsymbol{b}}\boldsymbol{b}.\]</span>
+The cross product gives a normal vector to the plane spanned by the two
+nonparallel vectors.</p>
+<div class="code-shell"><div class="code-bar">Python<a href="code/appendix-b-listing-11.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>a = np.array([2., -1., 4.])
+b = np.array([1., 3., -2.])
+projection = (a @ b)/(b @ b)*b
+normal = np.cross(a, b)
+print("projection:", projection)
+print("normal:", normal)
+assert np.isclose(normal @ a, 0)
+assert np.isclose(normal @ b, 0)</code></pre></div>
+<p><strong>Interpretation.</strong> The projection is the component of
+<span class="math inline">\(\boldsymbol{a}\)</span> parallel to <span class="math inline">\(\boldsymbol{b}\)</span>. The normal is
+perpendicular to the entire plane; it is not a unit normal unless
+divided by its magnitude.</p>
+<h2 id="chapter-2-laboratory-space-curves-speed-and-curvature">Chapter 2
+laboratory: space curves, speed, and curvature</h2>
+<p>Consider the helix <span class="math inline">\(\boldsymbol{r}(t)=(\cos t,\sin t,ct)\)</span>,
+where <span class="math inline">\(c&gt;0\)</span>. Differentiation gives
+<span class="math display">\[\boldsymbol{r}'=(-\sin t,\cos
+t,c),\qquad \boldsymbol{r}''=(-\cos t,-\sin t,0).\]</span>
+Consequently, speed is <span class="math inline">\(\sqrt{1+c^2}\)</span>, curvature is <span class="math inline">\(1/(1+c^2)\)</span>, and torsion is <span class="math inline">\(c/(1+c^2)\)</span>. The arc length on <span class="math inline">\([0,2\pi]\)</span> is <span class="math inline">\(2\pi\sqrt{1+c^2}\)</span>.</p>
+<div class="code-shell"><div class="code-bar">Python<a href="code/appendix-b-listing-12.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>t = sp.symbols("t", real=True)
+c = sp.Rational(1, 2)
+r = sp.Matrix([sp.cos(t), sp.sin(t), c*t])
+r1, r2, r3 = r.diff(t), r.diff(t, 2), r.diff(t, 3)
+cross = r1.cross(r2)
+kappa = sp.simplify(sp.sqrt(cross.dot(cross)) /
+                    sp.sqrt(r1.dot(r1))**3)
+tau = sp.simplify(cross.dot(r3) / cross.dot(cross))
+print("curvature:", kappa, "torsion:", tau)
+assert sp.simplify(kappa - sp.Rational(4, 5)) == 0
+assert sp.simplify(tau - sp.Rational(2, 5)) == 0</code></pre></div>
+<p>The torsion formula is valid where <span class="math inline">\(\boldsymbol{r}'\times\boldsymbol{r}''\ne\boldsymbol{0}\)</span>.
+Interpret curvature as bending per unit arc length and torsion as the
+departure from planarity.</p>
+<h2 id="chapter-3-laboratory-tangent-planes-and-approximation-error">Chapter
+3 laboratory: tangent planes and approximation error</h2>
+<p>For <span class="math inline">\(f(x,y)=x^2+xy+y^2\)</span>,
+linearization at <span class="math inline">\((1,1)\)</span> gives <span class="math display">\[L(x,y)=3+3(x-1)+3(y-1).\]</span> The difference
+<span class="math inline">\(f-L=(x-1)^2+(x-1)(y-1)+(y-1)^2\)</span> is
+nonnegative. Compute the approximation and compare it to the exact
+function.</p>
+<div class="code-shell"><div class="code-bar">Python<a href="code/appendix-b-listing-13.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>def f(x, y):
+    return x*x + x*y + y*y
+
+def L(x, y):
+    return 3 + 3*(x-1) + 3*(y-1)
+
+point = (1.1, 0.9)
+print("exact:", f(*point), "linear:", L(*point))
+print("error:", f(*point) - L(*point))</code></pre></div>
+<p>A small error near the base point supports the local usefulness of
+the tangent-plane approximation, not global accuracy.</p>
+<h2 id="chapter-4-laboratory-constrained-optimization">Chapter 4
+laboratory: constrained optimization</h2>
+<p>Maximize <span class="math inline">\(U(x,y)=8x+6y-x^2-2y^2-xy\)</span> subject to <span class="math inline">\(x\ge0\)</span>, <span class="math inline">\(y\ge0\)</span>, and <span class="math inline">\(2x+y\le8\)</span>. Its Hessian <span class="math inline">\(\begin{pmatrix}-2&amp;-1\\-1&amp;-4\end{pmatrix}\)</span>
+is negative definite, so the objective is strictly concave. The feasible
+region is convex and compact; a feasible stationary point or boundary
+optimum is therefore global.</p>
+<div class="code-shell"><div class="code-bar">Python<a href="code/appendix-b-listing-14.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>from scipy.optimize import minimize
+
+def utility(z):
+    x, y = z
+    return 8*x + 6*y - x*x - 2*y*y - x*y
+
+constraints = [{"type": "ineq", "fun": lambda z: 8-2*z[0]-z[1]}]
+result = minimize(lambda z: -utility(z), x0=[1., 1.],
+                  bounds=[(0, None), (0, None)],
+                  constraints=constraints, method="SLSQP",
+                  options={"ftol": 1e-12})
+assert result.success
+assert 2*result.x[0] + result.x[1] &lt;= 8 + 1e-8
+print("allocation:", result.x, "utility:", utility(result.x))</code></pre></div>
+<p>A solver success flag is not a proof. Verify feasibility, compare
+relevant boundaries, and use concavity to justify global optimality.</p>
+<h2 id="chapter-5-laboratory-multiple-integration-and-monte-carlo">Chapter 5
+laboratory: multiple integration and Monte Carlo</h2>
+<p>Consider the triangular region <span class="math inline">\(D=\{(x,y):0\le x\le1,\ 0\le y\le1-x\}\)</span> and
+<span class="math inline">\(f(x,y)=x+y\)</span>. The exact integral is
+<span class="math display">\[I=\int_0^1\int_0^{1-x}(x+y)\,\mathrm{d}y\,\mathrm{d}x=\frac13.\]</span></p>
+<div class="code-shell"><div class="code-bar">Python<a href="code/appendix-b-listing-15.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>from scipy.integrate import dblquad
+I, estimated_error = dblquad(lambda y, x: x+y,
+                              0, 1, lambda x: 0,
+                              lambda x: 1-x)
+print("quadrature:", I, "estimated error:", estimated_error)
+assert np.isclose(I, 1/3)
+
+rng = np.random.default_rng(2026)
+n = 100000
+x = rng.uniform(0, 1, n)
+y = rng.uniform(0, 1, n)
+mc = np.mean((x+y)*(x+y &lt;= 1))
+print("Monte Carlo estimate:", mc)</code></pre></div>
+<p>The Monte Carlo method samples uniformly on the enclosing unit square
+and uses an indicator for membership in <span class="math inline">\(D\)</span>. The estimate approaches <span class="math inline">\(I\)</span> as the sample size grows, but
+individual results vary. Always state the random seed and sample
+size.</p>
+<h2 id="chapter-6-laboratory-circulation-and-greens-theorem">Chapter 6
+laboratory: circulation and Green’s theorem</h2>
+<p>Let <span class="math inline">\(\boldsymbol{F}(x,y)=(-y,x)\)</span>
+and let <span class="math inline">\(C\)</span> be the positively
+oriented unit circle. Parameterizing <span class="math inline">\(C\)</span> by <span class="math inline">\((\cos
+t,\sin t)\)</span> gives <span class="math display">\[\oint_C\boldsymbol{F}\cdot\,\mathrm{d}\boldsymbol{r}=\int_0^{2\pi}1\,\mathrm{d}t=2\pi.\]</span>
+Green’s theorem gives the same result because <span class="math inline">\(\partial Q/\partial x-\partial P/\partial
+y=2\)</span> and the unit disk has area <span class="math inline">\(\pi\)</span>.</p>
+<div class="code-shell"><div class="code-bar">Python<a href="code/appendix-b-listing-16.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>from scipy.integrate import quad
+
+def circulation_integrand(t):
+    x, y = np.cos(t), np.sin(t)
+    dx, dy = -np.sin(t), np.cos(t)
+    P, Q = -y, x
+    return P*dx + Q*dy
+
+value, error = quad(circulation_integrand, 0, 2*np.pi)
+assert np.isclose(value, 2*np.pi)
+print("line integral:", value, "Green theorem:", 2*np.pi)</code></pre></div>
+<p>Orientation matters: reversing the direction of traversal changes the
+sign of the circulation. The theorem requires suitable smoothness and
+orientation assumptions.</p>
+<h2 id="chapter-7-laboratory-spherical-metrics-and-great-circles">Chapter 7
+laboratory: spherical metrics and great circles</h2>
+<p>For a sphere of radius <span class="math inline">\(R\)</span>, use
+latitude <span class="math inline">\(\phi\)</span> and longitude <span class="math inline">\(\lambda\)</span>. The line element is <span class="math display">\[\,\mathrm{d}s^2=R^2\,\mathrm{d}\phi^2+R^2\cos^2\phi\,\mathrm{d}\lambda^2.\]</span>
+The corresponding metric tensor is diagonal with entries <span class="math inline">\(R^2\)</span> and <span class="math inline">\(R^2\cos^2\phi\)</span>. Given two points on the
+unit sphere with latitudes <span class="math inline">\(\phi_1,\phi_2\)</span> and longitude difference
+<span class="math inline">\(\Delta\lambda\)</span>, their central angle
+<span class="math inline">\(\gamma\)</span> satisfies <span class="math display">\[\cos\gamma=\sin\phi_1\sin\phi_2+\cos\phi_1\cos\phi_2\cos(\Delta\lambda).\]</span>
+The shortest spherical distance is <span class="math inline">\(R\gamma\)</span> (subject to the usual antipodal
+nonuniqueness).</p>
+<div class="code-shell"><div class="code-bar">Python<a href="code/appendix-b-listing-17.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>def great_circle_distance(lat1, lon1, lat2, lon2, R=6371.0):
+    p1, l1, p2, l2 = np.deg2rad([lat1, lon1, lat2, lon2])
+    a = np.sin((p2-p1)/2)**2 + (
+        np.cos(p1)*np.cos(p2)*np.sin((l2-l1)/2)**2)
+    angle = 2*np.arctan2(np.sqrt(a), np.sqrt(max(0, 1-a)))
+    return R*angle
+
+print(great_circle_distance(0, 0, 0, 90, R=1))
+assert np.isclose(great_circle_distance(0,0,0,90,R=1), np.pi/2)</code></pre></div>
+<p>The haversine-based expression is often more stable for small
+separations than direct inverse cosine. Earth is not exactly spherical,
+so this is a modeling approximation rather than an ellipsoidal geodesic
+calculation.</p>
+<h2 id="chapter-8-laboratory-a-finite-difference-heat-solver">Chapter 8
+laboratory: a finite-difference heat solver</h2>
+<p>For the one-dimensional heat equation <span class="math inline">\(u_t=\alpha u_{xx}\)</span> on <span class="math inline">\(0&lt;x&lt;1\)</span> with zero boundary values, an
+explicit forward-time, centered-space scheme is <span class="math display">\[u_i^{n+1}=u_i^n+\mu(u_{i-1}^n-2u_i^n+u_{i+1}^n),\qquad\mu=\frac{\alpha\Delta
+t}{(\Delta x)^2}.\]</span> For this standard one-dimensional scheme,
+<span class="math inline">\(\mu\le1/2\)</span> is the stability
+restriction. With initial condition <span class="math inline">\(u(x,0)=\sin(\pi x)\)</span>, the exact solution is
+<span class="math inline">\(u(x,t)=e^{-\alpha\pi^2t}\sin(\pi
+x)\)</span>.</p>
+<div class="code-shell"><div class="code-bar">Python<a href="code/appendix-b-listing-18.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>def heat_solver(nx=80, alpha=0.1, T=0.1, mu=0.4):
+    dx = 1.0/nx
+    dt_target = mu*dx*dx/alpha
+    steps = int(np.ceil(T/dt_target))
+    dt = T/steps
+    actual_mu = alpha*dt/dx**2
+    assert actual_mu &lt;= 0.5
+    x = np.linspace(0, 1, nx+1)
+    u = np.sin(np.pi*x)
+    for _ in range(steps):
+        new = u.copy()
+        new[1:-1] = u[1:-1] + actual_mu*(
+            u[:-2]-2*u[1:-1]+u[2:])
+        u = new
+    exact = np.exp(-alpha*np.pi**2*T)*np.sin(np.pi*x)
+    return x, u, np.max(np.abs(u-exact))
+
+x, numerical, error = heat_solver()
+print("maximum error:", error)</code></pre></div>
+<p>A stable computation can still be inaccurate. Refine the spatial
+mesh, adjust the time step consistently, and compare errors against the
+exact solution to study convergence.</p>
+<h2 id="working-with-files-tables-and-reproducible-results">Working with
+files, tables, and reproducible results</h2>
+<p>For small structured datasets, pandas is convenient. Its
+<code>DataFrame</code> is analogous to an R data frame. Use
+<code>pd.read_csv("data/measurements.csv")</code> for existing data;
+write results with <code>to_csv</code>. Treat a missing-value marker
+<code>NaN</code> differently from a mathematical zero. For numerical
+arrays, <code>np.savetxt</code> and <code>np.loadtxt</code> may suffice.
+Use <code>pathlib.Path</code> to construct paths portably.</p>
+<div class="code-shell"><div class="code-bar">Python<a href="code/appendix-b-listing-19.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>from pathlib import Path
+import pandas as pd
+
+Path("results").mkdir(exist_ok=True)
+summary = pd.DataFrame({"method": ["quadrature", "exact"],
+                        "integral": [I, 1/3]})
+summary.to_csv("results/integration_comparison.csv", index=False)
+print(summary)</code></pre></div>
+<p>Avoid storing outputs without units, methods, or parameter settings.
+A reproducible computational report states the mathematical model,
+numerical method, software versions, and evidence of accuracy.</p>
+<h2 id="common-mistakes-and-debugging-strategies">Common mistakes and
+debugging strategies</h2>
+<div class="center">
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Symptom</th>
+<th style="text-align: left;">Diagnostic action</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>NameError</code></td>
+<td style="text-align: left;">Run the defining cell; check spelling and
+notebook execution order.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>ModuleNotFoundError</code></td>
+<td style="text-align: left;">Verify the active kernel and install into
+that Python environment.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>IndexError</code></td>
+<td style="text-align: left;">Remember zero-based indexing and inspect
+<code>len</code> or <code>shape</code>.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>ValueError</code> about shapes</td>
+<td style="text-align: left;">Inspect array dimensions and broadcasting
+assumptions.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Unexpected matrix result</td>
+<td style="text-align: left;">Use <code>@</code> for matrix
+multiplication, not <code>*</code>.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Plot looks distorted</td>
+<td style="text-align: left;">Inspect axis scales, ranges, labels, and
+units.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>nan</code> or <code>inf</code></td>
+<td style="text-align: left;">Check division by zero, domain
+restrictions, and overflow.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Solver does not converge</td>
+<td style="text-align: left;">Check scaling, initialization,
+constraints, tolerances, and analytical conditions.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>A practical debugging sequence is to isolate a small example, print
+shapes and intermediate values, verify the mathematics by hand, and
+write an automated assertion. The <code>assert</code> statement is
+helpful during development but should not replace validation and
+explicit error handling in production code.</p>
+<h2 id="comparing-python-and-r-computational-conventions">Comparing
+Python and R computational conventions</h2>
+<div class="center">
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Task</th>
+<th style="text-align: left;">R</th>
+<th style="text-align: left;">Python</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Create numeric vector</td>
+<td style="text-align: left;"><code>c(1,2,3)</code></td>
+<td style="text-align: left;"><code>np.array([1,2,3])</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">First component</td>
+<td style="text-align: left;"><code>v[1]</code></td>
+<td style="text-align: left;"><code>v[0]</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Dot product</td>
+<td style="text-align: left;"><code>sum(a*b)</code></td>
+<td style="text-align: left;"><code>np.dot(a,b)</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Matrix product</td>
+<td style="text-align: left;"><code>A %*% B</code></td>
+<td style="text-align: left;"><code>A @ B</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Solve <span class="math inline">\(Ax=b\)</span></td>
+<td style="text-align: left;"><code>solve(A,b)</code></td>
+<td style="text-align: left;"><code>np.linalg.solve(A,b)</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Integrate one variable</td>
+<td style="text-align: left;"><code>integrate(f,a,b)</code></td>
+<td style="text-align: left;"><code>scipy.integrate.quad(f,a,b)</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Set random seed</td>
+<td style="text-align: left;"><code>set.seed(2026)</code></td>
+<td style="text-align: left;"><code>np.random.default_rng(2026)</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Format output</td>
+<td style="text-align: left;"><code>cat(...)</code></td>
+<td style="text-align: left;"><code>print(f"...")</code></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The same mathematics should lead to compatible results, but numerical
+methods, default tolerances, and random-number generators may differ.
+Matching random seeds across languages does not guarantee matching
+random samples.</p>
+<h2 id="guided-practice-problems">Guided practice problems</h2>
+<p>Complete each problem analytically before writing Python. Submit
+code, numerical output, a brief mathematical explanation, and at least
+one validation check.</p>
+<ol type="1">
+<li><p>Construct <span class="math inline">\(\boldsymbol{a}=(1,-2,2)\)</span> and <span class="math inline">\(\boldsymbol{b}=(2,1,0)\)</span>. Compute the angle
+between them and verify the Cauchy–Schwarz inequality
+numerically.</p></li>
+<li><p>Find a normal to the plane through <span class="math inline">\(P=(1,0,0)\)</span>, <span class="math inline">\(Q=(0,1,0)\)</span>, and <span class="math inline">\(R=(0,0,1)\)</span>. Verify that all three points
+satisfy the plane equation.</p></li>
+<li><p>Plot <span class="math inline">\(\boldsymbol{r}(t)=(2\cos t,2\sin
+t,t)\)</span> for <span class="math inline">\(0\le t\le4\pi\)</span> and
+calculate its arc length and curvature analytically and
+numerically.</p></li>
+<li><p>For <span class="math inline">\(f(x,y)=x^2e^y+xy\)</span>, derive
+the gradient and Hessian; use SymPy to verify both.</p></li>
+<li><p>Compare the exact value of <span class="math inline">\(f(1.05,0.95)\)</span> with its first-order Taylor
+approximation at <span class="math inline">\((1,1)\)</span> for <span class="math inline">\(f(x,y)=x^2+xy+y^2\)</span>.</p></li>
+<li><p>Solve a strictly convex quadratic minimization analytically and
+with SciPy; justify why the optimum is global.</p></li>
+<li><p>Numerically evaluate <span class="math inline">\(\int_0^1\int_0^{1-x}(x^2+y)\,\mathrm{d}y\,\mathrm{d}x\)</span>
+and compare with exact integration.</p></li>
+<li><p>Use seeded Monte Carlo simulation to approximate the volume below
+<span class="math inline">\(z=1-x^2-y^2\)</span> above the unit disk;
+explain your sampling region.</p></li>
+<li><p>Verify Green’s theorem for <span class="math inline">\(\boldsymbol{F}=(y^2,x^2)\)</span> around the
+positively oriented unit square.</p></li>
+<li><p>Numerically compare the great-circle distances between three
+latitude–longitude locations; state the spherical Earth
+assumption.</p></li>
+<li><p>Implement the explicit heat scheme with <span class="math inline">\(\mu=0.4\)</span> and repeat with three spatial
+resolutions. Estimate convergence order.</p></li>
+<li><p>Recreate one calculation from any chapter in both R and Python.
+Compare formulas, numerical precision, code clarity, and plotting
+choices.</p></li>
+</ol>
+<h2 id="culminating-computational-portfolio-project">Culminating
+computational portfolio project</h2>
+<p><strong>Project: One mathematical model, two computational
+languages.</strong> Choose a physical or geometric model from Chapters
+1–8, such as a three-dimensional trajectory, spatial density
+distribution, constrained design problem, circulation field, spherical
+route, or heat-diffusion model. The portfolio should demonstrate that
+software supports rather than substitutes for mathematical
+reasoning.</p>
+<ol type="1">
+<li><p><strong>Model and assumptions (15 points).</strong> Define
+variables, units, domain, constraints, and why the model is
+appropriate.</p></li>
+<li><p><strong>Analytical development (25 points).</strong> Derive the
+governing formulas and identify assumptions behind each theorem or
+numerical method.</p></li>
+<li><p><strong>Python implementation (20 points).</strong> Write a
+notebook with named functions, readable output, labeled figures, and
+comments describing non-obvious steps.</p></li>
+<li><p><strong>R comparison (15 points).</strong> Solve the same
+mathematical problem in R; compare output and explain differences in
+language conventions or numerical routines.</p></li>
+<li><p><strong>Verification and sensitivity (15 points).</strong> Use an
+exact special case, refinement study, conservation law, or independent
+numerical check; vary one meaningful parameter.</p></li>
+<li><p><strong>Communication and reproducibility (10 points).</strong>
+Submit a clean notebook, reusable script, version information, a short
+interpretation, and instructions to rerun the work.</p></li>
+</ol>
+<p><strong>Suggested submission.</strong> A four- to six-page
+mathematical report, an executable Jupyter notebook, a Python script, an
+R script, and exported figures. Provide citations for any external
+datasets or models. A result without a mathematical explanation or
+validation check is incomplete.</p>
+<h2 id="quick-reference-and-next-steps">Quick reference and next
+steps</h2>
+<div class="center">
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Library</th>
+<th style="text-align: left;">Typical uses in this book</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>math</code></td>
+<td style="text-align: left;">Scalar elementary functions and
+constants</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>numpy</code></td>
+<td style="text-align: left;">Arrays, linear algebra, grids, random
+sampling</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>matplotlib</code></td>
+<td style="text-align: left;">Curves, contours, surfaces, vector-field
+plots</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>sympy</code></td>
+<td style="text-align: left;">Symbolic derivatives, Jacobians, exact
+integrals</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>scipy.integrate</code></td>
+<td style="text-align: left;">Quadrature and ODE solvers</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>scipy.optimize</code></td>
+<td style="text-align: left;">Numerical optimization and constrained
+problems</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>pandas</code></td>
+<td style="text-align: left;">Data tables and CSV input/output</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>pathlib</code></td>
+<td style="text-align: left;">Portable paths for reproducible
+projects</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>For documentation and updated installation instructions, consult <a class="uri" href="https://docs.python.org/3/">https://docs.python.org/3/</a>, <a class="uri" href="https://jupyter.org/">https://jupyter.org/</a>, <a class="uri" href="https://numpy.org/doc/">https://numpy.org/doc/</a>, <a class="uri" href="https://matplotlib.org/stable/">https://matplotlib.org/stable/</a>, <a class="uri" href="https://docs.scipy.org/doc/scipy/">https://docs.scipy.org/doc/scipy/</a>, and <a class="uri" href="https://docs.sympy.org/">https://docs.sympy.org/</a>.
+Documentation is a supplement to the mathematical foundations developed
+in the chapters, not a substitute for them.</p>
+<footer><a href="appendix-a.html">Appendix A. Introduction to R and RStudio ←</a><a href="resources.html">Computational resources →</a></footer></main><aside class="chapter-toc"><strong>On this page</strong><ul><li><a href="#the-role-of-python-in-this-textbook">The role of Python in this
+textbook</a></li><li><a href="#installation-notebooks-and-project-organization">Installation,
+notebooks, and project organization</a></li><li><a href="#choosing-an-environment">Choosing an environment</a></li><li><a href="#understanding-the-notebook-interface">Understanding the notebook
+interface</a></li><li><a href="#a-reproducible-folder-structure">A reproducible folder
+structure</a></li><li><a href="#first-calculations-syntax-names-and-types">First calculations:
+syntax, names, and types</a></li><li><a href="#floating-point-arithmetic-and-validation">Floating-point
+arithmetic and validation</a></li><li><a href="#arrays-indexing-broadcasting-and-linear-algebra">Arrays,
+indexing, broadcasting, and linear algebra</a></li><li><a href="#vectors-and-arrays">Vectors and arrays</a></li><li><a href="#matrices-and-systems-of-equations">Matrices and systems of
+equations</a></li><li><a href="#functions-loops-conditionals-and-reusable-code">Functions,
+loops, conditionals, and reusable code</a></li><li><a href="#visualization-with-matplotlib">Visualization with
+Matplotlib</a></li><li><a href="#two-dimensional-plots">Two-dimensional plots</a></li><li><a href="#three-dimensional-curves-surfaces-and-contours">Three-dimensional
+curves, surfaces, and contours</a></li><li><a href="#symbolic-differentiation-and-multivariable-calculus-with-sympy">Symbolic
+differentiation and multivariable calculus with SymPy</a></li><li><a href="#the-chain-rule-and-jacobian-matrices">The chain rule and
+Jacobian matrices</a></li><li><a href="#chapter-1-laboratory-vector-geometry-and-projections">Chapter 1
+laboratory: vector geometry and projections</a></li><li><a href="#chapter-2-laboratory-space-curves-speed-and-curvature">Chapter 2
+laboratory: space curves, speed, and curvature</a></li><li><a href="#chapter-3-laboratory-tangent-planes-and-approximation-error">Chapter
+3 laboratory: tangent planes and approximation error</a></li><li><a href="#chapter-4-laboratory-constrained-optimization">Chapter 4
+laboratory: constrained optimization</a></li><li><a href="#chapter-5-laboratory-multiple-integration-and-monte-carlo">Chapter 5
+laboratory: multiple integration and Monte Carlo</a></li><li><a href="#chapter-6-laboratory-circulation-and-greens-theorem">Chapter 6
+laboratory: circulation and Green’s theorem</a></li><li><a href="#chapter-7-laboratory-spherical-metrics-and-great-circles">Chapter 7
+laboratory: spherical metrics and great circles</a></li><li><a href="#chapter-8-laboratory-a-finite-difference-heat-solver">Chapter 8
+laboratory: a finite-difference heat solver</a></li><li><a href="#working-with-files-tables-and-reproducible-results">Working with
+files, tables, and reproducible results</a></li><li><a href="#common-mistakes-and-debugging-strategies">Common mistakes and
+debugging strategies</a></li><li><a href="#comparing-python-and-r-computational-conventions">Comparing
+Python and R computational conventions</a></li><li><a href="#guided-practice-problems">Guided practice problems</a></li><li><a href="#culminating-computational-portfolio-project">Culminating
+computational portfolio project</a></li><li><a href="#quick-reference-and-next-steps">Quick reference and next
+steps</a></li></ul></aside></div><script src="search-index.js"></script><script src="site.js"></script></body></html>

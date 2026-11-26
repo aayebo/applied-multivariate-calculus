@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><title>Vector Fields and Integral Theorems | Applied Multivariate Calculus Using R and Python</title><link href="site.css" rel="stylesheet"/><script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]}};</script><script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script></head><body><a class="skip" href="#main">Skip to content</a><nav aria-label="Book navigation" class="site-nav"><a class="brand" href="index.html">Applied Multivariate Calculus Using R and Python</a><p class="subtitle">Volume III · Abraham Ayebo</p><label for="book-search">Search book</label><input id="book-search" placeholder="Search chapters" type="search"/><div aria-live="polite" class="search-results" id="search-results"></div><div class="nav-label">Contents</div><a href="index.html">Welcome</a><a href="chapter01.html">1. Vectors and Geometry in Three-Dimensional Space</a><a href="chapter02.html">2. Curves, Surfaces, and Coordinate Systems</a><a href="chapter03.html">3. Functions of Several Variables and Partial Differentiation</a><a href="chapter04.html">4. Gradients, Taylor Approximations, and Optimization</a><a href="chapter05.html">5. Multiple Integration and Applications</a><a aria-current="page" class="active" href="chapter06.html">6. Vector Fields and Integral Theorems</a><a href="chapter07.html">7. Introduction to Tensor Calculus and Differential Geometry</a><a href="chapter08.html">8. Partial Differential Equations and Computational Methods</a><a href="appendix-a.html">Appendix A. Introduction to R and RStudio</a><a href="appendix-b.html">Appendix B. Introduction to Python and Jupyter</a><a href="resources.html">Computational resources</a><a href="about.html">About this book</a><div class="nav-label">Series</div><a href="https://aayebo.github.io/applied-precalculus/">Volume I · Applied Precalculus</a><a href="https://aayebo.github.io/applied-calculus/">Volume II · Applied Calculus</a></nav><header class="topbar"><button aria-expanded="false" class="menu">Contents</button><span>Applied Mathematics · Volume III</span><span class="spacer"></span><a href="resources.html">Code &amp; resources</a></header><div class="page-grid"><main id="main"><h1>6. Vector Fields and Integral Theorems</h1><p><span id="ch:vector-fields" label="ch:vector-fields"></span></p>
+<div class="learning-box example"><p><strong>Learning.</strong> By the end of this chapter, you should be
+able to visualize scalar and vector fields; compute scalar and vector
+line integrals; identify conservative fields and construct potentials;
+calculate circulation and flux; apply Green’s theorem, Stokes’ theorem,
+and the divergence theorem with correct orientations; parameterize
+surfaces and compute their area and flux; interpret divergence and curl
+locally; and use SymPy, NumPy, SciPy, and Matplotlib to check analytic
+calculations numerically.</p></div>
+<section class="mv-lab" id="interactive-investigation"><h2>Interactive investigation: Vector fields and circulation</h2><p>Explore F(x,y)=(a x − b y, b x + a y).</p><div data-mv-lab="6"></div><p><strong>Explore:</strong> Which parameter controls divergence? Which controls circulation around the unit circle?</p><noscript>Enable JavaScript to use this investigation.</noscript></section><h2 id="fields-quantities-distributed-through-space">Fields: quantities
+distributed through space</h2>
+<p>A scalar field assigns one number to each point: temperature <span class="math inline">\(T(x,y,z)\)</span>, density <span class="math inline">\(\rho(x,y,z)\)</span>, or pressure <span class="math inline">\(p(x,y,z)\)</span>. A vector field assigns a
+vector: fluid velocity, force, or an electric field. In the plane we
+write <span class="math inline">\(\boldsymbol{F}(x,y)=P(x,y)\boldsymbol{i}+Q(x,y)\boldsymbol{j}\)</span>;
+in space <span class="math inline">\(\boldsymbol{F}=P\boldsymbol{i}+Q\boldsymbol{j}+R\boldsymbol{k}\)</span>.
+The domain and differentiability of the component functions determine
+which operations are meaningful.</p>
+<div class="learning-box example"><p><strong>Example — Rotation and radial flow.</strong> The field <span class="math inline">\(\boldsymbol{F}=(-y,x)\)</span> circulates
+counterclockwise around the origin. The field <span class="math inline">\(\boldsymbol{G}=(x,y)\)</span> points radially
+outward. Both have magnitude <span class="math inline">\(\sqrt{x^2+y^2}\)</span>, yet their geometric
+behavior is completely different. A quiver plot should therefore display
+direction as well as magnitude.</p></div>
+<figure id="fig:ch6-fields">
+<img alt="Rotational and outward radial planar vector fields, generated using NumPy and Matplotlib. Arrow lengths are normalized for legibility." src="figures/ch6_fields.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">Rotational and outward radial planar
+vector fields, generated using NumPy and Matplotlib. Arrow lengths are
+normalized for legibility.</figcaption>
+</figure>
+<h3 id="flow-lines-and-integral-curves">Flow lines and integral
+curves</h3>
+<p>A flow line <span class="math inline">\(\boldsymbol{r}(t)\)</span> of
+a stationary field satisfies <span class="math inline">\(\boldsymbol{r}'(t)=\boldsymbol{F}(\boldsymbol{r}(t))\)</span>.
+For <span class="math inline">\(\boldsymbol{F}=(-y,x)\)</span>, the
+system <span class="math inline">\(x'=-y\)</span>, <span class="math inline">\(y'=x\)</span> has solution <span class="math inline">\(x=a\cos t-b\sin t\)</span>, <span class="math inline">\(y=a\sin t+b\cos t\)</span>: circles centered at
+the origin. This differential equation differs from a line integral: the
+former describes a trajectory, whereas the latter accumulates a quantity
+along a prescribed curve.</p>
+<div class="learning-box example"><p><strong>Remark — Computational follow-up.</strong> The complete
+example is developed in the paired R and Python sections and in the
+executable companion programs.</p></div>
+<h2 id="parametrized-curves-and-orientation">Parametrized curves and
+orientation</h2>
+<p>A piecewise continuously differentiable curve <span class="math inline">\(C\)</span> is described by <span class="math inline">\(\boldsymbol{r}(t)\)</span>, <span class="math inline">\(a\le t\le b\)</span>. Its differential
+displacement is <span class="math inline">\(\,\mathrm{d}\boldsymbol{r}=\boldsymbol{r}'(t)\,\,\mathrm{d}t\)</span>
+and its arc-length element is <span class="math inline">\(\,\mathrm{d}s=\left\lVert
+\boldsymbol{r}'(t)\right\rVert\,\mathrm{d}t\)</span>. A regular
+parametrization has <span class="math inline">\(\boldsymbol{r}'(t)\ne\boldsymbol{0}\)</span>;
+piecewise regular curves may have finitely many corners. Reversing the
+parameter direction reverses orientation but leaves geometric length
+unchanged.</p>
+<div class="learning-box example"><p><strong>Example — Two paths with the same endpoints.</strong> From
+<span class="math inline">\((0,0)\)</span> to <span class="math inline">\((1,1)\)</span>, take <span class="math inline">\(C_1:\boldsymbol{r}(t)=(t,t)\)</span> and <span class="math inline">\(C_2:\boldsymbol{q}(t)=(t,t^2)\)</span> for <span class="math inline">\(0\le t\le1\)</span>. Both join the same endpoints,
+but their shapes and lengths differ. Whether a vector line integral
+depends on the path is a central question in this chapter.</p></div>
+<h2 id="scalar-line-integrals-mass-along-a-wire">Scalar line integrals:
+mass along a wire</h2>
+<div class="learning-box example"><p><strong>Definition.</strong> If <span class="math inline">\(f\)</span> is continuous on a piecewise smooth
+curve <span class="math inline">\(C\)</span> parametrized by <span class="math inline">\(\boldsymbol{r}(t)\)</span>, define <span class="math display">\[\int_C f\,\,\mathrm{d}s=\int_a^b
+f(\boldsymbol{r}(t))\left\lVert
+\boldsymbol{r}'(t)\right\rVert\,\,\mathrm{d}t.\]</span></p></div>
+<p>The definition comes from dividing a wire into short segments,
+multiplying a representative density by segment length, and passing to
+the limit. For linear density <span class="math inline">\(\lambda\)</span>, mass is <span class="math inline">\(M=\int_C\lambda\,\,\mathrm{d}s\)</span>; the
+center of mass is <span class="math inline">\(\bar x=M^{-1}\int_C
+x\lambda\,\,\mathrm{d}s\)</span>, with analogous formulas for other
+coordinates. A scalar line integral does not change sign when
+orientation is reversed.</p>
+<div class="learning-box example"><p><strong>Example — Nonuniform circular wire.</strong> On the quarter
+unit circle <span class="math inline">\(\boldsymbol{r}(t)=(\cos t,\sin
+t)\)</span>, <span class="math inline">\(0\le t\le\pi/2\)</span>, let
+<span class="math inline">\(\lambda(x,y)=1+x\)</span>. Because <span class="math inline">\(\left\lVert
+\boldsymbol{r}'\right\rVert=1\)</span>, <span class="math display">\[M=\int_0^{\pi/2}(1+\cos
+t)\,\,\mathrm{d}t=\frac\pi2+1.\]</span> The <span class="math inline">\(x\)</span>-moment is <span class="math inline">\(\int_0^{\pi/2}\cos t(1+\cos
+t)\,\,\mathrm{d}t=1+\pi/4\)</span>, hence <span class="math inline">\(\bar x=(1+\pi/4)/(1+\pi/2)\)</span>.</p></div>
+<div class="learning-box example"><p><strong>Remark — Computational follow-up.</strong> The complete
+example is developed in the paired R and Python sections and in the
+executable companion programs.</p></div>
+<h2 id="vector-line-integrals-work-and-circulation">Vector line
+integrals: work and circulation</h2>
+<div class="learning-box example"><p><strong>Definition.</strong> For <span class="math inline">\(\boldsymbol{F}=(P,Q,R)\)</span> along an oriented
+curve <span class="math inline">\(C\)</span>, <span class="math display">\[\int_C\boldsymbol{F}\cdot\,\mathrm{d}\boldsymbol{r}
+=\int_a^b\boldsymbol{F}(\boldsymbol{r}(t))\cdot\boldsymbol{r}'(t)\,\,\mathrm{d}t
+=\int_C P\,\,\mathrm{d}x+Q\,\,\mathrm{d}y+R\,\,\mathrm{d}z.\]</span></p></div>
+<p>This measures tangential accumulation. For a force field, it is work;
+for fluid velocity around a closed curve, it is circulation. Reversing
+orientation changes its sign. The Cauchy–Schwarz inequality gives the
+useful bound <span class="math inline">\(|\int_C\boldsymbol{F}\cdot\,\mathrm{d}\boldsymbol{r}|\le
+\max_C\left\lVert \boldsymbol{F}\right\rVert\,L(C)\)</span> for a
+continuous field along a finite-length curve.</p>
+<div class="learning-box example"><p><strong>Example — Work around a circle.</strong> For <span class="math inline">\(\boldsymbol{F}=(-y,x)\)</span> and the
+counterclockwise unit circle <span class="math inline">\(\boldsymbol{r}(t)=(\cos t,\sin t)\)</span>, <span class="math inline">\(0\le t\le2\pi\)</span>, we have <span class="math inline">\(\boldsymbol{F}(\boldsymbol{r}(t))=\boldsymbol{r}'(t)\)</span>.
+Thus <span class="math display">\[\oint_C\boldsymbol{F}\cdot\,\mathrm{d}\boldsymbol{r}=\int_0^{2\pi}1\,\,\mathrm{d}t=2\pi.\]</span>
+Clockwise traversal yields <span class="math inline">\(-2\pi\)</span>.
+The field performs nonzero net work around a closed path and cannot be
+conservative on a domain containing this circle.</p></div>
+<figure>
+<img alt="Counterclockwise circulation in a rotational field. The tangential field and positive boundary orientation reinforce each other." src="figures/ch6_circulation.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">Counterclockwise circulation in a
+rotational field. The tangential field and positive boundary orientation
+reinforce each other.</figcaption>
+</figure>
+<h3 id="independence-of-parametrization">Independence of
+parametrization</h3>
+<p>For a smooth, orientation-preserving reparametrization <span class="math inline">\(t=\phi(u)\)</span>, substitution in the defining
+integral preserves <span class="math inline">\(\int_C\boldsymbol{F}\cdot\,\mathrm{d}\boldsymbol{r}\)</span>.
+If <span class="math inline">\(\phi\)</span> reverses orientation, the
+endpoints swap and the integral changes sign. Thus a vector line
+integral belongs to an <em>oriented geometric curve</em>, not to a
+particular parameter speed.</p>
+<h2 id="conservative-fields-and-potential-functions">Conservative fields
+and potential functions</h2>
+<div class="learning-box example"><p><strong>Definition.</strong> A vector field <span class="math inline">\(\boldsymbol{F}\)</span> is <em>conservative</em>
+on a domain <span class="math inline">\(D\)</span> if there exists a
+differentiable scalar potential <span class="math inline">\(\varphi\)</span> with <span class="math inline">\(\boldsymbol{F}=\nabla\varphi\)</span> on <span class="math inline">\(D\)</span>.</p></div>
+<div class="learning-box example"><p><strong>Theorem — Fundamental theorem for line integrals.</strong> If
+<span class="math inline">\(\boldsymbol{F}=\nabla\varphi\)</span> on a
+domain containing a piecewise smooth curve <span class="math inline">\(C\)</span> from <span class="math inline">\(A\)</span> to <span class="math inline">\(B\)</span>, then <span class="math display">\[\int_C\boldsymbol{F}\cdot\,\mathrm{d}\boldsymbol{r}=\varphi(B)-\varphi(A).\]</span>
+In particular, the integral around every closed curve in that domain is
+zero.</p></div>
+<div class="learning-box example"><p><strong>Proof.</strong> By the multivariable chain rule, <span class="math inline">\(\frac{\,\mathrm{d}}{\,\mathrm{d}t}\varphi(\boldsymbol{r}(t))=\nabla\varphi(\boldsymbol{r}(t))\cdot\boldsymbol{r}'(t)\)</span>.
+Integrate both sides from <span class="math inline">\(a\)</span> to
+<span class="math inline">\(b\)</span> and apply the one-variable
+fundamental theorem of calculus.</p></div>
+<div class="learning-box example"><p><strong>Example — Finding a potential.</strong> Let <span class="math inline">\(\boldsymbol{F}=(2xy+3,x^2+2y)\)</span>.
+Integrating <span class="math inline">\(\varphi_x=2xy+3\)</span> with
+respect to <span class="math inline">\(x\)</span> gives <span class="math inline">\(\varphi=x^2y+3x+h(y)\)</span>. Then <span class="math inline">\(\varphi_y=x^2+h'(y)=x^2+2y\)</span>, so <span class="math inline">\(h(y)=y^2+C\)</span>. Work from <span class="math inline">\((0,0)\)</span> to <span class="math inline">\((1,2)\)</span> is <span class="math inline">\(\varphi(1,2)-\varphi(0,0)=2+3+4=9\)</span>,
+regardless of path.</p></div>
+<div class="learning-box example"><p><strong>Proposition — A useful test in the plane.</strong> If <span class="math inline">\(P,Q\)</span> have continuous first derivatives on
+a simply connected open domain <span class="math inline">\(D\)</span>,
+then <span class="math inline">\(P\,\,\mathrm{d}x+Q\,\,\mathrm{d}y\)</span> is
+conservative if and only if <span class="math inline">\(P_y=Q_x\)</span>
+throughout <span class="math inline">\(D\)</span>.</p></div>
+<div class="learning-box example"><p><strong>Proof — Explanation.</strong> If a potential has continuous
+second derivatives, equality of mixed partials gives <span class="math inline">\(P_y=Q_x\)</span>. Conversely, on a simply
+connected domain, Green’s theorem implies that integrals around closed
+curves vanish; defining <span class="math inline">\(\varphi(X)\)</span>
+by integration from a fixed base point gives a path-independent
+potential. The topological hypothesis matters.</p></div>
+<div class="learning-box example"><p><strong>Remark — A hole in the domain.</strong> The field <span class="math inline">\(\boldsymbol{H}=(-y/(x^2+y^2),\,x/(x^2+y^2))\)</span>
+has <span class="math inline">\(P_y=Q_x\)</span> away from the origin
+but circulation <span class="math inline">\(2\pi\)</span> around the
+unit circle. It has no globally defined single-valued potential on <span class="math inline">\(\mathbb{R}^2\setminus\{(0,0)\}\)</span>. Local
+derivative tests must not be applied without checking the domain.</p></div>
+<div class="learning-box check"><p><strong>Checkpoint.</strong> For <span class="math inline">\(\boldsymbol{F}=(2xy+y,\,x^2+x)\)</span>, determine
+whether <span class="math inline">\(\boldsymbol{F}\)</span> is
+conservative on <span class="math inline">\(\mathbb{R}^2\)</span>. Find
+a potential and evaluate the work from <span class="math inline">\((0,0)\)</span> to <span class="math inline">\((2,1)\)</span>.</p></div>
+<h2 id="greens-theorem-a-boundary-measures-an-interior">Green’s theorem:
+a boundary measures an interior</h2>
+<div class="learning-box example"><p><strong>Theorem — Green’s theorem, circulation form.</strong> Let
+<span class="math inline">\(D\)</span> be a bounded planar region with
+positively oriented, piecewise smooth boundary <span class="math inline">\(C\)</span> and suppose <span class="math inline">\(P,Q\)</span> have continuous first derivatives on
+an open neighborhood of <span class="math inline">\(D\)</span>. Then
+<span class="math display">\[\boxed{\oint_C
+P\,\,\mathrm{d}x+Q\,\,\mathrm{d}y=\iint_D\left(Q_x-P_y\right)\,\,\mathrm{d}A.}\]</span>
+Positive orientation means that <span class="math inline">\(D\)</span>
+stays on the left while traversing its boundary; for a simple region
+this is counterclockwise. For a region with holes, inner boundaries are
+clockwise.</p></div>
+<div class="learning-box example"><p><strong>Proof — For a vertically simple region.</strong> For <span class="math inline">\(D=\{(x,y):a\le x\le b,\,g_1(x)\le y\le
+g_2(x)\}\)</span>, the contributions of <span class="math inline">\(P\,\,\mathrm{d}x\)</span> from the upper and lower
+boundary combine into <span class="math inline">\(\int_a^b[P(x,g_1(x))-P(x,g_2(x))]\,\,\mathrm{d}x=-\iint_D
+P_y\,\,\mathrm{d}A\)</span>. The analogous argument on a horizontally
+simple region gives <span class="math inline">\(\oint_C
+Q\,\,\mathrm{d}y=\iint_DQ_x\,\,\mathrm{d}A\)</span>. Subdivide a more
+general regular region into pieces and cancel the contributions along
+internal boundaries.</p></div>
+<div class="learning-box example"><p><strong>Example — Circulation of a rotating field.</strong> For <span class="math inline">\(\boldsymbol{F}=(-y,x)\)</span>, <span class="math inline">\(Q_x-P_y=1-(-1)=2\)</span>. Over a disk of radius
+<span class="math inline">\(a\)</span>, Green’s theorem gives <span class="math inline">\(\oint_C\boldsymbol{F}\cdot\,\mathrm{d}\boldsymbol{r}=2\pi
+a^2\)</span>. Direct parametrization yields the same value.</p></div>
+<h3 id="area-from-boundary-data">Area from boundary data</h3>
+<p>Choosing <span class="math inline">\(P=-y/2\)</span>, <span class="math inline">\(Q=x/2\)</span> makes <span class="math inline">\(Q_x-P_y=1\)</span>, so <span class="math display">\[\operatorname{Area}(D)=\frac12\oint_C(x\,\,\mathrm{d}y-y\,\,\mathrm{d}x).\]</span>
+For a counterclockwise polygon with vertices <span class="math inline">\((x_i,y_i)\)</span> and <span class="math inline">\((x_{n+1},y_{n+1})=(x_1,y_1)\)</span>, evaluating
+the edge integrals produces the shoelace formula <span class="math inline">\(A=\frac12\sum_i(x_i
+y_{i+1}-x_{i+1}y_i)\)</span>.</p>
+<figure>
+<img alt="Positive orientation for a planar region with a hole: the outer boundary is counterclockwise and the inner boundary clockwise." src="figures/ch6_green.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">Positive orientation for a planar region
+with a hole: the outer boundary is counterclockwise and the inner
+boundary clockwise.</figcaption>
+</figure>
+<h2 id="flux-across-planar-curves">Flux across planar curves</h2>
+<p>Circulation measures tangential flow; <em>flux</em> measures
+crossing. For a counterclockwise parametrized boundary, the outward unit
+normal is <span class="math inline">\(\boldsymbol{n}=(y',-x')/\left\lVert
+\boldsymbol{r}'\right\rVert\)</span>. Hence <span class="math inline">\(\boldsymbol{n}\,\,\mathrm{d}s=(\,\mathrm{d}y,-\,\mathrm{d}x)\)</span>
+and <span class="math display">\[\oint_C\boldsymbol{F}\cdot\boldsymbol{n}\,\,\mathrm{d}s=\oint_C
+P\,\,\mathrm{d}y-Q\,\,\mathrm{d}x.\]</span> Applying Green’s theorem to
+<span class="math inline">\((-Q,P)\)</span> yields the planar flux
+form:</p>
+<div class="learning-box example"><p><strong>Theorem — Green’s theorem, flux form.</strong> Under the same
+regularity and orientation hypotheses, <span class="math display">\[\boxed{\oint_C\boldsymbol{F}\cdot\boldsymbol{n}\,\,\mathrm{d}s=\iint_D(P_x+Q_y)\,\,\mathrm{d}A.}\]</span></p></div>
+<div class="learning-box example"><p><strong>Example — Outward flux of a radial field.</strong> For <span class="math inline">\(\boldsymbol{F}=(x,y)\)</span>, <span class="math inline">\(\operatorname{div}\boldsymbol{F}=2\)</span>. On
+the disk of radius <span class="math inline">\(a\)</span>, outward flux
+is <span class="math inline">\(2\pi a^2\)</span>. Directly, <span class="math inline">\(\boldsymbol{F}\cdot\boldsymbol{n}=a\)</span> and
+the circumference is <span class="math inline">\(2\pi a\)</span>.</p></div>
+<h2 id="divergence-and-curl-as-local-measurements">Divergence and curl
+as local measurements</h2>
+<p>For <span class="math inline">\(\boldsymbol{F}=(P,Q,R)\)</span>,
+define <span class="math display">\[\operatorname{div}\boldsymbol{F}=P_x+Q_y+R_z,\qquad
+\nabla\times\boldsymbol{F}=(R_y-Q_z,\,P_z-R_x,\,Q_x-P_y).\]</span>
+Divergence describes net outward flux per unit volume in the
+infinitesimal limit; curl describes oriented circulation density. These
+are derivatives, not direct statements about whether arrows appear to
+bend in a plot.</p>
+<div class="learning-box example"><p><strong>Example — Contrasting local behaviors.</strong> For <span class="math inline">\(\boldsymbol{F}=(-y,x,0)\)</span>, <span class="math inline">\(\operatorname{div}\boldsymbol{F}=0\)</span> and
+<span class="math inline">\(\nabla\times\boldsymbol{F}=(0,0,2)\)</span>.
+For <span class="math inline">\(\boldsymbol{G}=(x,y,z)\)</span>, <span class="math inline">\(\operatorname{div}\boldsymbol{G}=3\)</span> and
+<span class="math inline">\(\nabla\times\boldsymbol{G}=\boldsymbol{0}\)</span>.
+A field may have zero divergence without being constant or
+conservative.</p></div>
+<div class="learning-box example"><p><strong>Remark — Computational follow-up.</strong> The complete
+example is developed in the paired R and Python sections and in the
+executable companion programs.</p></div>
+<h3 id="two-useful-identities">Two useful identities</h3>
+<p>For sufficiently smooth <span class="math inline">\(\varphi\)</span>
+and <span class="math inline">\(\boldsymbol{F}\)</span>, <span class="math display">\[\nabla\times(\nabla\varphi)=\boldsymbol{0},\qquad\operatorname{div}(\nabla\times\boldsymbol{F})=0.\]</span>
+Both follow from equality of mixed second partial derivatives. Their
+converses require geometric or topological assumptions and must not be
+used indiscriminately.</p>
+<h2 id="parametrized-surfaces-and-orientation">Parametrized surfaces and
+orientation</h2>
+<p>A smooth surface patch is described by <span class="math inline">\(\boldsymbol{r}(u,v)\)</span> for <span class="math inline">\((u,v)\)</span> in a planar parameter domain <span class="math inline">\(D\)</span>. The tangent vectors are <span class="math inline">\(\boldsymbol{r}_u\)</span> and <span class="math inline">\(\boldsymbol{r}_v\)</span>. Their cross product is
+normal to the surface; the area element is <span class="math display">\[\,\mathrm{d}S=\left\lVert
+\boldsymbol{r}_u\times\boldsymbol{r}_v\right\rVert\,\,\mathrm{d}u\,\,\mathrm{d}v.\]</span>
+The scalar surface integral is <span class="math inline">\(\iint_S
+f\,\,\mathrm{d}S=\iint_D f(\boldsymbol{r}(u,v))\left\lVert
+\boldsymbol{r}_u\times\boldsymbol{r}_v\right\rVert\,\,\mathrm{d}u\,\,\mathrm{d}v\)</span>.
+For a vector field and a chosen orientation, <span class="math display">\[\iint_S\boldsymbol{F}\cdot\boldsymbol{n}\,\,\mathrm{d}S
+=\iint_D\boldsymbol{F}(\boldsymbol{r}(u,v))\cdot(\boldsymbol{r}_u\times\boldsymbol{r}_v)\,\,\mathrm{d}u\,\,\mathrm{d}v.\]</span>
+Interchanging <span class="math inline">\(u\)</span> and <span class="math inline">\(v\)</span> reverses the normal. An outward
+orientation on a closed surface points away from its enclosed
+region.</p>
+<div class="learning-box example"><p><strong>Example — Flux through an upward graph.</strong> For <span class="math inline">\(S:z=x^2+y^2\)</span> above the unit disk, use
+<span class="math inline">\(\boldsymbol{r}(x,y)=(x,y,x^2+y^2)\)</span>.
+Then <span class="math inline">\(\boldsymbol{r}_x\times\boldsymbol{r}_y=(-2x,-2y,1)\)</span>,
+an upward normal area vector. For <span class="math inline">\(\boldsymbol{F}=(0,0,z)\)</span>, the flux is <span class="math display">\[\iint_S\boldsymbol{F}\cdot\boldsymbol{n}\,\,\mathrm{d}S=\iint_{x^2+y^2\le1}(x^2+y^2)\,\,\mathrm{d}A
+=\int_0^{2\pi}\int_0^1
+r^3\,\,\mathrm{d}r\,\,\mathrm{d}\theta=\frac\pi2.\]</span></p></div>
+<figure>
+<img alt="A parametrized paraboloid with upward-pointing normal vectors. Surface orientation determines the sign of flux." src="figures/ch6_surface.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">A parametrized paraboloid with
+upward-pointing normal vectors. Surface orientation determines the sign
+of flux.</figcaption>
+</figure>
+<h2 id="the-divergence-theorem">The divergence theorem</h2>
+<div class="learning-box example"><p><strong>Theorem — Gauss–Ostrogradsky divergence theorem.</strong> Let
+<span class="math inline">\(E\)</span> be a bounded solid with a
+piecewise smooth closed boundary <span class="math inline">\(S=\partial
+E\)</span> oriented outward, and let <span class="math inline">\(\boldsymbol{F}\)</span> have continuous first
+derivatives on a neighborhood of <span class="math inline">\(E\)</span>.
+Then <span class="math display">\[\boxed{\iint_{\partial
+E}\boldsymbol{F}\cdot\boldsymbol{n}\,\,\mathrm{d}S=\iiint_E\operatorname{div}\boldsymbol{F}\,\,\mathrm{d}V.}\]</span></p></div>
+<div class="learning-box example"><p><strong>Proof — Idea for a rectangular box.</strong> The flux across
+the two faces perpendicular to the <span class="math inline">\(x\)</span>-axis is <span class="math inline">\(\int\int[P(b,y,z)-P(a,y,z)]\,\,\mathrm{d}y\,\,\mathrm{d}z=\iiint_E
+P_x\,\,\mathrm{d}V\)</span>. Analogous calculations for the <span class="math inline">\(y\)</span> and <span class="math inline">\(z\)</span> faces give the integrals of <span class="math inline">\(Q_y\)</span> and <span class="math inline">\(R_z\)</span>. Add them. For general solids,
+subdivide into small boxes and cancel flux through internal faces, then
+pass to a limit.</p></div>
+<div class="learning-box example"><p><strong>Example — Flux through a sphere.</strong> Let <span class="math inline">\(\boldsymbol{F}=(x,y,z)\)</span> and <span class="math inline">\(E\)</span> be a ball of radius <span class="math inline">\(a\)</span>. Since <span class="math inline">\(\operatorname{div}\boldsymbol{F}=3\)</span>, <span class="math display">\[\iint_{\partial
+E}\boldsymbol{F}\cdot\boldsymbol{n}\,\,\mathrm{d}S=3\cdot\frac{4\pi
+a^3}{3}=4\pi a^3.\]</span> On the sphere, <span class="math inline">\(\boldsymbol{F}\cdot\boldsymbol{n}=a\)</span> and
+surface area is <span class="math inline">\(4\pi a^2\)</span>, giving
+the same answer.</p></div>
+<div class="learning-box example"><p><strong>Remark — Closed surfaces are essential.</strong> The
+divergence theorem applies to the <em>entire</em> boundary. If a surface
+is open, close it with a cap, compute the total outward flux, and
+subtract the cap’s flux. Keep orientations consistent.</p></div>
+<h2 id="stokes-theorem-circulation-and-curl">Stokes’ theorem:
+circulation and curl</h2>
+<div class="learning-box example"><p><strong>Theorem — Stokes’ theorem.</strong> Let <span class="math inline">\(S\)</span> be a smooth oriented surface (or a
+finite union of smooth patches) with piecewise smooth boundary <span class="math inline">\(C=\partial S\)</span>, and let <span class="math inline">\(\boldsymbol{F}\)</span> have continuous first
+derivatives near <span class="math inline">\(S\)</span>. Give <span class="math inline">\(C\)</span> the orientation induced by the
+right-hand rule relative to the chosen normal. Then <span class="math display">\[\boxed{\oint_C\boldsymbol{F}\cdot\,\mathrm{d}\boldsymbol{r}=\iint_S(\nabla\times\boldsymbol{F})\cdot\boldsymbol{n}\,\,\mathrm{d}S.}\]</span></p></div>
+<div class="learning-box example"><p><strong>Proof — Connection to Green’s theorem.</strong> For a single
+parametrized patch <span class="math inline">\(\boldsymbol{r}(u,v)\)</span>, pull back the line
+integral to the boundary of the parameter domain. The resulting
+coefficients are <span class="math inline">\(A=\boldsymbol{F}(\boldsymbol{r})\cdot\boldsymbol{r}_u\)</span>
+and <span class="math inline">\(B=\boldsymbol{F}(\boldsymbol{r})\cdot\boldsymbol{r}_v\)</span>.
+Green’s theorem gives <span class="math inline">\(\oint(A\,\,\mathrm{d}u+B\,\,\mathrm{d}v)=\iint(B_u-A_v)\,\,\mathrm{d}u\,\,\mathrm{d}v\)</span>.
+The chain and product rules show <span class="math inline">\(B_u-A_v=(\nabla\times\boldsymbol{F})(\boldsymbol{r})\cdot(\boldsymbol{r}_u\times\boldsymbol{r}_v)\)</span>.
+For multiple patches, integrals on shared edges cancel.</p></div>
+<div class="learning-box example"><p><strong>Example — The same boundary, two surfaces.</strong> Take
+<span class="math inline">\(\boldsymbol{F}=(-y/2,x/2,0)\)</span> and
+<span class="math inline">\(C:x^2+y^2=1\)</span>, <span class="math inline">\(z=0\)</span>, counterclockwise viewed from above.
+The curl is <span class="math inline">\((0,0,1)\)</span>. Over the flat
+disk <span class="math inline">\(S_1\)</span>, upward curl flux is <span class="math inline">\(\pi\)</span>. Over the upward-oriented hemisphere
+<span class="math inline">\(S_2:z=\sqrt{1-x^2-y^2}\)</span>, the flux is
+again <span class="math inline">\(\pi\)</span>, because <span class="math inline">\(\iint_{S_2}n_z\,\,\mathrm{d}S\)</span> equals the
+area of its horizontal projection. Directly, <span class="math inline">\(\oint_C\boldsymbol{F}\cdot\,\mathrm{d}\boldsymbol{r}=\pi\)</span>.
+The equality depends on both surfaces inducing the same boundary
+orientation.</p></div>
+<figure>
+<img alt="Two surfaces sharing a boundary: a planar disk and a hemisphere. With consistent upward orientation, Stokes’ theorem gives equal curl fluxes." src="figures/ch6_stokes.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">Two surfaces sharing a boundary: a planar
+disk and a hemisphere. With consistent upward orientation, Stokes’
+theorem gives equal curl fluxes.</figcaption>
+</figure>
+<h3 id="how-the-theorems-fit-together">How the theorems fit
+together</h3>
+<p>The fundamental theorem for line integrals relates a gradient
+integrated along a path to values at endpoints. Green’s theorem relates
+a planar boundary integral to an interior double integral. Stokes’
+theorem extends circulation–curl balance to surfaces in three
+dimensions. The divergence theorem relates outward flux across a closed
+surface to sources and sinks throughout the enclosed solid. All four
+compare a derivative accumulated over a region with a quantity measured
+at its boundary.</p>
+<h2 id="a-practical-theorem-selection-workflow">A practical
+theorem-selection workflow</h2>
+<p>Before integrating, identify the <em>dimension of the domain</em> and
+the <em>kind of boundary data</em>. For work along a curve, test for a
+potential. For planar circulation, consider Green’s theorem. For
+circulation along a spatial closed curve, consider Stokes’ theorem and
+choose a convenient spanning surface. For outward flux across a closed
+surface, consider the divergence theorem. A direct parametrization
+remains valuable as a verification method. Always check continuity,
+holes or singularities, whether the surface is closed, and the required
+orientation.</p>
+<div class="learning-box check"><p><strong>Checkpoint.</strong> A vector field is undefined at the
+origin, and the surface encloses the origin. Can the divergence theorem
+be applied directly? Explain what region would need to be removed or
+what limiting argument would be required.</p></div>
+<h2 id="additional-mathematical-examples-from-the-r-manuscript">Additional
+mathematical examples from the R manuscript</h2>
+<h3 id="mass-of-a-nonuniform-semicircular-wire">Mass of a nonuniform
+semicircular wire</h3>
+<p>For the upper semicircle <span class="math inline">\(\boldsymbol{r}(t)=(2\cos t,2\sin t)\)</span>,
+<span class="math inline">\(0\le t\le\pi\)</span>, with linear density
+<span class="math inline">\(\rho=1+y\)</span>, the speed is <span class="math inline">\(2\)</span> and <span class="math display">\[M=\int_0^\pi (1+2\sin
+t)2\,\,\mathrm{d}t=2\pi+8.\]</span> Unlike a vector work integral, this
+mass integral does not change under reversal of orientation.</p>
+<h3 id="an-explicit-conservative-field-potential">An explicit
+conservative-field potential</h3>
+<p>Let <span class="math inline">\(\boldsymbol{F}=(2xy+\cos
+x,x^2+3y^2)\)</span>. Integrating its first component with respect to
+<span class="math inline">\(x\)</span> and matching the second yields
+<span class="math display">\[\phi(x,y)=x^2y+\sin
+x+y^3,\quad\nabla\phi=\boldsymbol{F}.\]</span> Consequently the work
+from <span class="math inline">\((0,0)\)</span> to <span class="math inline">\((1,2)\)</span> is <span class="math inline">\(\phi(1,2)-\phi(0,0)=10+\sin1\)</span>, independent
+of the connecting path.</p>
+<h3 id="flux-through-a-paraboloid">Flux through a paraboloid</h3>
+<p>On <span class="math inline">\(S:z=4-x^2-y^2\)</span> above the unit
+disk, the upward-oriented vector area element is <span class="math inline">\((2x,2y,1)\,\,\mathrm{d}x\,\mathrm{d}y\)</span>.
+For <span class="math inline">\(\boldsymbol{F}=(0,0,z)\)</span>, <span class="math display">\[\iint_S\boldsymbol{F}\cdot\boldsymbol{n}\,\,\mathrm{d}S=\iint_D(4-x^2-y^2)\,\,\mathrm{d}A=\frac{7\pi}{2}.\]</span>
+This example makes the distinction between scalar surface area and
+oriented flux explicit.</p>
+<h3 id="divergence-theorem-on-the-unit-cube">Divergence theorem on the
+unit cube</h3>
+<p>For <span class="math inline">\(\boldsymbol{F}=(x^2,y^2,z^2)\)</span>
+on <span class="math inline">\([0,1]^3\)</span>, the divergence is <span class="math inline">\(2x+2y+2z\)</span>, giving total outward flux <span class="math inline">\(3\)</span>. Direct flux across the three
+coordinate-one faces gives <span class="math inline">\(1\)</span> per
+face, while the coordinate-zero faces contribute <span class="math inline">\(0\)</span>.</p>
+<h2 id="deeper-mathematical-foundations-orientation-topology-and-regularity">Deeper
+mathematical foundations: orientation, topology, and regularity</h2>
+<h3 id="when-zero-curl-does-not-imply-a-potential">When zero curl does
+not imply a potential</h3>
+<p>The implication “zero curl implies a potential” requires hypotheses
+on the domain. On the punctured plane <span class="math inline">\(D=\mathbb{R}^2\setminus\{(0,0)\}\)</span>,
+consider <span class="math display">\[\boldsymbol{H}(x,y)=\left(-\frac{y}{x^2+y^2},\frac{x}{x^2+y^2}\right).\]</span>
+Its component derivatives satisfy <span class="math inline">\(Q_x-P_y=0\)</span> at every point of <span class="math inline">\(D\)</span>, but for <span class="math inline">\(C(t)=(\cos t,\sin t)\)</span>, <span class="math display">\[\oint_C\boldsymbol{H}\cdot\,\mathrm{d}\boldsymbol{r}=\int_0^{2\pi}1\,\,\mathrm{d}t=2\pi.\]</span>
+A potential would force every closed-loop integral to vanish, a
+contradiction. This is a topological obstruction: <span class="math inline">\(C\)</span> cannot be contracted to a point within
+<span class="math inline">\(D\)</span>. The example also explains why a
+computational curl test is not a substitute for checking domain
+hypotheses.</p>
+<div class="learning-box example"><p><strong>Theorem — Conservative-field criterion on simply connected
+domains.</strong> Let <span class="math inline">\(D\subset\mathbb{R}^2\)</span> be open and simply
+connected and let <span class="math inline">\(P,Q\in C^1(D)\)</span>. If
+<span class="math inline">\(P_y=Q_x\)</span> throughout <span class="math inline">\(D\)</span>, then <span class="math inline">\((P,Q)\)</span> has a potential on <span class="math inline">\(D\)</span>.</p></div>
+<div class="learning-box example"><p><strong>Proof — Geometric proof outline.</strong> For any two
+piecewise smooth paths between the same endpoints, their concatenation
+forms a closed curve. Simple connectivity allows its interior to be
+decomposed into regions where Green’s theorem applies. Since <span class="math inline">\(Q_x-P_y=0\)</span>, every such closed integral is
+zero. Hence the line integral from a fixed base point to <span class="math inline">\((x,y)\)</span> is path independent; defining this
+integral as <span class="math inline">\(\varphi(x,y)\)</span> and
+differentiating along short coordinate segments gives <span class="math inline">\(\nabla\varphi=(P,Q)\)</span>.</p></div>
+<h3 id="the-distinction-between-a-surface-normal-and-a-unit-normal">The
+distinction between a surface normal and a unit normal</h3>
+<p>For a regular parametrized surface <span class="math inline">\(\boldsymbol{r}(u,v)\)</span>, the vector <span class="math inline">\(\boldsymbol{r}_u\times\boldsymbol{r}_v\)</span>
+encodes both orientation and the local area scaling. Consequently, <span class="math display">\[\iint_S\boldsymbol{F}\cdot\boldsymbol{n}\,\,\mathrm{d}S=\iint_D\boldsymbol{F}(\boldsymbol{r}(u,v))\cdot(\boldsymbol{r}_u\times\boldsymbol{r}_v)\,\,\mathrm{d}u\,\mathrm{d}v.\]</span>
+If <span class="math inline">\(\boldsymbol{n}=(\boldsymbol{r}_u\times\boldsymbol{r}_v)/\|\boldsymbol{r}_u\times\boldsymbol{r}_v\|\)</span>,
+then <span class="math inline">\(\,\mathrm{d}S=\|\boldsymbol{r}_u\times\boldsymbol{r}_v\|\,\,\mathrm{d}u\,\mathrm{d}v\)</span>.
+In numerical code, multiplying by the norm a second time would
+double-count the area factor.</p>
+<div class="learning-box example"><p><strong>Example — Flux through a tilted planar patch.</strong> Let
+<span class="math inline">\(S\)</span> be <span class="math inline">\(\boldsymbol{r}(u,v)=(u,v,u+2v)\)</span> for <span class="math inline">\(0\le u,v\le1\)</span>, oriented upward, and let
+<span class="math inline">\(\boldsymbol{F}=(1,2,3)\)</span>. Then <span class="math inline">\(\boldsymbol{r}_u\times\boldsymbol{r}_v=(-1,-2,1)\)</span>
+and <span class="math display">\[\iint_S\boldsymbol{F}\cdot\boldsymbol{n}\,\,\mathrm{d}S=\int_0^1\int_0^1(-1-4+3)\,\,\mathrm{d}u\,\mathrm{d}v=-2.\]</span>
+The sign is negative even though the chosen normal has a positive
+vertical component: the field crosses this plane primarily in the
+opposite direction.</p></div>
+<h2 id="extended-worked-examples-integral-theorems-in-practice">Extended
+worked examples: integral theorems in practice</h2>
+<h3 id="greens-theorem-on-an-ellipse-a-source-derived-r-example">Green’s
+theorem on an ellipse: a source-derived R example</h3>
+<p>For the counterclockwise ellipse <span class="math inline">\(x=a\cos
+t\)</span>, <span class="math inline">\(y=b\sin t\)</span>, <span class="math inline">\(0\le t\le2\pi\)</span>, and <span class="math inline">\(\boldsymbol{F}=(-y,x)\)</span>, direct integration
+gives <span class="math display">\[\oint_C(-y\,\,\mathrm{d}x+x\,\,\mathrm{d}y)=\int_0^{2\pi}ab(\sin^2t+\cos^2t)\,\,\mathrm{d}t=2\pi
+ab.\]</span> Green’s theorem gives <span class="math inline">\(\iint_D
+2\,\,\mathrm{d}A=2\pi ab\)</span>. The result holds for every <span class="math inline">\(a,b&gt;0\)</span> and provides a useful
+parameterized numerical benchmark.</p>
+<h3 id="greens-theorem-on-an-annulus-two-boundary-components">Green’s
+theorem on an annulus: two boundary components</h3>
+<p>Let <span class="math inline">\(D=\{(x,y):1\le x^2+y^2\le4\}\)</span>
+and <span class="math inline">\(\boldsymbol{F}=(-y/2,x/2)\)</span>. Its
+scalar curl is <span class="math inline">\(1\)</span>. Positive
+orientation means counterclockwise on the outer radius-two circle and
+clockwise on the inner radius-one circle. Hence <span class="math display">\[\oint_{\partial
+D}\boldsymbol{F}\cdot\,\mathrm{d}\boldsymbol{r}=\pi(2^2)-\pi(1^2)=3\pi=\iint_D1\,\,\mathrm{d}A.\]</span>
+Traversing both circles counterclockwise would produce <span class="math inline">\(5\pi\)</span>, which is not the correctly oriented
+boundary integral. This is a common orientation error.</p>
+<h3 id="the-divergence-theorem-on-a-rectangular-box">The divergence
+theorem on a rectangular box</h3>
+<p>Let <span class="math inline">\(V=[0,a]\times[0,b]\times[0,c]\)</span> and <span class="math inline">\(\boldsymbol{F}=(x^2,y^2,z^2)\)</span>. The
+divergence is <span class="math inline">\(2x+2y+2z\)</span>, so <span class="math display">\[\iiint_V\nabla\cdot\boldsymbol{F}\,\,\mathrm{d}V=a^2bc+ab^2c+abc^2.\]</span>
+The outward flux through the three positive-coordinate faces is
+respectively <span class="math inline">\(a^2bc\)</span>, <span class="math inline">\(ab^2c\)</span>, and <span class="math inline">\(abc^2\)</span>. The other three faces contribute
+zero. Both methods agree for arbitrary positive side lengths, not only
+for the unit cube.</p>
+<h3 id="stokes-theorem-and-a-nonplanar-spanning-surface">Stokes’ theorem
+and a nonplanar spanning surface</h3>
+<p>Let <span class="math inline">\(C\)</span> be the counterclockwise
+circle <span class="math inline">\(x^2+y^2=a^2\)</span> in the plane
+<span class="math inline">\(z=0\)</span>, and let <span class="math inline">\(S\)</span> be the paraboloid <span class="math inline">\(z=a^2-x^2-y^2\)</span> above the disk, oriented
+upward. For <span class="math inline">\(\boldsymbol{F}=(-y/2,x/2,z)\)</span>, <span class="math inline">\(\nabla\times\boldsymbol{F}=(0,0,1)\)</span>. Using
+<span class="math inline">\(\boldsymbol{r}(x,y)=(x,y,a^2-x^2-y^2)\)</span>,
+<span class="math display">\[\iint_S(\nabla\times\boldsymbol{F})\cdot\boldsymbol{n}\,\,\mathrm{d}S=\iint_D(0,0,1)\cdot(2x,2y,1)\,\,\mathrm{d}A=\pi
+a^2.\]</span> On <span class="math inline">\(C(t)=(a\cos t,a\sin
+t,0)\)</span>, the work integrand is <span class="math inline">\(a^2/2\)</span>, giving <span class="math inline">\(\pi a^2\)</span>. The disk and paraboloid have
+different areas but the same oriented boundary, and therefore the same
+curl flux.</p>
+<h2 id="error-control-and-computational-reliability">Error control and
+computational reliability</h2>
+<h3 id="quadrature-tolerance-and-orientation-checks">Quadrature
+tolerance and orientation checks</h3>
+<p>Numerical agreement should be reported with an error metric, for
+example <span class="math display">\[E_{\mathrm{abs}}=|I_{\mathrm{boundary}}-I_{\mathrm{interior}}|,\qquad
+E_{\mathrm{rel}}=\frac{E_{\mathrm{abs}}}{\max(1,|I_{\mathrm{interior}}|)}.\]</span>
+An appropriate validation suite should compare at least two
+mathematically independent expressions, reverse orientations to check
+sign changes, and refine the numerical resolution. Agreement at a single
+mesh size does not prove a theorem or establish convergence.</p>
+<h3 id="a-convergence-check-for-the-periodic-trapezoidal-rule">A
+convergence check for the periodic trapezoidal rule</h3>
+<p>For a smooth <span class="math inline">\(2\pi\)</span>-periodic
+boundary integrand <span class="math inline">\(g\)</span>, approximate
+<span class="math display">\[I=\int_0^{2\pi}g(t)\,\,\mathrm{d}t\quad\text{by}\quad
+T_N=\frac{2\pi}{N}\sum_{j=0}^{N-1}g(2\pi j/N).\]</span> This rule is
+particularly effective for smooth periodic data. For the ellipse example
+above, <span class="math inline">\(g(t)=ab\)</span> is constant, so
+<span class="math inline">\(T_N=2\pi ab\)</span> for every positive
+integer <span class="math inline">\(N\)</span>. A more informative
+convergence test uses a nonconstant field, such as <span class="math inline">\(\boldsymbol{F}=(-y(1+x^2),x)\)</span>, and
+compares successive <span class="math inline">\(N\)</span> values
+against a high-accuracy adaptive integral.</p>
+<h2 id="paired-computational-laboratory-three-independent-theorem-checks">Paired
+computational laboratory: three independent theorem checks</h2>
+<p>The next examples use the same geometry and exact benchmarks in R and
+Python. The complete programs are included in the companion archive.</p>
+<h3 id="r-ellipse-annulus-and-box">R: ellipse, annulus, and box</h3>
+<div class="code-shell"><div class="code-bar">R<a href="code/chapter06-listing-01.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>a &lt;- 3; b &lt;- 2
+ellipse &lt;- integrate(function(t) rep(a*b,length(t)),0,2*pi)$value
+annulus &lt;- pi*(2^2-1^2)
+box &lt;- function(a,b,c) a^2*b*c+a*b^2*c+a*b*c^2
+print(c(ellipse=ellipse,expected=2*pi*a*b,
+        annulus=annulus,box=box(2,3,4)))
+stopifnot(abs(ellipse-2*pi*a*b)&lt;1e-9)
+stopifnot(abs(annulus-3*pi)&lt;1e-9)
+stopifnot(abs(box(2,3,4)-216)&lt;1e-9)</code></pre></div>
+<h3 id="python-the-same-three-calculations">Python: the same three
+calculations</h3>
+<div class="code-shell"><div class="code-bar">Python<a href="code/chapter06-listing-02.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>import numpy as np
+from scipy.integrate import quad
+a,b = 3.0,2.0
+ellipse = quad(lambda t:a*b,0,2*np.pi)[0]
+annulus = np.pi*(2**2-1**2)
+def box(a,b,c):
+    return a*a*b*c+a*b*b*c+a*b*c*c
+print('ellipse',ellipse,'annulus',annulus,'box',box(2,3,4))
+assert np.isclose(ellipse,2*np.pi*a*b)
+assert np.isclose(annulus,3*np.pi)
+assert np.isclose(box(2,3,4),216)</code></pre></div>
+<div class="learning-box check"><p><strong>Checkpoint.</strong> Before accepting numerical agreement,
+explain the role of boundary orientation in the annulus, verify the
+units of flux, and state the regularity assumptions required for the
+selected integral theorem.</p></div>
+<h2 id="further-exercises-proof-computation-and-interpretation">Further
+exercises: proof, computation, and interpretation</h2>
+<ol type="1">
+<li><p>Show directly that the field <span class="math inline">\((-y/(x^2+y^2),x/(x^2+y^2))\)</span> has zero
+scalar curl away from the origin, yet circulation <span class="math inline">\(2\pi\)</span> on the unit circle. Explain why
+there is no contradiction.</p></li>
+<li><p>For <span class="math inline">\(\boldsymbol{F}=(x^2,y^2)\)</span>
+and the positively oriented boundary of <span class="math inline">\([0,a]\times[0,b]\)</span>, compute the outward
+flux directly and using Green’s flux form.</p></li>
+<li><p>Find the flux of <span class="math inline">\((1,2,3)\)</span>
+through the upward-oriented graph <span class="math inline">\(z=x+2y\)</span> above the unit square. Reverse the
+orientation and interpret the result.</p></li>
+<li><p>Let <span class="math inline">\(\boldsymbol{F}=(-y(1+x^2),x)\)</span> on the
+ellipse <span class="math inline">\(x=3\cos t\)</span>, <span class="math inline">\(y=2\sin t\)</span>. Derive the boundary integrand,
+use Green’s theorem for an independent exact integral, and compare with
+the periodic trapezoidal rule at <span class="math inline">\(N=8,16,32,64\)</span>.</p></li>
+<li><p>Show that <span class="math inline">\(\iint_S(\nabla\times\boldsymbol{F})\cdot\boldsymbol{n}\,\,\mathrm{d}S\)</span>
+is unchanged when an upward-oriented planar disk is replaced by the
+upward-oriented paraboloid with the same boundary, assuming all
+hypotheses of Stokes’ theorem.</p></li>
+<li><p>For <span class="math inline">\(\boldsymbol{F}=(x^2,y^2,z^2)\)</span> on <span class="math inline">\([0,a]\times[0,b]\times[0,c]\)</span>, calculate
+the flux through all six faces separately, including the outward unit
+normal for each.</p></li>
+<li><p>Develop a unit test in R and Python that detects an accidentally
+reversed surface orientation. Include a test for a nonzero exact
+flux.</p></li>
+<li><p>Write a short critique of the statement: “The numerical
+circulation and curl-flux agree to ten decimal places, so Stokes’
+theorem has been proved.”</p></li>
+</ol>
+<h2 id="solving-the-mathematical-problems-using-r">Solving the
+mathematical problems using R</h2>
+<p>The examples use base R’s adaptive one-dimensional
+<code>integrate()</code> and numerical differentiation only where
+appropriate. The complete executable program is
+<code>code/chapter06_paired.R</code>.</p>
+<h3 id="circulation-around-a-circle-and-greens-theorem">Circulation
+around a circle and Green’s theorem</h3>
+<div class="code-shell"><div class="code-bar">R<a href="code/chapter06-listing-03.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>a &lt;- 2
+integrand &lt;- function(t) a^2 + 0*t
+circulation &lt;- integrate(integrand, 0, 2*pi)$value
+area_side &lt;- 2*pi*a^2
+print(c(boundary=circulation, interior=area_side))
+stopifnot(abs(circulation-area_side)&lt;1e-8)</code></pre></div>
+<p>For <span class="math inline">\(\boldsymbol{F}=(-y,x)\)</span>, both
+calculations equal <span class="math inline">\(2\pi a^2\)</span>.</p>
+<h3 id="scalar-wire-mass-and-paraboloid-flux">Scalar wire mass and
+paraboloid flux</h3>
+<div class="code-shell"><div class="code-bar">R<a href="code/chapter06-listing-04.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>wire_mass &lt;- integrate(function(t) 2*(1+2*sin(t)),0,pi)$value
+flux &lt;- integrate(function(r) 2*pi*(4-r^2)*r,0,1)$value
+print(c(wire_mass=wire_mass,exact_mass=2*pi+8,
+        surface_flux=flux,exact_flux=7*pi/2))</code></pre></div>
+<h3 id="stokes-theorem-on-two-spanning-surfaces">Stokes’ theorem on two
+spanning surfaces</h3>
+<p>With <span class="math inline">\(\boldsymbol{F}=(-y/2,x/2,z)\)</span>, <span class="math inline">\(\nabla\times\boldsymbol{F}=(0,0,1)\)</span>. For
+the circle of radius <span class="math inline">\(2\)</span>, the line
+integral and curl flux across either the disk or the paraboloid cap are
+<span class="math inline">\(4\pi\)</span>.</p>
+<div class="code-shell"><div class="code-bar">R<a href="code/chapter06-listing-05.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>a &lt;- 2
+line &lt;- integrate(function(t) rep(a^2/2,length(t)),0,2*pi)$value
+flat &lt;- pi*a^2
+cap &lt;- integrate(function(r) 2*pi*r,0,a)$value
+print(c(line=line,flat=flat,cap=cap))
+stopifnot(max(abs(c(line,flat,cap)-4*pi))&lt;1e-8)</code></pre></div>
+<h2 id="solving-the-same-problems-using-python">Solving the same
+problems using Python</h2>
+<p>Python uses SciPy for quadrature and SymPy for symbolic checks. The
+complete program is <code>code/chapter06_paired.py</code>.</p>
+<h3 id="greens-theorem-and-the-wire-mass">Green’s theorem and the wire
+mass</h3>
+<div class="code-shell"><div class="code-bar">Python<a href="code/chapter06-listing-06.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>import numpy as np
+from scipy.integrate import quad
+a=2.0
+circulation=quad(lambda t:a*a,0,2*np.pi)[0]
+wire_mass=quad(lambda t:2*(1+2*np.sin(t)),0,np.pi)[0]
+print(circulation,2*np.pi*a*a)
+print(wire_mass,2*np.pi+8)</code></pre></div>
+<h3 id="flux-and-stokes-theorem">Flux and Stokes’ theorem</h3>
+<div class="code-shell"><div class="code-bar">Python<a href="code/chapter06-listing-07.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>flux=quad(lambda r:2*np.pi*(4-r*r)*r,0,1)[0]
+line=quad(lambda t:a*a/2,0,2*np.pi)[0]
+cap=quad(lambda r:2*np.pi*r,0,a)[0]
+print('paraboloid flux',flux,'exact',7*np.pi/2)
+print('Stokes boundary',line,'cap',cap,'disk',np.pi*a*a)
+assert abs(flux-7*np.pi/2)&lt;1e-9
+assert abs(line-cap)&lt;1e-9</code></pre></div>
+<h2 id="comparing-r-and-python-results">Comparing R and Python
+results</h2>
+<p>Both programs evaluate the same parameterizations, orientation
+conventions, and exact benchmarks. Numerical agreement is a useful
+diagnostic, but the theorems require the stated smoothness and geometric
+hypotheses. When orientation is reversed, the signed work and flux
+change sign; scalar wire mass does not.</p>
+<h2 id="application-idealized-circulation-and-fluid-transport">Application:
+idealized circulation and fluid transport</h2>
+<p>Consider a planar idealized velocity field <span class="math inline">\(\boldsymbol{v}=(-\omega y,\omega x)\)</span>,
+where <span class="math inline">\(\omega\)</span> is a constant with
+units s<span class="math inline">\(^{-1}\)</span>. Its divergence is
+zero and scalar curl is <span class="math inline">\(2\omega\)</span>.
+Around a counterclockwise circular boundary of radius <span class="math inline">\(a\)</span>, circulation is <span class="math inline">\(2\pi\omega a^2\)</span>. The net outward planar
+flux is zero. This illustrates that rotational motion and net expansion
+are different local phenomena; the model is not a measured environmental
+flow.</p>
+<figure id="fig:ch6-flux">
+<img alt="Outward radial flux through a closed curve: the field crosses the boundary instead of circulating tangentially. Original Python illustration." src="figures/ch6_flux.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">Outward radial flux through a closed
+curve: the field crosses the boundary instead of circulating
+tangentially. Original Python illustration.</figcaption>
+</figure>
+<h2 id="chapter-project-one-boundary-two-spanning-surfaces">Chapter
+project: one boundary, two spanning surfaces</h2>
+<p>Let <span class="math inline">\(C\)</span> be the circle <span class="math inline">\(x^2+y^2=4\)</span>, <span class="math inline">\(z=0\)</span>, oriented counterclockwise viewed
+from above, and let <span class="math inline">\(\boldsymbol{F}=(-y/2,x/2,z)\)</span>.</p>
+<ol type="1">
+<li><p>Parametrize <span class="math inline">\(C\)</span> and evaluate
+the circulation analytically, identifying the orientation.</p></li>
+<li><p>Compute <span class="math inline">\(\nabla\times\boldsymbol{F}\)</span> and evaluate
+its flux across the flat disk <span class="math inline">\(z=0\)</span>
+with upward orientation.</p></li>
+<li><p>Repeat across the paraboloid cap <span class="math inline">\(z=4-x^2-y^2\)</span> using an upward normal and a
+correct parameter-domain Jacobian.</p></li>
+<li><p>Implement all three computations independently in R and Python,
+checking each against the exact result <span class="math inline">\(4\pi\)</span>.</p></li>
+<li><p>Reverse the orientation of the curve and surfaces and explain
+every sign change.</p></li>
+<li><p>Explore at least three circle radii, produce a labeled plot of
+the field and boundary, and tabulate exact and numerical
+circulation.</p></li>
+<li><p>Submit a two-page report explaining Stokes’ theorem, assumptions,
+numerical tolerance, and why matching floating-point results do not
+constitute a proof.</p></li>
+</ol>
+<p><strong>Suggested rubric (100 points):</strong> analytic development
+30; orientation and theorem hypotheses 20; R implementation 15; Python
+implementation 15; figures and comparison 10; written interpretation
+10.</p>
+<h2 id="chapter-summary">Chapter summary</h2>
+<ul>
+<li><p>Scalar line integrals weight arc length; vector line integrals
+measure tangential work or circulation and depend on
+orientation.</p></li>
+<li><p>Conservative fields are gradients; their line integrals depend
+only on endpoints.</p></li>
+<li><p>Green’s theorem connects planar circulation or flux with curl or
+divergence over the enclosed region.</p></li>
+<li><p>Surface flux uses a normal area vector, whose sign is determined
+by orientation.</p></li>
+<li><p>The divergence theorem converts outward flux across a closed
+surface into a triple integral of divergence.</p></li>
+<li><p>Stokes’ theorem converts circulation around a surface boundary
+into curl flux through the surface.</p></li>
+<li><p>Numerical checks are most meaningful when the domain, parameter
+bounds, Jacobians, and orientation are explicitly documented.</p></li>
+</ul>
+<h2 id="exercises">Exercises</h2>
+<h3 class="unnumbered" id="fields-and-line-integrals">Fields and line
+integrals</h3>
+<ol type="1">
+<li><p>Sketch <span class="math inline">\(\boldsymbol{F}=(y,-x)\)</span>
+at <span class="math inline">\((1,0)\)</span>, <span class="math inline">\((0,1)\)</span>, and <span class="math inline">\((-1,-1)\)</span>. State the direction of
+rotation.</p></li>
+<li><p>Find the flow lines of <span class="math inline">\(\boldsymbol{F}=(2x,-y)\)</span> through <span class="math inline">\((1,1)\)</span>.</p></li>
+<li><p>Parametrize the segment from <span class="math inline">\((1,-2)\)</span> to <span class="math inline">\((4,3)\)</span> in both orientations.</p></li>
+<li><p>Compute <span class="math inline">\(\int_C(x+y)\,\,\mathrm{d}s\)</span> along <span class="math inline">\(\boldsymbol{r}(t)=(t,2t)\)</span>, <span class="math inline">\(0\le t\le1\)</span>.</p></li>
+<li><p>Find the mass of the upper semicircle <span class="math inline">\(x^2+y^2=4\)</span> with density <span class="math inline">\(\lambda=1+y\)</span>.</p></li>
+<li><p>Compute <span class="math inline">\(\int_C(y\,\,\mathrm{d}x+x\,\,\mathrm{d}y)\)</span>
+along the parabola <span class="math inline">\(y=x^2\)</span>, <span class="math inline">\(0\le x\le2\)</span>.</p></li>
+<li><p>Evaluate <span class="math inline">\(\int_C(-y\,\,\mathrm{d}x+x\,\,\mathrm{d}y)\)</span>
+around the circle <span class="math inline">\(x^2+y^2=9\)</span>
+counterclockwise.</p></li>
+<li><p>Re-evaluate Exercise 6.7 clockwise. Explain the change.</p></li>
+<li><p>Find the work of <span class="math inline">\(\boldsymbol{F}=(x,y,z)\)</span> along the straight
+segment from <span class="math inline">\((0,0,0)\)</span> to <span class="math inline">\((1,2,2)\)</span>.</p></li>
+<li><p>Evaluate the scalar line integral of <span class="math inline">\(f=x^2+y^2\)</span> over the unit circle.</p></li>
+</ol>
+<h3 class="unnumbered" id="potentials-and-greens-theorem">Potentials and
+Green’s theorem</h3>
+<ol type="1">
+<li><p>Determine whether <span class="math inline">\(\boldsymbol{F}=(2xy,x^2+3y^2)\)</span> is
+conservative; find a potential if possible.</p></li>
+<li><p>Evaluate the work of <span class="math inline">\(\boldsymbol{F}=(e^x\cos y,-e^x\sin y)\)</span>
+from <span class="math inline">\((0,0)\)</span> to <span class="math inline">\((1,\pi/2)\)</span>.</p></li>
+<li><p>Explain why <span class="math inline">\(\boldsymbol{F}=(-y/(x^2+y^2),x/(x^2+y^2))\)</span>
+is not conservative on the punctured plane.</p></li>
+<li><p>Use Green’s theorem to compute <span class="math inline">\(\oint_C(-y\,\,\mathrm{d}x+x\,\,\mathrm{d}y)\)</span>
+for the ellipse <span class="math inline">\(x^2/4+y^2/9=1\)</span>
+counterclockwise.</p></li>
+<li><p>Evaluate <span class="math inline">\(\oint_C
+(x^2-y)\,\,\mathrm{d}x+(y^2+x)\,\,\mathrm{d}y\)</span> around the unit
+square positively oriented.</p></li>
+<li><p>Use Green’s theorem to compute the area enclosed by <span class="math inline">\(x=a\cos t\)</span>, <span class="math inline">\(y=b\sin t\)</span>.</p></li>
+<li><p>Find the outward flux of <span class="math inline">\(\boldsymbol{F}=(x^2,y^2)\)</span> across the unit
+square.</p></li>
+<li><p>Compute the outward flux of <span class="math inline">\(\boldsymbol{F}=(x,y)\)</span> across the circle of
+radius <span class="math inline">\(3\)</span>.</p></li>
+<li><p>For an annulus <span class="math inline">\(1\le
+x^2+y^2\le4\)</span>, specify the positive orientation of each boundary
+component.</p></li>
+<li><p>Derive the shoelace area formula by integrating <span class="math inline">\(x\,\,\mathrm{d}y-y\,\,\mathrm{d}x\)</span> along a
+polygon edge.</p></li>
+</ol>
+<h3 class="unnumbered" id="surface-integrals-and-major-theorems">Surface
+integrals and major theorems</h3>
+<ol type="1">
+<li><p>Find the upward normal area vector for <span class="math inline">\(z=2x+y^2\)</span> parametrized by <span class="math inline">\((x,y)\)</span>.</p></li>
+<li><p>Compute the area of the graph <span class="math inline">\(z=x+y\)</span> over <span class="math inline">\([0,1]^2\)</span>.</p></li>
+<li><p>Compute upward flux of <span class="math inline">\(\boldsymbol{F}=(0,0,1)\)</span> through <span class="math inline">\(z=x^2+y^2\)</span> over the unit disk.</p></li>
+<li><p>Find the flux of <span class="math inline">\(\boldsymbol{F}=(x,y,z)\)</span> through the unit
+sphere using the divergence theorem.</p></li>
+<li><p>Compute outward flux of <span class="math inline">\(\boldsymbol{F}=(x^3,y^3,z^3)\)</span> through the
+cube <span class="math inline">\([-1,1]^3\)</span>.</p></li>
+<li><p>Apply the divergence theorem to <span class="math inline">\(\boldsymbol{F}=(x,0,0)\)</span> on the cylinder
+<span class="math inline">\(x^2+y^2\le4\)</span>, <span class="math inline">\(0\le z\le3\)</span>.</p></li>
+<li><p>Compute the curl of <span class="math inline">\(\boldsymbol{F}=(yz,zx,xy)\)</span> and interpret
+the result.</p></li>
+<li><p>Use Stokes’ theorem for <span class="math inline">\(\boldsymbol{F}=(-y,x,0)\)</span> along the circle
+<span class="math inline">\(x^2+y^2=4\)</span>, <span class="math inline">\(z=5\)</span>, oriented counterclockwise from
+above.</p></li>
+<li><p>Use Stokes’ theorem to calculate <span class="math inline">\(\oint_C
+\boldsymbol{F}\cdot\,\mathrm{d}\boldsymbol{r}\)</span> for <span class="math inline">\(\boldsymbol{F}=(-y/2,x/2,0)\)</span> around the
+boundary of <span class="math inline">\(z=4-x^2-y^2\)</span>, <span class="math inline">\(z\ge0\)</span>, with upward orientation.</p></li>
+<li><p>Verify Stokes’ theorem directly for <span class="math inline">\(\boldsymbol{F}=(0,0,x)\)</span> on the triangular
+surface joining <span class="math inline">\((0,0,0)\)</span>, <span class="math inline">\((1,0,0)\)</span>, <span class="math inline">\((0,1,1)\)</span> with the orientation induced by
+this vertex order.</p></li>
+</ol>
+<h3 class="unnumbered" id="python-investigations-and-synthesis">Python
+investigations and synthesis</h3>
+<ol type="1">
+<li><p>Plot <span class="math inline">\(\boldsymbol{F}=(-y,x)\)</span>
+and <span class="math inline">\(\boldsymbol{G}=(x,y)\)</span> on the
+same grid in separate panels. Discuss divergence and curl.</p></li>
+<li><p>Use SymPy to verify <span class="math inline">\(\nabla\times\nabla(x^2y+\sin
+z)=\boldsymbol{0}\)</span>.</p></li>
+<li><p>Use SciPy’s <code>quad</code> to approximate circulation of <span class="math inline">\(\boldsymbol{F}=(-y,x)\)</span> around ellipses
+with varying semiaxes. Compare with Green’s theorem.</p></li>
+<li><p>Numerically compare the direct flux through a sphere with the
+divergence theorem for <span class="math inline">\(\boldsymbol{F}=(x,y,z)\)</span>.</p></li>
+<li><p>Reproduce Figure <a data-reference="fig:ch6-fields" data-reference-type="ref" href="#fig:ch6-fields">1</a> using a
+finer grid and explain why arrow normalization changes the appearance
+but not the field.</p></li>
+<li><p>For <span class="math inline">\(\boldsymbol{F}=(x^2y,yz,zx)\)</span>, compute
+divergence and curl symbolically and verify them at three points using
+centered finite differences.</p></li>
+<li><p>Design a vector field with zero divergence but nonzero curl and
+another with zero curl but nonzero divergence. Explain your
+choices.</p></li>
+<li><p>Investigate numerically how circulation around small circles
+estimates the vertical curl at their centers.</p></li>
+<li><p>Show analytically and numerically that a gradient field has zero
+circulation around a closed triangle.</p></li>
+<li><p>Complete the extended Stokes investigation and submit your
+notebook with numerical results and an orientation diagram.</p></li>
+</ol>
+<footer><a href="chapter05.html">5. Multiple Integration and Applications ←</a><a href="chapter07.html">7. Introduction to Tensor Calculus and Differential Geometry →</a></footer></main><aside class="chapter-toc"><strong>On this page</strong><ul><li><a href="#interactive-investigation">Interactive investigation</a></li><li><a href="#fields-quantities-distributed-through-space">Fields: quantities
+distributed through space</a></li><li><a href="#flow-lines-and-integral-curves">Flow lines and integral
+curves</a></li><li><a href="#parametrized-curves-and-orientation">Parametrized curves and
+orientation</a></li><li><a href="#scalar-line-integrals-mass-along-a-wire">Scalar line integrals:
+mass along a wire</a></li><li><a href="#vector-line-integrals-work-and-circulation">Vector line
+integrals: work and circulation</a></li><li><a href="#independence-of-parametrization">Independence of
+parametrization</a></li><li><a href="#conservative-fields-and-potential-functions">Conservative fields
+and potential functions</a></li><li><a href="#greens-theorem-a-boundary-measures-an-interior">Green’s theorem:
+a boundary measures an interior</a></li><li><a href="#area-from-boundary-data">Area from boundary data</a></li><li><a href="#flux-across-planar-curves">Flux across planar curves</a></li><li><a href="#divergence-and-curl-as-local-measurements">Divergence and curl
+as local measurements</a></li><li><a href="#two-useful-identities">Two useful identities</a></li><li><a href="#parametrized-surfaces-and-orientation">Parametrized surfaces and
+orientation</a></li><li><a href="#the-divergence-theorem">The divergence theorem</a></li><li><a href="#stokes-theorem-circulation-and-curl">Stokes’ theorem:
+circulation and curl</a></li><li><a href="#how-the-theorems-fit-together">How the theorems fit
+together</a></li><li><a href="#a-practical-theorem-selection-workflow">A practical
+theorem-selection workflow</a></li><li><a href="#additional-mathematical-examples-from-the-r-manuscript">Additional
+mathematical examples from the R manuscript</a></li><li><a href="#mass-of-a-nonuniform-semicircular-wire">Mass of a nonuniform
+semicircular wire</a></li><li><a href="#an-explicit-conservative-field-potential">An explicit
+conservative-field potential</a></li><li><a href="#flux-through-a-paraboloid">Flux through a paraboloid</a></li><li><a href="#divergence-theorem-on-the-unit-cube">Divergence theorem on the
+unit cube</a></li><li><a href="#deeper-mathematical-foundations-orientation-topology-and-regularity">Deeper
+mathematical foundations: orientation, topology, and regularity</a></li><li><a href="#when-zero-curl-does-not-imply-a-potential">When zero curl does
+not imply a potential</a></li><li><a href="#the-distinction-between-a-surface-normal-and-a-unit-normal">The
+distinction between a surface normal and a unit normal</a></li><li><a href="#extended-worked-examples-integral-theorems-in-practice">Extended
+worked examples: integral theorems in practice</a></li><li><a href="#greens-theorem-on-an-ellipse-a-source-derived-r-example">Green’s
+theorem on an ellipse: a source-derived R example</a></li><li><a href="#greens-theorem-on-an-annulus-two-boundary-components">Green’s
+theorem on an annulus: two boundary components</a></li><li><a href="#the-divergence-theorem-on-a-rectangular-box">The divergence
+theorem on a rectangular box</a></li><li><a href="#stokes-theorem-and-a-nonplanar-spanning-surface">Stokes’ theorem
+and a nonplanar spanning surface</a></li><li><a href="#error-control-and-computational-reliability">Error control and
+computational reliability</a></li><li><a href="#quadrature-tolerance-and-orientation-checks">Quadrature
+tolerance and orientation checks</a></li><li><a href="#a-convergence-check-for-the-periodic-trapezoidal-rule">A
+convergence check for the periodic trapezoidal rule</a></li><li><a href="#paired-computational-laboratory-three-independent-theorem-checks">Paired
+computational laboratory: three independent theorem checks</a></li><li><a href="#r-ellipse-annulus-and-box">R: ellipse, annulus, and box</a></li><li><a href="#python-the-same-three-calculations">Python: the same three
+calculations</a></li><li><a href="#further-exercises-proof-computation-and-interpretation">Further
+exercises: proof, computation, and interpretation</a></li><li><a href="#solving-the-mathematical-problems-using-r">Solving the
+mathematical problems using R</a></li><li><a href="#circulation-around-a-circle-and-greens-theorem">Circulation
+around a circle and Green’s theorem</a></li><li><a href="#scalar-wire-mass-and-paraboloid-flux">Scalar wire mass and
+paraboloid flux</a></li><li><a href="#stokes-theorem-on-two-spanning-surfaces">Stokes’ theorem on two
+spanning surfaces</a></li><li><a href="#solving-the-same-problems-using-python">Solving the same
+problems using Python</a></li><li><a href="#greens-theorem-and-the-wire-mass">Green’s theorem and the wire
+mass</a></li><li><a href="#flux-and-stokes-theorem">Flux and Stokes’ theorem</a></li><li><a href="#comparing-r-and-python-results">Comparing R and Python
+results</a></li><li><a href="#application-idealized-circulation-and-fluid-transport">Application:
+idealized circulation and fluid transport</a></li><li><a href="#chapter-project-one-boundary-two-spanning-surfaces">Chapter
+project: one boundary, two spanning surfaces</a></li><li><a href="#chapter-summary">Chapter summary</a></li><li><a href="#exercises">Exercises</a></li><li><a href="#fields-and-line-integrals">Fields and line
+integrals</a></li><li><a href="#potentials-and-greens-theorem">Potentials and
+Green’s theorem</a></li><li><a href="#surface-integrals-and-major-theorems">Surface
+integrals and major theorems</a></li><li><a href="#python-investigations-and-synthesis">Python
+investigations and synthesis</a></li></ul></aside></div><script src="search-index.js"></script><script src="site.js"></script><script src="investigations.js"></script></body></html>

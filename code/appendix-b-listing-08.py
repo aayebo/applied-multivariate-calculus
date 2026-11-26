@@ -1,0 +1,16 @@
+t = np.linspace(0, 4*np.pi, 500)
+fig = plt.figure()
+ax = fig.add_subplot(111, projection="3d")
+ax.plot(np.cos(t), np.sin(t), 0.2*t)
+ax.set(xlabel="x", ylabel="y", zlabel="z", title="Helix")
+plt.show()
+
+x = np.linspace(-2, 2, 100)
+y = np.linspace(-2, 2, 100)
+X, Y = np.meshgrid(x, y)
+Z = X**2 + Y**2
+fig, ax = plt.subplots()
+cs = ax.contour(X, Y, Z, levels=12)
+ax.clabel(cs)
+ax.set_aspect("equal")
+plt.show()

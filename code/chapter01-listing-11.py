@@ -1,0 +1,11 @@
+import numpy as np
+u = np.array([1, 0, 2])
+v = np.array([0, 2, 1])
+w = np.array([2, 1, 0])
+triple = np.dot(u, np.cross(v, w))
+volume = abs(triple)
+M = np.stack([u, v, w], axis=0)
+print('Triple product:', triple)
+print('Volume:', volume)
+print('Determinant:', np.linalg.det(M))
+assert np.isclose(triple, np.linalg.det(M))

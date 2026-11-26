@@ -1,0 +1,1 @@
+Eight original browser investigations added. JavaScript syntax and 24 default/endpoint smoke tests passed. Browser and native Quarto rendering not tested; R/Python scripts unchanged.

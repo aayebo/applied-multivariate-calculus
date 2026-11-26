@@ -1,0 +1,10 @@
+import sympy as sp
+A = sp.Matrix([1, 0, 1])
+B = sp.Matrix([2, 1, 1])
+C = sp.Matrix([1, 2, 3])
+n = (B-A).cross(C-A)
+print('Plane normal:', n)
+P = sp.Matrix([1, 2, 3])
+d = n.dot(A)
+distance = sp.simplify(abs(n.dot(P)-d) / sp.sqrt(n.dot(n)))
+print('Exact point-to-plane distance:', distance)

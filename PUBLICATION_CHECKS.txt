@@ -1,0 +1,10 @@
+Phase 4 publication checks
+HTML pages: 13
+Search entries: 531
+Local references including search and anchors checked: 1708
+Issues: 4
+('chapter01.html', '#eq:cross', 'anchor')
+('chapter01.html', '#eq:lagrange', 'anchor')
+('chapter01.html', '#eq:angle', 'anchor')
+('chapter01.html', '#eq:crossarea', 'anchor')
+Browser and live deployment not tested.

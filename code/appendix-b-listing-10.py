@@ -1,0 +1,5 @@
+u, v = sp.symbols("u v")
+F = sp.Matrix([u**2 - v, u*v])
+J = F.jacobian([u, v])
+print(J)
+print(J.det())

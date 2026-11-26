@@ -1,0 +1,5 @@
+V <- c(2,3)
+V_lower <- as.vector(g %*% V)
+V_recovered <- as.vector(solve(g,V_lower))
+print(c(V_lower,squared_norm=sum(V*V_lower)))
+stopifnot(max(abs(V-V_recovered))<1e-12)

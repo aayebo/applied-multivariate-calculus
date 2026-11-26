@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><title>Multiple Integration and Applications | Applied Multivariate Calculus Using R and Python</title><link href="site.css" rel="stylesheet"/><script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]}};</script><script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script></head><body><a class="skip" href="#main">Skip to content</a><nav aria-label="Book navigation" class="site-nav"><a class="brand" href="index.html">Applied Multivariate Calculus Using R and Python</a><p class="subtitle">Volume III · Abraham Ayebo</p><label for="book-search">Search book</label><input id="book-search" placeholder="Search chapters" type="search"/><div aria-live="polite" class="search-results" id="search-results"></div><div class="nav-label">Contents</div><a href="index.html">Welcome</a><a href="chapter01.html">1. Vectors and Geometry in Three-Dimensional Space</a><a href="chapter02.html">2. Curves, Surfaces, and Coordinate Systems</a><a href="chapter03.html">3. Functions of Several Variables and Partial Differentiation</a><a href="chapter04.html">4. Gradients, Taylor Approximations, and Optimization</a><a aria-current="page" class="active" href="chapter05.html">5. Multiple Integration and Applications</a><a href="chapter06.html">6. Vector Fields and Integral Theorems</a><a href="chapter07.html">7. Introduction to Tensor Calculus and Differential Geometry</a><a href="chapter08.html">8. Partial Differential Equations and Computational Methods</a><a href="appendix-a.html">Appendix A. Introduction to R and RStudio</a><a href="appendix-b.html">Appendix B. Introduction to Python and Jupyter</a><a href="resources.html">Computational resources</a><a href="about.html">About this book</a><div class="nav-label">Series</div><a href="https://aayebo.github.io/applied-precalculus/">Volume I · Applied Precalculus</a><a href="https://aayebo.github.io/applied-calculus/">Volume II · Applied Calculus</a></nav><header class="topbar"><button aria-expanded="false" class="menu">Contents</button><span>Applied Mathematics · Volume III</span><span class="spacer"></span><a href="resources.html">Code &amp; resources</a></header><div class="page-grid"><main id="main"><h1>5. Multiple Integration and Applications</h1><p><span id="ch:multiple-integration" label="ch:multiple-integration"></span></p>
+<div class="learning-box example"><p><strong>Learning.</strong> After completing this chapter, you should
+be able to define and interpret double and triple integrals; evaluate
+iterated integrals using Fubini’s theorem; describe Type I and Type II
+regions and reverse integration order; derive polar, cylindrical, and
+spherical Jacobians; apply the change-of-variables theorem; calculate
+volume, average value, mass, centroids, and moments of inertia;
+determine the area of graphs and parametrized surfaces; and use SymPy,
+SciPy, and NumPy to verify exact and approximate integrals.</p></div>
+<section class="mv-lab" id="interactive-investigation"><h2>Interactive investigation: Double Riemann sums</h2><p>Approximate the volume under f(x,y)=1+x²+y² on the unit square using midpoint prisms.</p><div data-mv-lab="5"></div><p><strong>Explore:</strong> How does the error change when the subdivision count doubles?</p><noscript>Enable JavaScript to use this investigation.</noscript></section><h2 id="why-integrate-over-regions">Why integrate over regions?</h2>
+<p>A single-variable definite integral accumulates quantities along an
+interval. When a quantity varies across a planar region <span class="math inline">\(D\)</span>, the analogous accumulation is a
+<em>double integral</em>; for a solid <span class="math inline">\(E\)</span>, it is a <em>triple integral</em>.
+Applications include volume, total heat, spatially varying population,
+material mass, and rotational inertia. The key mathematical ideas are
+subdivision, limits, and the geometry of the integration region.</p>
+<h3 id="riemann-sums-in-two-dimensions">Riemann sums in two
+dimensions</h3>
+<p>Suppose <span class="math inline">\(f\)</span> is bounded on a
+rectangle <span class="math inline">\(R=[a,b]\times[c,d]\)</span>.
+Partition <span class="math inline">\(R\)</span> into small rectangles
+<span class="math inline">\(R_{ij}\)</span> of area <span class="math inline">\(\Delta A_{ij}\)</span> and choose sample points
+<span class="math inline">\((x_{ij}^*,y_{ij}^*)\)</span>. The sum <span class="math display">\[S=\sum_{i,j}f(x_{ij}^*,y_{ij}^*)\Delta
+A_{ij}\]</span> approximates the total signed accumulation. If these
+sums approach a common limit as the maximum subrectangle diameter tends
+to zero, we define <span class="math display">\[\iint_R
+f(x,y)\,\,\mathrm{d}A=\lim_{\|P\|\to0}\sum_{i,j}f(x_{ij}^*,y_{ij}^*)\Delta
+A_{ij}.\]</span> For a nonrectangular bounded region <span class="math inline">\(D\)</span>, one can extend <span class="math inline">\(f\)</span> by zero to a containing rectangle when
+the boundary is sufficiently regular. Continuous functions on bounded
+regions with piecewise smooth boundaries are integrable.</p>
+<div class="learning-box example"><p><strong>Example — A height field over a square.</strong> Let <span class="math inline">\(f(x,y)=1+x+2y\)</span> on <span class="math inline">\(R=[0,1]^2\)</span>. Its average height is <span class="math inline">\(1+\frac12+2(\frac12)=\frac52\)</span>. Since <span class="math inline">\(R\)</span> has unit area, <span class="math inline">\(\iint_R f\,\,\mathrm{d}A=\frac52\)</span>. This
+result can be checked with midpoint sums: sampling each of <span class="math inline">\(n^2\)</span> equal cells gives the exact integral
+for this affine function, for every positive integer <span class="math inline">\(n\)</span>.</p></div>
+<figure id="fig:riemann">
+<img alt="Midpoint sampling over a rectangular domain. Each cell contributes its area multiplied by the field value at its midpoint. Original Python visualization." src="figures/ch5_riemann.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">Midpoint sampling over a rectangular
+domain. Each cell contributes its area multiplied by the field value at
+its midpoint. Original Python visualization.</figcaption>
+</figure>
+<div class="learning-box example"><p><strong>Theorem — Linearity, additivity, and comparison.</strong> For
+integrable <span class="math inline">\(f,g\)</span> on <span class="math inline">\(D\)</span> and constants <span class="math inline">\(\alpha,\beta\)</span>, <span class="math display">\[\iint_D(\alpha f+\beta
+g)\,\,\mathrm{d}A=\alpha\iint_Df\,\,\mathrm{d}A+\beta\iint_Dg\,\,\mathrm{d}A.\]</span>
+If <span class="math inline">\(D\)</span> is the union of regions with
+disjoint interiors, the integral over <span class="math inline">\(D\)</span> equals the sum of their integrals. If
+<span class="math inline">\(f\le g\)</span> throughout <span class="math inline">\(D\)</span>, then <span class="math inline">\(\iint_Df\,\,\mathrm{d}A\le\iint_Dg\,\,\mathrm{d}A\)</span>.</p></div>
+<div class="learning-box example"><p><strong>Proof.</strong> Each property holds for every finite Riemann
+sum. Passing to the limit preserves sums and inequalities. For
+additivity, contributions from a shared piecewise smooth boundary vanish
+in the limit because the boundary has area zero.</p></div>
+<h2 id="iterated-integration-and-fubinis-theorem">Iterated integration
+and Fubini’s theorem</h2>
+<p>A remarkable simplification is that many double integrals can be
+evaluated by integrating one variable at a time.</p>
+<div class="learning-box example"><p><strong>Theorem — Fubini’s theorem for continuous functions.</strong>
+If <span class="math inline">\(f\)</span> is continuous on <span class="math inline">\([a,b]\times[c,d]\)</span>, then <span class="math display">\[\iint_R f\,\,\mathrm{d}A=\int_a^b\left(\int_c^d
+f(x,y)\,\,\mathrm{d}y\right)\,\mathrm{d}x=\int_c^d\left(\int_a^b
+f(x,y)\,\,\mathrm{d}x\right)\,\mathrm{d}y.\]</span></p></div>
+<div class="learning-box example"><p><strong>Proof — Explanation.</strong> Group the terms of a
+rectangular Riemann sum by columns, producing one-dimensional sums in
+<span class="math inline">\(y\)</span> followed by sums in <span class="math inline">\(x\)</span>. Continuity ensures uniform convergence
+of the inner sums as the mesh is refined. The reversed grouping produces
+the other order.</p></div>
+<div class="learning-box example"><p><strong>Example — Two orders, one answer.</strong> For <span class="math inline">\(f(x,y)=x^2+3y\)</span> on <span class="math inline">\(0\le x\le2\)</span>, <span class="math inline">\(0\le y\le1\)</span>, <span class="math display">\[\int_0^2\int_0^1(x^2+3y)\,\,\mathrm{d}y\,\mathrm{d}x=\int_0^2(x^2+\tfrac32)\,\,\mathrm{d}x=\frac83+3=\frac{17}{3}.\]</span>
+Integrating in the opposite order gives <span class="math inline">\(\int_0^1(\frac83+6y)\,\,\mathrm{d}y=\frac{17}{3}\)</span>.</p></div>
+<h3 class="unnumbered" id="computational-preview-symbolic-and-numerical-verification">Computational
+preview: symbolic and numerical verification</h3>
+<div class="learning-box example"><p><strong>Remark — Paired computational laboratory.</strong> This
+example is revisited using identical inputs in the dedicated R and
+Python sections. Complete executable code appears in the companion
+files.</p></div>
+<p>Notice that <code>dblquad</code> expects the integrand arguments in
+the order <code>(y, x)</code>. Its reported error is an estimate, not a
+rigorous guarantee for every integrand.</p>
+<h2 id="regions-bounded-by-curves">Regions bounded by curves</h2>
+<p>Most applications involve triangles, disks, or regions enclosed by
+nonlinear curves. Correct bounds matter more than mechanical
+integration.</p>
+<div class="learning-box example"><p><strong>Definition.</strong> A <em>Type I</em> region is <span class="math inline">\(D=\{(x,y):a\le x\le b,\ g_1(x)\le y\le
+g_2(x)\}\)</span>. A <em>Type II</em> region is <span class="math inline">\(D=\{(x,y):c\le y\le d,\ h_1(y)\le x\le
+h_2(y)\}\)</span>. A region may have both descriptions, or require
+subdivision to use a particular orientation.</p></div>
+<p>For a Type I region with continuous boundary functions, <span class="math display">\[\iint_D
+f\,\,\mathrm{d}A=\int_a^b\int_{g_1(x)}^{g_2(x)}f(x,y)\,\,\mathrm{d}y\,\mathrm{d}x.\]</span>
+For a Type II region, reverse the roles of <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span>.</p>
+<div class="learning-box example"><p><strong>Example — A triangular region.</strong> Let <span class="math inline">\(D\)</span> be bounded by <span class="math inline">\(y=0\)</span>, <span class="math inline">\(x=1\)</span>, and <span class="math inline">\(y=x\)</span>. Its Type I description is <span class="math inline">\(0\le x\le1\)</span>, <span class="math inline">\(0\le y\le x\)</span>. Its Type II description is
+<span class="math inline">\(0\le y\le1\)</span>, <span class="math inline">\(y\le x\le1\)</span>. Thus <span class="math display">\[\int_0^1\int_0^x
+(x+y)\,\,\mathrm{d}y\,\mathrm{d}x=\int_0^1\int_y^1(x+y)\,\,\mathrm{d}x\,\mathrm{d}y=\frac12.\]</span>
+The geometric descriptions are equivalent even though the integration
+limits look different.</p></div>
+<figure id="fig:regions">
+<img alt="The same triangular region described by vertical and horizontal slices. Reversing the order of integration changes the limits, not the region." src="figures/ch5_regions.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">The same triangular region described by
+vertical and horizontal slices. Reversing the order of integration
+changes the limits, not the region.</figcaption>
+</figure>
+<h3 id="reversing-order-can-remove-an-obstacle">Reversing order can
+remove an obstacle</h3>
+<p>Consider <span class="math inline">\(I=\int_0^1\int_0^x
+e^{y^2}\,\,\mathrm{d}y\,\mathrm{d}x\)</span>. The inner integral has no
+elementary antiderivative. The region is <span class="math inline">\(0\le y\le x\le1\)</span>, so <span class="math display">\[I=\int_0^1\int_y^1
+e^{y^2}\,\,\mathrm{d}x\,\mathrm{d}y=\int_0^1(1-y)e^{y^2}\,\,\mathrm{d}y.\]</span>
+The second term integrates exactly, while the first remains
+non-elementary; this is still a useful reduction, but not every order
+reversal produces a closed form. By contrast, for <span class="math display">\[J=\int_0^1\int_0^x
+e^{x^2}\,\,\mathrm{d}y\,\mathrm{d}x=\int_0^1
+xe^{x^2}\,\,\mathrm{d}x=\frac{e-1}{2},\]</span> performing the inner
+integral immediately is effective. These examples emphasize that a
+clever order choice depends on the integrand as well as the region.</p>
+<div class="learning-box check"><p><strong>Checkpoint.</strong> Rewrite <span class="math inline">\(\int_0^2\int_{x^2/2}^{2}f(x,y)\,\,\mathrm{d}y\,\mathrm{d}x\)</span>
+in the opposite order. Sketch the region first; the correct bounds are
+<span class="math inline">\(0\le y\le2\)</span> and <span class="math inline">\(0\le x\le\sqrt{2y}\)</span>.</p></div>
+<h2 id="area-volume-and-average-value">Area, volume, and average
+value</h2>
+<p>Taking <span class="math inline">\(f\equiv1\)</span> gives the area
+<span class="math inline">\(A(D)=\iint_D1\,\,\mathrm{d}A\)</span>. If
+<span class="math inline">\(f\ge0\)</span>, the volume under <span class="math inline">\(z=f(x,y)\)</span> above <span class="math inline">\(D\)</span> is <span class="math inline">\(V=\iint_Df\,\,\mathrm{d}A\)</span>. If <span class="math inline">\(f\ge g\)</span>, the volume between the surfaces
+is <span class="math inline">\(\iint_D(f-g)\,\,\mathrm{d}A\)</span>. The
+average value of an integrable function over a region of positive area
+is <span class="math display">\[f_{\mathrm{avg}}=\frac{1}{A(D)}\iint_Df\,\,\mathrm{d}A.\]</span></p>
+<div class="learning-box example"><p><strong>Example — Volume under a paraboloid.</strong> Above the disk
+<span class="math inline">\(x^2+y^2\le4\)</span>, consider <span class="math inline">\(z=4-x^2-y^2\)</span>. In polar coordinates, the
+volume is <span class="math display">\[V=\int_0^{2\pi}\int_0^2(4-r^2)r\,\,\mathrm{d}r\,\mathrm{d}\theta=8\pi.\]</span>
+The area of the base is <span class="math inline">\(4\pi\)</span>, so
+the average height is <span class="math inline">\(2\)</span>.</p></div>
+<h2 id="polar-coordinates-and-the-jacobian">Polar coordinates and the
+Jacobian</h2>
+<p>For a planar region with circular symmetry, substitute <span class="math inline">\(x=r\cos\theta\)</span>, <span class="math inline">\(y=r\sin\theta\)</span>. The coordinate
+transformation has derivative matrix <span class="math display">\[\frac{\partial(x,y)}{\partial(r,\theta)}=\begin{pmatrix}\cos\theta&amp;-r\sin\theta\\\sin\theta&amp;r\cos\theta\end{pmatrix},\qquad
+\det\frac{\partial(x,y)}{\partial(r,\theta)}=r.\]</span> Consequently,
+<em>area is not</em> <span class="math inline">\(\,\mathrm{d}r\,\mathrm{d}\theta\)</span>: the
+small sector has area approximately <span class="math inline">\(r\,\Delta r\,\Delta\theta\)</span>, and <span class="math display">\[\iint_D
+f(x,y)\,\,\mathrm{d}A=\iint_{D^*}f(r\cos\theta,r\sin\theta)r\,\,\mathrm{d}r\,\mathrm{d}\theta.\]</span>
+The factor <span class="math inline">\(r\)</span> is essential. Since
+<span class="math inline">\(r\ge0\)</span>, no absolute-value symbol is
+needed for this particular Jacobian.</p>
+<figure id="fig:polar">
+<img alt="Polar coordinate cells widen with radius; their area is approximately r\,\Delta r\,\Delta\theta." src="figures/ch5_polar.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">Polar coordinate cells widen with radius;
+their area is approximately <span class="math inline">\(r\,\Delta
+r\,\Delta\theta\)</span>.</figcaption>
+</figure>
+<div class="learning-box example"><p><strong>Example — An annulus with nonconstant density.</strong> Let
+<span class="math inline">\(D\)</span> be <span class="math inline">\(1\le x^2+y^2\le9\)</span> and <span class="math inline">\(\rho(x,y)=\sqrt{x^2+y^2}\)</span>. Its total mass
+is <span class="math display">\[M=\int_0^{2\pi}\int_1^3 r\cdot
+r\,\,\mathrm{d}r\,\mathrm{d}\theta=\frac{52\pi}{3}.\]</span> The first
+<span class="math inline">\(r\)</span> is the density; the second is the
+polar Jacobian.</p></div>
+<h3 class="unnumbered" id="computational-preview-integrating-over-a-disk">Computational
+preview: integrating over a disk</h3>
+<div class="learning-box example"><p><strong>Remark — Paired computational laboratory.</strong> This
+example is revisited using identical inputs in the dedicated R and
+Python sections. Complete executable code appears in the companion
+files.</p></div>
+<p>Here <code>r</code> is the inner integration variable, so it appears
+first in the callable.</p>
+<h2 id="mass-centroids-and-moments-of-inertia">Mass, centroids, and
+moments of inertia</h2>
+<p>Suppose a thin lamina occupies <span class="math inline">\(D\)</span>
+and has nonnegative areal density <span class="math inline">\(\rho(x,y)\)</span>. The mass of a small piece is
+approximately <span class="math inline">\(\rho\,\Delta A\)</span>, hence
+<span class="math display">\[M=\iint_D\rho\,\,\mathrm{d}A.\]</span> Its
+first moments about the coordinate axes are <span class="math display">\[M_x=\iint_D y\rho\,\,\mathrm{d}A,\qquad
+M_y=\iint_Dx\rho\,\,\mathrm{d}A.\]</span> The center of mass is <span class="math inline">\((\bar x,\bar y)=(M_y/M,M_x/M)\)</span> when <span class="math inline">\(M&gt;0\)</span>. The moments of inertia about the
+axes and origin are <span class="math display">\[I_x=\iint_Dy^2\rho\,\,\mathrm{d}A,\quad
+I_y=\iint_Dx^2\rho\,\,\mathrm{d}A,\quad I_O=I_x+I_y.\]</span> The
+squared distance in each formula reflects the mechanical resistance to
+rotational acceleration. Units matter: if <span class="math inline">\(x,y\)</span> are meters and <span class="math inline">\(\rho\)</span> is kg/m<span class="math inline">\(^2\)</span>, then <span class="math inline">\(I_x\)</span> is kg m<span class="math inline">\(^2\)</span>.</p>
+<div class="learning-box example"><p><strong>Example — A density that increases toward one edge.</strong>
+On <span class="math inline">\(D=[0,2]\times[0,1]\)</span>, let <span class="math inline">\(\rho(x,y)=1+x\)</span>. Then <span class="math display">\[M=\int_0^2\int_0^1(1+x)\,\,\mathrm{d}y\,\mathrm{d}x=4,\quad
+M_y=\int_0^2x(1+x)\,\,\mathrm{d}x=\frac{14}{3},\]</span> <span class="math display">\[M_x=\int_0^2\int_0^1y(1+x)\,\,\mathrm{d}y\,\mathrm{d}x=2.\]</span>
+Therefore <span class="math inline">\(\bar x=7/6\)</span> and <span class="math inline">\(\bar y=1/2\)</span>. The horizontal shift of the
+centroid toward larger <span class="math inline">\(x\)</span> is
+physically reasonable.</p></div>
+<div class="learning-box example"><p><strong>Example — A uniform circular lamina.</strong> A disk of
+radius <span class="math inline">\(a\)</span> with constant density
+<span class="math inline">\(\rho_0\)</span> has mass <span class="math inline">\(M=\rho_0\pi a^2\)</span> and <span class="math display">\[I_O=\int_0^{2\pi}\int_0^a
+r^2\rho_0\,r\,\mathrm{d}r\,\mathrm{d}\theta=\frac12\rho_0\pi
+a^4=\frac12Ma^2.\]</span> By symmetry, <span class="math inline">\(I_x=I_y=\frac14Ma^2\)</span>.</p></div>
+<figure id="fig:density">
+<img alt="Spatially varying density on a rectangular lamina and its center of mass. The centroid moves toward the denser edge." src="figures/ch5_density.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">Spatially varying density on a
+rectangular lamina and its center of mass. The centroid moves toward the
+denser edge.</figcaption>
+</figure>
+<h2 id="surface-area-as-a-double-integral">Surface area as a double
+integral</h2>
+<p>For a smooth graph <span class="math inline">\(z=f(x,y)\)</span> over
+<span class="math inline">\(D\)</span>, a small horizontal rectangle is
+stretched by the factor <span class="math inline">\(\sqrt{1+f_x^2+f_y^2}\)</span> when lifted to the
+surface. Thus <span class="math display">\[A=\iint_D\sqrt{1+f_x(x,y)^2+f_y(x,y)^2}\,\,\mathrm{d}A.\]</span></p>
+<div class="learning-box example"><p><strong>Proof — Derivation from tangent vectors.</strong> Parametrize
+the graph by <span class="math inline">\(\boldsymbol{R}(x,y)=(x,y,f(x,y))\)</span>. Then
+<span class="math inline">\(\boldsymbol{R}_x=(1,0,f_x)\)</span> and
+<span class="math inline">\(\boldsymbol{R}_y=(0,1,f_y)\)</span>. The
+parallelogram spanned by these vectors has area <span class="math inline">\(\|\boldsymbol{R}_x\times\boldsymbol{R}_y\|\,\,\mathrm{d}x\,\mathrm{d}y=\sqrt{1+f_x^2+f_y^2}\,\,\mathrm{d}x\,\mathrm{d}y\)</span>.
+Summing these local areas yields the formula.</p></div>
+<p>For a general regular parametrized surface <span class="math inline">\(\boldsymbol{R}(u,v)\)</span>, the corresponding
+formula is <span class="math display">\[A=\iint_\Omega\|\boldsymbol{R}_u\times\boldsymbol{R}_v\|\,\,\mathrm{d}u\,\mathrm{d}v.\]</span>
+The cross product must be nonzero at regular points. Surface area is
+different from projected area; a tilted surface is larger than its
+horizontal shadow.</p>
+<div class="learning-box example"><p><strong>Example — Area of a sloping plane.</strong> For <span class="math inline">\(z=2x+3y\)</span> over <span class="math inline">\(0\le x\le2\)</span>, <span class="math inline">\(0\le y\le1\)</span>, the graph area is <span class="math inline">\(\iint_D\sqrt{1+4+9}\,\,\mathrm{d}A=2\sqrt{14}\)</span>.</p></div>
+<div class="learning-box example"><p><strong>Example — A sphere by parametrization.</strong> Parametrize
+the sphere of radius <span class="math inline">\(a\)</span> by <span class="math inline">\(\boldsymbol{R}(\phi,\theta)=(a\sin\phi\cos\theta,a\sin\phi\sin\theta,a\cos\phi)\)</span>,
+<span class="math inline">\(0\le\phi\le\pi\)</span>, <span class="math inline">\(0\le\theta\le2\pi\)</span>. Then <span class="math inline">\(\|\boldsymbol{R}_\phi\times\boldsymbol{R}_\theta\|=a^2\sin\phi\)</span>,
+so <span class="math inline">\(A=\int_0^{2\pi}\int_0^\pi
+a^2\sin\phi\,\,\mathrm{d}\phi\,\mathrm{d}\theta=4\pi a^2\)</span>.</p></div>
+<figure id="fig:surface">
+<img alt="A parametrized surface patch with two tangent directions. Their cross product determines the local area scaling." src="figures/ch5_surface.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">A parametrized surface patch with two
+tangent directions. Their cross product determines the local area
+scaling.</figcaption>
+</figure>
+<h2 id="triple-integrals-and-solid-regions">Triple integrals and solid
+regions</h2>
+<p>For a bounded solid <span class="math inline">\(E\subset\mathbb{R}^3\)</span>, a triple integral
+is the limit of sums <span class="math inline">\(\sum
+f(x_i^*,y_i^*,z_i^*)\Delta V_i\)</span>. In particular, <span class="math inline">\(V(E)=\iiint_E1\,\,\mathrm{d}V\)</span>. If <span class="math inline">\(\rho(x,y,z)\)</span> is volume density, then <span class="math inline">\(M=\iiint_E\rho\,\,\mathrm{d}V\)</span>. For a
+vertically simple solid, <span class="math display">\[E=\{(x,y,z):(x,y)\in D,\ g(x,y)\le z\le
+h(x,y)\},\]</span> we obtain <span class="math display">\[\iiint_Ef\,\,\mathrm{d}V=\iint_D\left(\int_{g(x,y)}^{h(x,y)}f(x,y,z)\,\,\mathrm{d}z\right)\,\mathrm{d}A.\]</span></p>
+<div class="learning-box example"><p><strong>Example — Volume of a tetrahedron.</strong> Consider <span class="math inline">\(E=\{(x,y,z):x,y,z\ge0,\ x+y+z\le1\}\)</span>. Its
+volume is <span class="math display">\[V=\int_0^1\int_0^{1-x}\int_0^{1-x-y}1\,\,\mathrm{d}z\,\mathrm{d}y\,\mathrm{d}x=\frac16.\]</span>
+The factor <span class="math inline">\(1/6\)</span> can also be
+understood as the volume of the unit cube simplex.</p></div>
+<h3 id="cylindrical-coordinates">Cylindrical coordinates</h3>
+<p>Set <span class="math inline">\(x=r\cos\theta\)</span>, <span class="math inline">\(y=r\sin\theta\)</span>, <span class="math inline">\(z=z\)</span>. The Jacobian determinant has
+absolute value <span class="math inline">\(r\)</span>, giving <span class="math display">\[\,\mathrm{d}V=r\,\,\mathrm{d}r\,\mathrm{d}\theta\,\mathrm{d}z\]</span>
+with the integration order chosen to match the region. For a right
+circular cylinder <span class="math inline">\(0\le r\le a\)</span>,
+<span class="math inline">\(0\le\theta\le2\pi\)</span>, <span class="math inline">\(0\le z\le h\)</span>, the volume is <span class="math inline">\(\pi a^2h\)</span>.</p>
+<h3 id="spherical-coordinates">Spherical coordinates</h3>
+<p>Use the convention <span class="math display">\[x=\rho\sin\phi\cos\theta,\quad
+y=\rho\sin\phi\sin\theta,\quad z=\rho\cos\phi,\]</span> where <span class="math inline">\(\rho\ge0\)</span> is radial distance, <span class="math inline">\(0\le\phi\le\pi\)</span> is the polar angle
+measured from the positive <span class="math inline">\(z\)</span>-axis,
+and <span class="math inline">\(0\le\theta&lt;2\pi\)</span> is azimuth.
+The Jacobian has absolute value <span class="math inline">\(\rho^2\sin\phi\)</span>, hence <span class="math display">\[\,\mathrm{d}V=\rho^2\sin\phi\,\,\mathrm{d}\rho\,\mathrm{d}\phi\,\mathrm{d}\theta.\]</span></p>
+<div class="learning-box example"><p><strong>Example — Volume and mean squared radius of a ball.</strong>
+For a ball <span class="math inline">\(B_a\)</span> of radius <span class="math inline">\(a\)</span>, <span class="math display">\[V=\int_0^{2\pi}\int_0^\pi\int_0^a\rho^2\sin\phi\,\,\mathrm{d}\rho\,\mathrm{d}\phi\,\mathrm{d}\theta=\frac{4\pi
+a^3}{3}.\]</span> Moreover, <span class="math display">\[\frac1V\iiint_{B_a}(x^2+y^2+z^2)\,\,\mathrm{d}V=\frac{4\pi
+a^5/5}{4\pi a^3/3}=\frac{3a^2}{5}.\]</span></p></div>
+<figure id="fig:spherical">
+<img alt="Spherical coordinate geometry: radial distance \rho, inclination \phi, and azimuth \theta. The spherical volume element is \rho^2\sin\phi\,\,\mathrm{d}\rho\,\mathrm{d}\phi\,\mathrm{d}\theta." src="figures/ch5_spherical.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">Spherical coordinate geometry: radial
+distance <span class="math inline">\(\rho\)</span>, inclination <span class="math inline">\(\phi\)</span>, and azimuth <span class="math inline">\(\theta\)</span>. The spherical volume element is
+<span class="math inline">\(\rho^2\sin\phi\,\,\mathrm{d}\rho\,\mathrm{d}\phi\,\mathrm{d}\theta\)</span>.</figcaption>
+</figure>
+<h2 id="the-general-change-of-variables-theorem">The general
+change-of-variables theorem</h2>
+<div class="learning-box example"><p><strong>Theorem — Change of variables in two dimensions.</strong> Let
+<span class="math inline">\(T:U\to D\)</span> be a one-to-one
+continuously differentiable transformation with continuously
+differentiable inverse on the interiors of the regions, and assume its
+Jacobian determinant does not vanish there. Under standard boundary
+regularity assumptions, for integrable <span class="math inline">\(f\)</span>, <span class="math display">\[\iint_Df(x,y)\,\,\mathrm{d}x\,\mathrm{d}y=\iint_U
+f(T(u,v))\left|\det DT(u,v)\right|\,\,\mathrm{d}u\,\mathrm{d}v.\]</span>
+The analogous three-dimensional formula uses <span class="math inline">\(|\det DT(u,v,w)|\)</span>.</p></div>
+<div class="learning-box example"><p><strong>Proof — Geometric derivation.</strong> Near <span class="math inline">\((u,v)\)</span>, the differentiable map is
+approximated by its derivative matrix <span class="math inline">\(DT\)</span>. A small rectangle with side vectors
+<span class="math inline">\((\Delta u,0)\)</span> and <span class="math inline">\((0,\Delta v)\)</span> becomes approximately a
+parallelogram spanned by the columns of <span class="math inline">\(DT\)</span> multiplied by those side lengths. Its
+area is <span class="math inline">\(|\det DT|\Delta u\Delta v\)</span>.
+Substituting this local area scaling into Riemann sums gives the
+formula; the full theorem makes the limiting argument precise.</p></div>
+<div class="learning-box example"><p><strong>Example — A sheared parallelogram.</strong> Let <span class="math inline">\(T(u,v)=(u+v,u-v)\)</span> for <span class="math inline">\(0\le u,v\le1\)</span>. Then <span class="math inline">\(DT=\left(\begin{smallmatrix}1&amp;1\\1&amp;-1\end{smallmatrix}\right)\)</span>
+and <span class="math inline">\(|\det DT|=2\)</span>. Thus the
+parallelogram <span class="math inline">\(D=T([0,1]^2)\)</span> has area
+<span class="math inline">\(2\)</span>. Also <span class="math display">\[\iint_Dx\,\,\mathrm{d}A=\int_0^1\int_0^1(u+v)\cdot2\,\,\mathrm{d}u\,\mathrm{d}v=2.\]</span>
+The determinant is negative before taking the absolute value:
+orientation reversal does not produce negative physical area.</p></div>
+<h3 class="unnumbered" id="computational-preview-symbolic-jacobians">Computational preview:
+symbolic Jacobians</h3>
+<div class="learning-box example"><p><strong>Remark — Paired computational laboratory.</strong> This
+example is revisited using identical inputs in the dedicated R and
+Python sections. Complete executable code appears in the companion
+files.</p></div>
+<p>A nonzero Jacobian is a <em>local</em> condition; global one-to-one
+behavior must still be checked. Polar coordinates, for example, are not
+one-to-one if the angular interval includes both endpoints <span class="math inline">\(0\)</span> and <span class="math inline">\(2\pi\)</span>, although this boundary duplication
+does not change the integral.</p>
+<h2 id="numerical-integration-accuracy-and-limitations">Numerical
+integration: accuracy and limitations</h2>
+<p>Symbolic integration is ideal when a closed form exists, but many
+realistic fields have no elementary antiderivative.
+<code>scipy.integrate.quad</code>, <code>dblquad</code>, and
+<code>tplquad</code> perform adaptive numerical quadrature. A numerical
+result should be checked against geometry, symmetry, alternative
+coordinate systems, or refinement studies.</p>
+<div class="learning-box example"><p><strong>Example — A Gaussian over a square.</strong> Consider <span class="math inline">\(I=\int_{-1}^1\int_{-1}^1e^{-(x^2+y^2)}\,\,\mathrm{d}y\,\mathrm{d}x\)</span>.
+The integrand separates, so <span class="math display">\[I=\left(\int_{-1}^1e^{-x^2}\,\,\mathrm{d}x\right)^2=\pi\operatorname{erf}(1)^2.\]</span>
+This exact special-function form gives a reference value for numerical
+quadrature.</p></div>
+<div class="learning-box example"><p><strong>Remark — Paired computational laboratory.</strong> This
+example is revisited using identical inputs in the dedicated R and
+Python sections. Complete executable code appears in the companion
+files.</p></div>
+<h3 id="midpoint-rules-and-monte-carlo-integration">Midpoint rules and
+Monte Carlo integration</h3>
+<p>For a rectangle <span class="math inline">\(R\)</span> divided into
+<span class="math inline">\(n\times n\)</span> equal cells, the midpoint
+estimate is <span class="math display">\[Q_n=\sum_{i,j}f(x_i^*,y_j^*)\Delta x\Delta
+y.\]</span> For Monte Carlo integration over a region <span class="math inline">\(D\)</span> of known area <span class="math inline">\(A\)</span>, if <span class="math inline">\(\boldsymbol{X}_1,\ldots,\boldsymbol{X}_N\)</span>
+are independent uniform samples from <span class="math inline">\(D\)</span>, then <span class="math display">\[\widehat
+I_N=\frac{A}{N}\sum_{k=1}^Nf(\boldsymbol{X}_k).\]</span> Its standard
+error is approximately <span class="math inline">\(A s_f/\sqrt
+N\)</span>, where <span class="math inline">\(s_f\)</span> is the sample
+standard deviation of the evaluated field. This <span class="math inline">\(N^{-1/2}\)</span> scaling is typically slower than
+high-order deterministic quadrature in low dimensions, but Monte Carlo
+methods become attractive for irregular or high-dimensional regions.</p>
+<div class="learning-box example"><p><strong>Example — Monte Carlo volume of a paraboloid cap.</strong>
+Sample <span class="math inline">\((X,Y)\)</span> uniformly from the
+square <span class="math inline">\([-2,2]^2\)</span>. Define <span class="math inline">\(g(X,Y)=(4-X^2-Y^2)\mathbf1_{\{X^2+Y^2\le4\}}\)</span>.
+Then <span class="math inline">\(16\,\mathbb E[g(X,Y)]=8\pi\)</span>.
+The square area factor is <span class="math inline">\(16\)</span>, and
+points outside the disk contribute zero.</p></div>
+<div class="learning-box example"><p><strong>Remark — Paired computational laboratory.</strong> This
+example is revisited using identical inputs in the dedicated R and
+Python sections. Complete executable code appears in the companion
+files.</p></div>
+<div class="learning-box check"><p><strong>Checkpoint.</strong> Explain why sampling points uniformly
+from the bounding square requires the factor <span class="math inline">\(16\)</span>, while sampling uniformly from the
+disk requires the factor <span class="math inline">\(4\pi\)</span>. What
+would go wrong if the square samples outside the disk were simply
+discarded without changing the normalization?</p></div>
+<h2 id="additional-worked-examples-from-the-r-manuscript">Additional
+worked examples from the R manuscript</h2>
+<h3 id="a-triangular-region-integration-in-either-order">A triangular
+region: integration in either order</h3>
+<p>Let <span class="math inline">\(D=\{(x,y):x\ge0,\ y\ge0,\
+x+y\le1\}\)</span>. Then <span class="math display">\[I=\iint_D(x+2y)\,\,\mathrm{d}A=\int_0^1\int_0^{1-x}(x+2y)\,\,\mathrm{d}y\,\mathrm{d}x=\frac12.\]</span>
+Reversing the order gives <span class="math inline">\(I=\int_0^1\int_0^{1-y}(x+2y)\,\,\mathrm{d}x\,\mathrm{d}y=1/2\)</span>.
+This example will be used in the R/Python quadrature comparison. The
+integrand is nonnegative and the triangle has area <span class="math inline">\(1/2\)</span>, providing a useful plausibility
+check.</p>
+<h3 id="a-spatial-exposure-field">A spatial exposure field</h3>
+<p>On the rectangular field <span class="math inline">\(D=[0,3]\times[0,2]\)</span>, suppose a
+hypothetical exposure intensity is <span class="math inline">\(c(x,y)=2+0.5x+y^2\)</span> units per square meter.
+The total and average are <span class="math display">\[E=\int_0^3\int_0^2
+c(x,y)\,\,\mathrm{d}y\,\mathrm{d}x=\frac{49}{2}=24.5,\qquad \overline
+c=\frac{E}{6}=\frac{49}{12}.\]</span> The model is illustrative rather
+than an empirical exposure measurement. The physical units are
+important: integration converts intensity per unit area into a total
+over the region.</p>
+<h3 id="a-nonuniform-rectangular-lamina">A nonuniform rectangular
+lamina</h3>
+<p>For <span class="math inline">\(\rho(x,y)=1+x\)</span> on <span class="math inline">\(0\le x\le2\)</span>, <span class="math inline">\(0\le y\le1\)</span>, the mass is <span class="math display">\[M=\int_0^2\int_0^1(1+x)\,\,\mathrm{d}y\,\mathrm{d}x=4.\]</span>
+Its first moments yield <span class="math display">\[\bar
+x=\frac1M\int_0^2\int_0^1x(1+x)\,\,\mathrm{d}y\,\mathrm{d}x=\frac76,\qquad
+\bar
+y=\frac1M\int_0^2\int_0^1y(1+x)\,\,\mathrm{d}y\,\mathrm{d}x=\frac12.\]</span>
+The centroid shifts toward larger <span class="math inline">\(x\)</span>, where the material is denser.</p>
+<h3 id="the-jacobian-as-a-local-area-scale">The Jacobian as a local area
+scale</h3>
+<p>Under <span class="math inline">\(x=2u+v\)</span>, <span class="math inline">\(y=u+2v\)</span>, the Jacobian matrix is <span class="math inline">\(\begin{psmallmatrix}2&amp;1\\1&amp;2\end{psmallmatrix}\)</span>,
+whose determinant is <span class="math inline">\(3\)</span>. The image
+of the unit square is a parallelogram of area <span class="math inline">\(3\)</span>, so the determinant agrees with the
+direct geometric area calculation.</p>
+<h2 id="a-rigorous-view-of-integrability-and-region-boundaries">A
+rigorous view of integrability and region boundaries</h2>
+<p>A double integral is not simply an instruction to perform two
+antiderivatives. It is a limit of sums over small planar cells. The
+limit is independent of the choice of sample points when the integrand
+is Riemann integrable. A bounded function that is continuous except on
+finitely many smooth arcs is integrable over a bounded region with
+piecewise smooth boundary. For more general discontinuities and
+unbounded regions, additional hypotheses are required; the usual
+calculus-level Fubini formulas should not be applied automatically.</p>
+<div class="learning-box example"><p><strong>Theorem — Bounds from the range of a field.</strong> Suppose
+<span class="math inline">\(D\)</span> has finite positive area <span class="math inline">\(A\)</span> and <span class="math inline">\(m\le
+f(x,y)\le M\)</span> on <span class="math inline">\(D\)</span>. Then
+<span class="math display">\[mA\le\iint_D f\,\,\mathrm{d}A\le MA,\qquad
+m\le\frac1A\iint_Df\,\,\mathrm{d}A\le M.\]</span></p></div>
+<div class="learning-box example"><p><strong>Proof.</strong> Integrate the pointwise inequalities <span class="math inline">\(m\le f\le M\)</span> and use <span class="math inline">\(\iint_D1\,\,\mathrm{d}A=A\)</span>. Division by
+<span class="math inline">\(A&gt;0\)</span> gives the average-value
+bounds.</p></div>
+<div class="learning-box example"><p><strong>Example — A physical plausibility check.</strong> On the
+square <span class="math inline">\([0,2]^2\)</span>, a modeled
+concentration <span class="math inline">\(c(x,y)=3+x+y\)</span> lies
+between <span class="math inline">\(3\)</span> and <span class="math inline">\(7\)</span>. Therefore its integrated total lies
+between <span class="math inline">\(12\)</span> and <span class="math inline">\(28\)</span>. Direct integration gives <span class="math inline">\(\iint_Dc\,\,\mathrm{d}A=20\)</span>, and the
+average concentration is <span class="math inline">\(5\)</span>. A
+numerical answer of <span class="math inline">\(40\)</span> would
+violate the range bound before any code inspection.</p></div>
+<h3 id="when-fubinis-theorem-needs-care">When Fubini’s theorem needs
+care</h3>
+<p>For continuous integrands over compact rectangular regions, the two
+iterated integrals agree. The extension to absolutely integrable
+functions permits many additional cases. For signed integrands with
+divergent positive and negative parts, changing order without checking
+hypotheses can alter the result or make it undefined. For the
+applications in this chapter we work with continuous or bounded
+piecewise continuous fields over bounded piecewise smooth regions,
+except where a special limiting argument is explicitly given.</p>
+<h2 id="constructing-integration-bounds-from-geometry">Constructing
+integration bounds from geometry</h2>
+<p>A dependable method is to draw the region, identify a generic
+vertical or horizontal slice, and write the lower and upper limits
+before simplifying the integrand. The variable integrated first varies
+across each slice; the outer variable indexes the slices. When a region
+changes its lower or upper boundary, split the integral into pieces.</p>
+<div class="learning-box example"><p><strong>Example — A region that requires splitting.</strong> Let
+<span class="math inline">\(D\)</span> lie above <span class="math inline">\(y=0\)</span> and below both <span class="math inline">\(y=x\)</span> and <span class="math inline">\(y=2-x\)</span> for <span class="math inline">\(0\le x\le2\)</span>. The upper boundary switches
+at <span class="math inline">\(x=1\)</span>, so <span class="math display">\[\iint_D1\,\,\mathrm{d}A=\int_0^1\int_0^x1\,\,\mathrm{d}y\,\mathrm{d}x+\int_1^2\int_0^{2-x}1\,\,\mathrm{d}y\,\mathrm{d}x=1.\]</span>
+In the other order, the region is <span class="math inline">\(0\le
+y\le1\)</span> and <span class="math inline">\(y\le x\le2-y\)</span>,
+giving <span class="math display">\[\int_0^1\int_y^{2-y}1\,\,\mathrm{d}x\,\mathrm{d}y=1.\]</span>
+The second description requires one integral instead of two.</p></div>
+<div class="learning-box example"><p><strong>Example — Reversing an integral with a non-elementary
+antiderivative.</strong> Consider <span class="math display">\[I=\int_0^1\int_{\sqrt{x}}^1e^{y^3}\,\,\mathrm{d}y\,\mathrm{d}x.\]</span>
+The region is <span class="math inline">\(0\le y\le1\)</span> and <span class="math inline">\(0\le x\le y^2\)</span>. Hence <span class="math display">\[I=\int_0^1\int_0^{y^2}e^{y^3}\,\,\mathrm{d}x\,\mathrm{d}y=\int_0^1y^2e^{y^3}\,\,\mathrm{d}y=\frac{e-1}{3}.\]</span>
+This is a genuine improvement from changing order: the original inner
+antiderivative is not elementary, while the reversed integral is
+elementary.</p></div>
+<h2 id="symmetry-separability-and-scaling">Symmetry, separability, and
+scaling</h2>
+<p>Before calculating, inspect the geometry and the integrand. If <span class="math inline">\(D\)</span> is symmetric about the <span class="math inline">\(y\)</span>-axis and <span class="math inline">\(f(-x,y)=-f(x,y)\)</span>, then <span class="math inline">\(\iint_Df\,\,\mathrm{d}A=0\)</span> by pairing
+points with opposite <span class="math inline">\(x\)</span>-coordinates.
+On a rectangular domain, products of one-variable functions separate:
+<span class="math display">\[\int_a^b\int_c^d
+g(x)h(y)\,\,\mathrm{d}y\,\mathrm{d}x=\left(\int_a^bg(x)\,\,\mathrm{d}x\right)\left(\int_c^dh(y)\,\,\mathrm{d}y\right).\]</span></p>
+<div class="learning-box example"><p><strong>Example — Odd symmetry on a disk.</strong> Let <span class="math inline">\(D=\{(x,y):x^2+y^2\le4\}\)</span>. The integral of
+<span class="math inline">\(x(1+y^2)\)</span> over <span class="math inline">\(D\)</span> is zero because the integrand is odd in
+<span class="math inline">\(x\)</span>. This cancellation is
+mathematical, not numerical: quadrature returning a small nonzero number
+is a floating-point artifact.</p></div>
+<div class="learning-box example"><p><strong>Example — Scaling a family of disks.</strong> For <span class="math inline">\(p&gt;-2\)</span>, let <span class="math inline">\(I_p(a)=\iint_{x^2+y^2\le
+a^2}(x^2+y^2)^{p/2}\,\,\mathrm{d}A\)</span>. Polar coordinates give
+<span class="math display">\[I_p(a)=2\pi\int_0^a
+r^{p+1}\,\,\mathrm{d}r=\frac{2\pi a^{p+2}}{p+2}.\]</span> Thus doubling
+the radius multiplies the integral by <span class="math inline">\(2^{p+2}\)</span>. The condition <span class="math inline">\(p&gt;-2\)</span> ensures integrability at the
+origin.</p></div>
+<h2 id="deriving-coordinate-jacobians">Deriving coordinate
+Jacobians</h2>
+<p>The polar map <span class="math inline">\(T(r,\theta)=(r\cos\theta,r\sin\theta)\)</span> has
+derivative <span class="math display">\[DT=\begin{pmatrix}\cos\theta&amp;-r\sin\theta\\\sin\theta&amp;r\cos\theta\end{pmatrix},\qquad\det
+DT=r.\]</span> Therefore <span class="math inline">\(\,\mathrm{d}A=r\,\,\mathrm{d}r\,\mathrm{d}\theta\)</span>
+for <span class="math inline">\(r\ge0\)</span>. The factor <span class="math inline">\(r\)</span> is essential: cells farther from the
+origin subtend greater area for the same angular width.</p>
+<p>In cylindrical coordinates, <span class="math inline">\(T(r,\theta,z)=(r\cos\theta,r\sin\theta,z)\)</span>
+has determinant <span class="math inline">\(r\)</span>. For spherical
+coordinates under our convention, the columns of the derivative are the
+<span class="math inline">\(\rho\)</span>, <span class="math inline">\(\phi\)</span>, and <span class="math inline">\(\theta\)</span> tangent vectors; their scalar
+triple product has absolute value <span class="math inline">\(\rho^2\sin\phi\)</span>. The singularities at
+<span class="math inline">\(r=0\)</span> and at the spherical poles are
+coordinate singularities, not holes in the physical region; they occupy
+sets of zero volume and do not invalidate ordinary volume
+calculations.</p>
+<div class="learning-box example"><p><strong>Example — Mass of a radially graded disk.</strong> A thin
+disk of radius <span class="math inline">\(a\)</span> has density <span class="math inline">\(\rho(r)=\rho_0(1+\lambda r^2/a^2)\)</span>, where
+<span class="math inline">\(\rho_0&gt;0\)</span> and <span class="math inline">\(\lambda&gt;-1\)</span>. Its mass is <span class="math display">\[M=\int_0^{2\pi}\int_0^a\rho_0\left(1+\lambda\frac{r^2}{a^2}\right)r\,\,\mathrm{d}r\,\mathrm{d}\theta=\pi\rho_0a^2\left(1+\frac\lambda2\right).\]</span>
+The units are mass, because surface density is mass per area and <span class="math inline">\(r\,\,\mathrm{d}r\,\mathrm{d}\theta\)</span> is an
+area element.</p></div>
+<h2 id="moments-of-inertia-and-the-parallel-axis-principle">Moments of
+inertia and the parallel-axis principle</h2>
+<p>For a lamina of density <span class="math inline">\(\rho(x,y)\)</span>, its moment of inertia about
+the origin perpendicular to the plane is <span class="math display">\[I_O=\iint_D(x^2+y^2)\rho(x,y)\,\,\mathrm{d}A.\]</span>
+Let <span class="math inline">\((\bar x,\bar y)\)</span> be the center
+of mass. Expanding <span class="math inline">\(x^2+y^2\)</span> around
+this point and using the vanishing first central moments yields <span class="math display">\[I_O=I_C+M(\bar x^2+\bar y^2),\]</span> where
+<span class="math inline">\(I_C=\iint_D((x-\bar x)^2+(y-\bar
+y)^2)\rho\,\,\mathrm{d}A\)</span>. This is the parallel-axis theorem for
+the perpendicular axes.</p>
+<div class="learning-box example"><p><strong>Example — Moment of inertia of a graded rectangle.</strong>
+For <span class="math inline">\(D=[0,2]\times[0,1]\)</span> and <span class="math inline">\(\rho=1+x\)</span>, the mass is <span class="math inline">\(4\)</span> and the centroid is <span class="math inline">\((7/6,1/2)\)</span>. The moment of inertia about
+the origin is <span class="math display">\[I_O=\int_0^2\int_0^1(x^2+y^2)(1+x)\,\,\mathrm{d}y\,\mathrm{d}x=8.\]</span>
+Consequently <span class="math inline">\(I_C=8-4((7/6)^2+(1/2)^2)=\frac{14}{9}\)</span>.
+Both are nonnegative and have mass-times-length-squared units.</p></div>
+<h2 id="surface-area-from-tangent-vector-geometry">Surface area from
+tangent-vector geometry</h2>
+<p>Let <span class="math inline">\(\boldsymbol{r}(u,v)\)</span>
+parametrize a regular surface patch. A small parameter rectangle is
+mapped approximately to a parallelogram with sides <span class="math inline">\(\boldsymbol{r}_u\Delta u\)</span> and <span class="math inline">\(\boldsymbol{r}_v\Delta v\)</span>. Its area is
+<span class="math inline">\(\|\boldsymbol{r}_u\times\boldsymbol{r}_v\|\Delta
+u\Delta v\)</span>. Thus <span class="math display">\[A=\iint_U\|\boldsymbol{r}_u\times\boldsymbol{r}_v\|\,\,\mathrm{d}u\,\mathrm{d}v.\]</span>
+For a graph <span class="math inline">\(\boldsymbol{r}(x,y)=(x,y,f(x,y))\)</span>, this
+reduces to <span class="math display">\[A=\iint_D\sqrt{1+f_x^2+f_y^2}\,\,\mathrm{d}A.\]</span></p>
+<div class="learning-box example"><p><strong>Example — Surface area of a conical graph.</strong> Over the
+annulus <span class="math inline">\(1\le x^2+y^2\le4\)</span>, consider
+<span class="math inline">\(z=\sqrt{x^2+y^2}\)</span>. Away from the
+origin, <span class="math inline">\(f_x^2+f_y^2=1\)</span>, so <span class="math display">\[A=\iint_D\sqrt2\,\,\mathrm{d}A=3\pi\sqrt2.\]</span>
+The annulus avoids the nondifferentiable tip; the formula applies
+throughout the region.</p></div>
+<h2 id="error-analysis-for-computational-integration">Error analysis for
+computational integration</h2>
+<p>An algorithm returns an approximation, not an exact mathematical
+integral. For a midpoint rule on a square, smoothness often yields error
+of order <span class="math inline">\(h^2\)</span>, where <span class="math inline">\(h\)</span> is the grid spacing. Doubling the
+resolution in each direction should then reduce the error by
+approximately a factor of four, once the asymptotic regime is reached.
+Adaptive quadrature provides an estimated local error, which should be
+interpreted alongside independent checks.</p>
+<p>For Monte Carlo estimation, <span class="math inline">\(\widehat
+I=A\overline{f(\boldsymbol{X})}\)</span> is unbiased when the samples
+are independent and uniformly distributed over <span class="math inline">\(D\)</span> and <span class="math inline">\(f\)</span> has finite expectation. If the variance
+is finite, its standard error is <span class="math inline">\(A\sigma_f/\sqrt N\)</span>, estimated using the
+sample standard deviation. Multiplying the sample size by four roughly
+halves the standard error. A random confidence interval is not a
+deterministic guarantee for a particular run.</p>
+<div class="learning-box example"><p><strong>Example — Exact midpoint error for a quadratic
+field.</strong> For <span class="math inline">\(f(x,y)=x^2+y^2\)</span>
+on <span class="math inline">\([0,1]^2\)</span>, the exact integral is
+<span class="math inline">\(2/3\)</span>. The <span class="math inline">\(n\times n\)</span> midpoint sum is <span class="math display">\[Q_n=\frac23-\frac{1}{6n^2}.\]</span> Therefore
+<span class="math inline">\(|Q_n-2/3|=1/(6n^2)\)</span>, proving
+second-order convergence and giving a direct unit test for R and Python
+implementations.</p></div>
+<div class="learning-box check"><p><strong>Checkpoint.</strong> Explain why increasing the Monte Carlo
+sample size from <span class="math inline">\(10^4\)</span> to <span class="math inline">\(4\times10^4\)</span> generally improves the
+standard error by a factor of two, whereas doubling the grid resolution
+of a smooth midpoint quadrature may improve its deterministic error by a
+factor of four.</p></div>
+<h2 id="solving-the-mathematical-problems-using-r">Solving the
+mathematical problems using R</h2>
+<p>The examples use base R and its built-in one-dimensional
+<code>integrate()</code> routine. Nested integration uses a small
+wrapper that vectorizes the inner result. The complete program is
+<code>code/chapter05_paired.R</code>.</p>
+<h3 id="triangular-integration-and-order-reversal">Triangular
+integration and order reversal</h3>
+<div class="code-shell"><div class="code-bar">R<a href="code/chapter05-listing-01.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>inner &lt;- function(x) vapply(x,function(xx)
+  integrate(function(y) xx+2*y,0,1-xx)$value,numeric(1))
+I &lt;- integrate(inner,0,1)$value
+print(c(numerical=I,exact=1/2))
+stopifnot(abs(I-.5)&lt;1e-8)</code></pre></div>
+<h3 id="exposure-accumulation-and-average-intensity">Exposure
+accumulation and average intensity</h3>
+<div class="code-shell"><div class="code-bar">R<a href="code/chapter05-listing-02.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>inner &lt;- function(x) vapply(x,function(xx)
+  integrate(function(y) 2+.5*xx+y^2,0,2)$value,numeric(1))
+E &lt;- integrate(inner,0,3)$value
+print(c(total=E,average=E/6,exact=49/2))</code></pre></div>
+<h3 id="mass-centroid-and-the-polar-volume">Mass, centroid, and the
+polar volume</h3>
+<div class="code-shell"><div class="code-bar">R<a href="code/chapter05-listing-03.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>M &lt;- integrate(function(x) 1+x,0,2)$value
+Mx &lt;- integrate(function(x) x*(1+x),0,2)$value
+print(c(mass=M,xbar=Mx/M,ybar=.5))
+vol &lt;- integrate(function(r) 2*pi*(4-r^2)*r,0,2)$value
+print(c(paraboloid_volume=vol,exact=8*pi))</code></pre></div>
+<h3 id="monte-carlo-integration-and-uncertainty">Monte Carlo integration
+and uncertainty</h3>
+<div class="code-shell"><div class="code-bar">R<a href="code/chapter05-listing-04.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>set.seed(2026); n &lt;- 100000
+x &lt;- runif(n); y &lt;- runif(n)
+vals &lt;- ifelse(x+y&lt;=1,x+2*y,0)
+print(c(estimate=mean(vals),MC_SE=sd(vals)/sqrt(n),exact=.5))</code></pre></div>
+<h3 id="midpoint-convergence-and-a-change-of-order-benchmark">Midpoint
+convergence and a change-of-order benchmark</h3>
+<div class="code-shell"><div class="code-bar">R<a href="code/chapter05-listing-05.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>midpoint &lt;- function(n) {
+  m &lt;- ((1:n)-0.5)/n
+  sum(outer(m,m,function(x,y) x^2+y^2))/n^2
+}
+for (n in c(4,8,16,32)) {
+  err &lt;- abs(midpoint(n)-2/3)
+  cat("n =",n,"error =",format(err,digits=8),"\n")
+  stopifnot(abs(err-1/(6*n^2))&lt;1e-12)
+}
+I &lt;- integrate(function(y) y^2*exp(y^3),0,1)$value
+stopifnot(abs(I-(exp(1)-1)/3)&lt;1e-10)</code></pre></div>
+<h2 id="solving-the-same-problems-using-python">Solving the same
+problems using Python</h2>
+<p>Python provides symbolic integration with SymPy, adaptive numerical
+quadrature with SciPy, and Monte Carlo simulation with NumPy. The
+companion program <code>code/chapter05_paired.py</code> uses the same
+integrands and domains.</p>
+<h3 id="triangular-integral-and-exact-check">Triangular integral and
+exact check</h3>
+<div class="code-shell"><div class="code-bar">Python<a href="code/chapter05-listing-06.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>import sympy as sp
+from scipy.integrate import dblquad, quad
+x,y=sp.symbols('x y',real=True)
+exact=sp.integrate(sp.integrate(x+2*y,(y,0,1-x)),(x,0,1))
+num=dblquad(lambda yy,xx:xx+2*yy,0,1,0,lambda xx:1-xx)[0]
+print(exact,num)
+assert exact==sp.Rational(1,2) and abs(num-.5)&lt;1e-8</code></pre></div>
+<h3 id="exposure-field-and-centroid">Exposure field and centroid</h3>
+<div class="code-shell"><div class="code-bar">Python<a href="code/chapter05-listing-07.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>E=dblquad(lambda yy,xx:2+.5*xx+yy**2,0,3,0,2)[0]
+M=quad(lambda xx:1+xx,0,2)[0]
+Mx=quad(lambda xx:xx*(1+xx),0,2)[0]
+print('exposure',E,'average',E/6)
+print('mass',M,'centroid',(Mx/M,.5))</code></pre></div>
+<h3 id="paraboloid-volume-and-reproducible-simulation">Paraboloid volume
+and reproducible simulation</h3>
+<div class="code-shell"><div class="code-bar">Python<a href="code/chapter05-listing-08.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>import numpy as np
+vol=quad(lambda r:2*np.pi*(4-r*r)*r,0,2)[0]
+rng=np.random.default_rng(2026);n=100000
+xs=rng.random(n);ys=rng.random(n)
+vals=np.where(xs+ys&lt;=1,xs+2*ys,0)
+print('volume',vol,'exact',8*np.pi)
+print('MC estimate',vals.mean(),'SE',vals.std(ddof=1)/np.sqrt(n))</code></pre></div>
+<h2 id="comparing-r-and-python-results">Comparing R and Python
+results</h2>
+<p>Both languages compute the same mathematical integral, but R’s
+<code>integrate()</code> requires a nested wrapper for a double
+integral, whereas SciPy provides <code>dblquad</code>. SymPy
+additionally returns an exact rational value. The Monte Carlo estimates
+will not be identical even when both random seeds are set to 2026,
+because the random-number generators differ. Compare each estimate with
+the exact answer and its own estimated standard error, rather than
+demanding bit-for-bit agreement.</p>
+<h2 id="application-spatially-varying-exposure-and-uncertainty">Application:
+spatially varying exposure and uncertainty</h2>
+<p>A hypothetical monitoring area has dimensions <span class="math inline">\(3\,\mathrm m\)</span> by <span class="math inline">\(2\,\mathrm m\)</span> and intensity <span class="math inline">\(c(x,y)=2+0.5x+y^2\)</span> exposure units per
+square meter. The exact total is <span class="math inline">\(24.5\)</span> units and the spatial average is
+<span class="math inline">\(49/12\)</span>. If the coefficient of <span class="math inline">\(y^2\)</span> is uncertain, replace it by <span class="math inline">\(\beta\)</span> and derive <span class="math display">\[E(\beta)=\int_0^3\int_0^2(2+0.5x+\beta
+y^2)\,\,\mathrm{d}y\,\mathrm{d}x=16.5+8\beta.\]</span> Thus <span class="math inline">\(\,\mathrm{d}E/\,\mathrm{d}\beta=8\)</span> in the
+corresponding units. If <span class="math inline">\(\beta\)</span>
+changes from <span class="math inline">\(1\)</span> to <span class="math inline">\(1.1\)</span>, the predicted total rises by <span class="math inline">\(0.8\)</span>. The derivative is an exact
+sensitivity for this linear-in-parameter model, not an estimate of
+measurement error. Students should discuss why an integral of a modeled
+field cannot by itself establish real-world exposure risk.</p>
+<h2 id="common-errors-and-a-problem-solving-checklist">Common errors and
+a problem-solving checklist</h2>
+<p>Before computing an integral, sketch the region, verify the limits,
+include the Jacobian, check units, and compare with a symmetry argument
+or a bound. Numerical agreement is evidence of correct implementation
+but is not a proof of a general identity.</p>
+<h3 id="midpoint-convergence-and-a-change-of-order-benchmark-1">Midpoint
+convergence and a change-of-order benchmark</h3>
+<div class="code-shell"><div class="code-bar">Python<a href="code/chapter05-listing-09.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>import numpy as np
+from scipy.integrate import quad
+
+def midpoint(n):
+    m = (np.arange(n)+0.5)/n
+    xx, yy = np.meshgrid(m,m,indexing='ij')
+    return np.mean(xx**2+yy**2)
+
+for n in [4,8,16,32]:
+    err = abs(midpoint(n)-2/3)
+    print('n =',n,'error =',err)
+    assert abs(err-1/(6*n*n))&lt;1e-12
+I = quad(lambda y:y*y*np.exp(y**3),0,1)[0]
+assert abs(I-(np.e-1)/3)&lt;1e-10</code></pre></div>
+<h2 id="exercises">Exercises</h2>
+<h3 class="unnumbered" id="conceptual-and-analytical-problems">Conceptual and analytical
+problems</h3>
+<ol type="1">
+<li><p>Define a double integral using Riemann sums. State two
+assumptions that guarantee integrability for a continuous field on a
+bounded region.</p></li>
+<li><p>Evaluate <span class="math inline">\(\int_0^2\int_0^3(2x-y)\,\,\mathrm{d}y\,\mathrm{d}x\)</span>
+in both orders.</p></li>
+<li><p>Evaluate <span class="math inline">\(\iint_{[0,1]^2}(x^2+y^2)\,\,\mathrm{d}A\)</span>
+and determine the average value.</p></li>
+<li><p>Sketch <span class="math inline">\(D=\{(x,y):0\le x\le2,\ 0\le
+y\le x/2\}\)</span> and rewrite its integral in Type II form.</p></li>
+<li><p>Reverse the order of <span class="math inline">\(\int_0^1\int_{x^2}^{1}f(x,y)\,\,\mathrm{d}y\,\mathrm{d}x\)</span>.</p></li>
+<li><p>Evaluate <span class="math inline">\(\int_0^1\int_0^x(x+2y)\,\,\mathrm{d}y\,\mathrm{d}x\)</span>
+by reversing order.</p></li>
+<li><p>Find the area bounded by <span class="math inline">\(y=x^2\)</span> and <span class="math inline">\(y=2x\)</span>.</p></li>
+<li><p>Find the volume beneath <span class="math inline">\(z=6-x-y\)</span> above <span class="math inline">\([0,2]\times[0,1]\)</span>.</p></li>
+<li><p>Determine the average value of <span class="math inline">\(f(x,y)=xy\)</span> on <span class="math inline">\([0,2]\times[0,3]\)</span>.</p></li>
+<li><p>Explain why the order of integration can matter computationally
+even when Fubini’s theorem guarantees equal answers.</p></li>
+<li><p>Derive the polar Jacobian directly from the determinant of the
+transformation matrix.</p></li>
+<li><p>Evaluate <span class="math inline">\(\iint_D(x^2+y^2)\,\,\mathrm{d}A\)</span> for the
+disk <span class="math inline">\(D:x^2+y^2\le9\)</span>.</p></li>
+<li><p>Find the area of the annulus <span class="math inline">\(4\le
+x^2+y^2\le25\)</span> using polar coordinates.</p></li>
+<li><p>Compute the volume under <span class="math inline">\(z=9-x^2-y^2\)</span> above the disk <span class="math inline">\(x^2+y^2\le9\)</span>.</p></li>
+<li><p>Evaluate <span class="math inline">\(\iint_D
+xy\,\,\mathrm{d}A\)</span> over the disk centered at the origin, and
+justify your result by symmetry.</p></li>
+<li><p>For density <span class="math inline">\(\rho(x,y)=2+x\)</span> on
+<span class="math inline">\([0,1]^2\)</span>, find mass and
+centroid.</p></li>
+<li><p>Compute <span class="math inline">\(I_x\)</span>, <span class="math inline">\(I_y\)</span>, and <span class="math inline">\(I_O\)</span> for a uniform square lamina <span class="math inline">\([-a,a]^2\)</span> of density <span class="math inline">\(\rho_0\)</span>.</p></li>
+<li><p>Show that the centroid of a uniform disk is its center, without
+explicitly evaluating both first moments.</p></li>
+<li><p>Derive the graph surface-area element from the cross product of
+its tangent vectors.</p></li>
+<li><p>Find the surface area of <span class="math inline">\(z=x+y\)</span> over the unit square.</p></li>
+<li><p>Parametrize the lateral surface of a cylinder of radius <span class="math inline">\(a\)</span> and height <span class="math inline">\(h\)</span> and derive its area.</p></li>
+<li><p>Compute the volume of the solid <span class="math inline">\(x,y,z\ge0\)</span>, <span class="math inline">\(2x+y+z\le2\)</span>.</p></li>
+<li><p>Evaluate <span class="math inline">\(\iiint_E
+z\,\,\mathrm{d}V\)</span> for <span class="math inline">\(E=[0,1]\times[0,2]\times[0,3]\)</span>.</p></li>
+<li><p>Derive the cylindrical Jacobian and use it to compute the volume
+of a cylinder.</p></li>
+<li><p>Derive the spherical Jacobian or verify it using a symbolic
+determinant.</p></li>
+<li><p>Find the volume of the upper hemisphere <span class="math inline">\(x^2+y^2+z^2\le a^2\)</span>, <span class="math inline">\(z\ge0\)</span>.</p></li>
+<li><p>Compute <span class="math inline">\(\iiint_{B_a}(x^2+y^2+z^2)\,\,\mathrm{d}V\)</span>
+using spherical coordinates.</p></li>
+<li><p>For <span class="math inline">\(T(u,v)=(3u+v,u+2v)\)</span>,
+compute the Jacobian determinant and the area of the image of the unit
+square.</p></li>
+<li><p>Explain why <span class="math inline">\(|\det DT|\)</span>
+appears in a change-of-variables formula rather than <span class="math inline">\(\det DT\)</span>.</p></li>
+<li><p>Transform the ellipse <span class="math inline">\(x^2/4+y^2/9\le1\)</span> to a unit disk and
+compute its area.</p></li>
+</ol>
+<h3 class="unnumbered" id="python-and-applied-investigations">Python and
+applied investigations</h3>
+<ol type="1">
+<li><p>Use SymPy to integrate <span class="math inline">\(x^2+xy+y^2\)</span> over <span class="math inline">\([0,1]^2\)</span> and check with SciPy’s
+<code>dblquad</code>.</p></li>
+<li><p>Use <code>dblquad</code> to calculate the volume under <span class="math inline">\(z=1-x^2-y^2\)</span> above the unit disk; compare
+Cartesian and polar descriptions.</p></li>
+<li><p>Construct midpoint Riemann sums for <span class="math inline">\(e^{x+y}\)</span> on the unit square. Record
+absolute error for <span class="math inline">\(n=4,8,16,32\)</span>.</p></li>
+<li><p>Simulate a nonuniform lamina with density <span class="math inline">\(\rho(x,y)=1+2x\)</span> on <span class="math inline">\([0,1]^2\)</span> and compare numerical and exact
+centroids.</p></li>
+<li><p>Use SymPy to compute the Jacobian of <span class="math inline">\(x=2u+v\)</span>, <span class="math inline">\(y=u-v\)</span> and verify area scaling
+numerically.</p></li>
+<li><p>Use <code>tplquad</code> to estimate the volume of <span class="math inline">\(x,y,z\ge0\)</span>, <span class="math inline">\(x+y+z\le1\)</span>.</p></li>
+<li><p>Approximate the surface area of <span class="math inline">\(z=x^2+y^2\)</span> above the unit disk using
+numerical integration and a polar change of variables.</p></li>
+<li><p>Compare the numerical volume of a sphere with its exact value
+<span class="math inline">\(4\pi a^3/3\)</span> for <span class="math inline">\(a=1,2,3\)</span>.</p></li>
+<li><p>Run the Monte Carlo paraboloid-volume experiment with five random
+seeds and discuss variability.</p></li>
+<li><p>Create an original figure showing how the centroid of <span class="math inline">\(\rho(x,y)=1+\alpha x\)</span> on <span class="math inline">\([0,1]^2\)</span> changes with <span class="math inline">\(\alpha\ge0\)</span>.</p></li>
+<li><p>Estimate the moment of inertia of a disk with radial density
+<span class="math inline">\(\rho(r)=1+r\)</span> and compare with a
+symbolic result.</p></li>
+<li><p>Explain a realistic application in which spatial density, not
+geometric area alone, determines the quantity of interest. Formulate the
+integral and specify units.</p></li>
+</ol>
+<h2 class="unnumbered" id="chapter-summary">Chapter summary</h2>
+<p>Multiple integrals extend accumulation from intervals to regions and
+solids. Fubini’s theorem converts integrals over simple regions into
+iterated integrals; changing integration order can simplify computation.
+Coordinate transformations encode geometry through Jacobians, and double
+or triple integrals quantify volume, averages, mass, centroids, and
+moments. Surface area introduces a related cross-product scaling. Python
+supports symbolic derivation, deterministic quadrature, visualization,
+and stochastic approximation, but geometric reasoning remains
+indispensable.</p>
+<h2 id="further-mathematical-and-computational-exercises">Further
+mathematical and computational exercises</h2>
+<ol type="1">
+<li><p>Prove that <span class="math inline">\(\iint_Df\,\,\mathrm{d}A\)</span> lies between
+<span class="math inline">\(mA(D)\)</span> and <span class="math inline">\(MA(D)\)</span> when <span class="math inline">\(m\le f\le M\)</span>. Explain the significance for
+a nonnegative density.</p></li>
+<li><p>Find the area of the region under <span class="math inline">\(y=\min(x,3-x)\)</span> for <span class="math inline">\(0\le x\le3\)</span>, by slicing in both
+directions.</p></li>
+<li><p>Reverse the order in <span class="math inline">\(\int_0^1\int_{\sqrt
+x}^1\cos(y^3)y^2\,\,\mathrm{d}y\,\mathrm{d}x\)</span> and evaluate the
+result.</p></li>
+<li><p>Calculate <span class="math inline">\(\iint_{x^2+y^2\le9}(x^2+y^2)^{3/2}\,\,\mathrm{d}A\)</span>
+and state the dimensions of the result if <span class="math inline">\(x,y\)</span> measure meters.</p></li>
+<li><p>A disk has density <span class="math inline">\(\rho_0(1+\lambda
+r^2/a^2)\)</span>. Derive the moment of inertia about its central
+perpendicular axis.</p></li>
+<li><p>Establish the parallel-axis theorem for a planar lamina directly
+from the definitions of centroid and first moments.</p></li>
+<li><p>Derive the Jacobian for the transformation <span class="math inline">\(x=3u+v\)</span>, <span class="math inline">\(y=u-2v\)</span>. Determine whether orientation is
+preserved.</p></li>
+<li><p>Derive the surface area of <span class="math inline">\(z=2\sqrt{x^2+y^2}\)</span> over the annulus <span class="math inline">\(1\le x^2+y^2\le9\)</span>.</p></li>
+<li><p>Prove that the midpoint estimate for <span class="math inline">\(x^2+y^2\)</span> over the unit square is <span class="math inline">\(2/3-1/(6n^2)\)</span>.</p></li>
+<li><p>In R and Python, compute the midpoint error for <span class="math inline">\(n=8,16,32,64\)</span>; report error ratios and
+discuss the observed order.</p></li>
+<li><p>Use Monte Carlo sampling to estimate the integral of <span class="math inline">\(x^2+y^2\)</span> over the unit square. Compare
+uncertainty estimates at <span class="math inline">\(N=10^3\)</span>,
+<span class="math inline">\(10^4\)</span>, and <span class="math inline">\(10^5\)</span> without treating a single run as
+proof of convergence.</p></li>
+<li><p>For a density field of your choice, report the units of total
+mass, first moments, centroid, and moment of inertia; explain why unit
+consistency is an effective diagnostic.</p></li>
+</ol>
+<h2 id="chapter-project-spatial-mass-and-centroid-estimation">Chapter
+project: spatial mass and centroid estimation</h2>
+<p><strong>Scenario.</strong> A rectangular experimental panel occupies
+<span class="math inline">\(0\le x\le2\)</span>, <span class="math inline">\(0\le y\le1\)</span> meters. Its hypothetical areal
+density is <span class="math inline">\(\rho_\alpha(x,y)=1+\alpha
+x\)</span> kg/m<span class="math inline">\(^2\)</span>, where <span class="math inline">\(\alpha\ge0\)</span> has units m<span class="math inline">\(^{-1}\)</span>. The goal is to quantify how
+nonuniform density changes total mass, centroid, and moment of
+inertia.</p>
+<ol type="1">
+<li><p>Derive <span class="math inline">\(M(\alpha)=\iint_D\rho_\alpha\,\,\mathrm{d}A\)</span>
+and the first moments <span class="math inline">\(M_y=\iint_D
+x\rho_\alpha\,\,\mathrm{d}A\)</span> and <span class="math inline">\(M_x=\iint_D
+y\rho_\alpha\,\,\mathrm{d}A\)</span>.</p></li>
+<li><p>Obtain exact formulas for <span class="math inline">\(\bar
+x(\alpha)\)</span> and <span class="math inline">\(\bar
+y(\alpha)\)</span>; evaluate at <span class="math inline">\(\alpha=0,0.5,1,2\)</span> and explain the
+direction of the shift.</p></li>
+<li><p>Derive the polar moment <span class="math inline">\(I_O=\iint_D(x^2+y^2)\rho_\alpha\,\,\mathrm{d}A\)</span>
+and check dimensional consistency.</p></li>
+<li><p>Implement the integrals numerically in R using nested
+<code>integrate()</code> calls and in Python using
+<code>scipy.integrate.dblquad</code>. Compare both against your exact
+formulas.</p></li>
+<li><p>Generate a contour or heat-map figure in each language for at
+least two values of <span class="math inline">\(\alpha\)</span>, with
+the corresponding centroid marked.</p></li>
+<li><p>Use Monte Carlo sampling to estimate <span class="math inline">\(M\)</span> and <span class="math inline">\(\bar
+x\)</span> at <span class="math inline">\(\alpha=1\)</span>. Report the
+seed, sample size, numerical estimates, and variability over five
+independent runs.</p></li>
+<li><p>Write a two-page report describing the model assumptions, exact
+and numerical results, numerical discrepancies, and limitations of the
+stylized density field.</p></li>
+</ol>
+<p><strong>Suggested rubric (100 points):</strong> mathematical
+derivations (30), R implementation (15), Python implementation (15),
+figures and labels (15), numerical validation (10), interpretation and
+limitations (15).</p>
+<footer><a href="chapter04.html">4. Gradients, Taylor Approximations, and Optimization ←</a><a href="chapter06.html">6. Vector Fields and Integral Theorems →</a></footer></main><aside class="chapter-toc"><strong>On this page</strong><ul><li><a href="#interactive-investigation">Interactive investigation</a></li><li><a href="#why-integrate-over-regions">Why integrate over regions?</a></li><li><a href="#riemann-sums-in-two-dimensions">Riemann sums in two
+dimensions</a></li><li><a href="#iterated-integration-and-fubinis-theorem">Iterated integration
+and Fubini’s theorem</a></li><li><a href="#computational-preview-symbolic-and-numerical-verification">Computational
+preview: symbolic and numerical verification</a></li><li><a href="#regions-bounded-by-curves">Regions bounded by curves</a></li><li><a href="#reversing-order-can-remove-an-obstacle">Reversing order can
+remove an obstacle</a></li><li><a href="#area-volume-and-average-value">Area, volume, and average
+value</a></li><li><a href="#polar-coordinates-and-the-jacobian">Polar coordinates and the
+Jacobian</a></li><li><a href="#computational-preview-integrating-over-a-disk">Computational
+preview: integrating over a disk</a></li><li><a href="#mass-centroids-and-moments-of-inertia">Mass, centroids, and
+moments of inertia</a></li><li><a href="#surface-area-as-a-double-integral">Surface area as a double
+integral</a></li><li><a href="#triple-integrals-and-solid-regions">Triple integrals and solid
+regions</a></li><li><a href="#cylindrical-coordinates">Cylindrical coordinates</a></li><li><a href="#spherical-coordinates">Spherical coordinates</a></li><li><a href="#the-general-change-of-variables-theorem">The general
+change-of-variables theorem</a></li><li><a href="#computational-preview-symbolic-jacobians">Computational preview:
+symbolic Jacobians</a></li><li><a href="#numerical-integration-accuracy-and-limitations">Numerical
+integration: accuracy and limitations</a></li><li><a href="#midpoint-rules-and-monte-carlo-integration">Midpoint rules and
+Monte Carlo integration</a></li><li><a href="#additional-worked-examples-from-the-r-manuscript">Additional
+worked examples from the R manuscript</a></li><li><a href="#a-triangular-region-integration-in-either-order">A triangular
+region: integration in either order</a></li><li><a href="#a-spatial-exposure-field">A spatial exposure field</a></li><li><a href="#a-nonuniform-rectangular-lamina">A nonuniform rectangular
+lamina</a></li><li><a href="#the-jacobian-as-a-local-area-scale">The Jacobian as a local area
+scale</a></li><li><a href="#a-rigorous-view-of-integrability-and-region-boundaries">A
+rigorous view of integrability and region boundaries</a></li><li><a href="#when-fubinis-theorem-needs-care">When Fubini’s theorem needs
+care</a></li><li><a href="#constructing-integration-bounds-from-geometry">Constructing
+integration bounds from geometry</a></li><li><a href="#symmetry-separability-and-scaling">Symmetry, separability, and
+scaling</a></li><li><a href="#deriving-coordinate-jacobians">Deriving coordinate
+Jacobians</a></li><li><a href="#moments-of-inertia-and-the-parallel-axis-principle">Moments of
+inertia and the parallel-axis principle</a></li><li><a href="#surface-area-from-tangent-vector-geometry">Surface area from
+tangent-vector geometry</a></li><li><a href="#error-analysis-for-computational-integration">Error analysis for
+computational integration</a></li><li><a href="#solving-the-mathematical-problems-using-r">Solving the
+mathematical problems using R</a></li><li><a href="#triangular-integration-and-order-reversal">Triangular
+integration and order reversal</a></li><li><a href="#exposure-accumulation-and-average-intensity">Exposure
+accumulation and average intensity</a></li><li><a href="#mass-centroid-and-the-polar-volume">Mass, centroid, and the
+polar volume</a></li><li><a href="#monte-carlo-integration-and-uncertainty">Monte Carlo integration
+and uncertainty</a></li><li><a href="#midpoint-convergence-and-a-change-of-order-benchmark">Midpoint
+convergence and a change-of-order benchmark</a></li><li><a href="#solving-the-same-problems-using-python">Solving the same
+problems using Python</a></li><li><a href="#triangular-integral-and-exact-check">Triangular integral and
+exact check</a></li><li><a href="#exposure-field-and-centroid">Exposure field and centroid</a></li><li><a href="#paraboloid-volume-and-reproducible-simulation">Paraboloid volume
+and reproducible simulation</a></li><li><a href="#comparing-r-and-python-results">Comparing R and Python
+results</a></li><li><a href="#application-spatially-varying-exposure-and-uncertainty">Application:
+spatially varying exposure and uncertainty</a></li><li><a href="#common-errors-and-a-problem-solving-checklist">Common errors and
+a problem-solving checklist</a></li><li><a href="#midpoint-convergence-and-a-change-of-order-benchmark-1">Midpoint
+convergence and a change-of-order benchmark</a></li><li><a href="#exercises">Exercises</a></li><li><a href="#conceptual-and-analytical-problems">Conceptual and analytical
+problems</a></li><li><a href="#python-and-applied-investigations">Python and
+applied investigations</a></li><li><a href="#chapter-summary">Chapter summary</a></li><li><a href="#further-mathematical-and-computational-exercises">Further
+mathematical and computational exercises</a></li><li><a href="#chapter-project-spatial-mass-and-centroid-estimation">Chapter
+project: spatial mass and centroid estimation</a></li></ul></aside></div><script src="search-index.js"></script><script src="site.js"></script><script src="investigations.js"></script></body></html>

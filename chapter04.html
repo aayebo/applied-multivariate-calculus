@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><title>Gradients, Taylor Approximations, and Optimization | Applied Multivariate Calculus Using R and Python</title><link href="site.css" rel="stylesheet"/><script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]}};</script><script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script></head><body><a class="skip" href="#main">Skip to content</a><nav aria-label="Book navigation" class="site-nav"><a class="brand" href="index.html">Applied Multivariate Calculus Using R and Python</a><p class="subtitle">Volume III · Abraham Ayebo</p><label for="book-search">Search book</label><input id="book-search" placeholder="Search chapters" type="search"/><div aria-live="polite" class="search-results" id="search-results"></div><div class="nav-label">Contents</div><a href="index.html">Welcome</a><a href="chapter01.html">1. Vectors and Geometry in Three-Dimensional Space</a><a href="chapter02.html">2. Curves, Surfaces, and Coordinate Systems</a><a href="chapter03.html">3. Functions of Several Variables and Partial Differentiation</a><a aria-current="page" class="active" href="chapter04.html">4. Gradients, Taylor Approximations, and Optimization</a><a href="chapter05.html">5. Multiple Integration and Applications</a><a href="chapter06.html">6. Vector Fields and Integral Theorems</a><a href="chapter07.html">7. Introduction to Tensor Calculus and Differential Geometry</a><a href="chapter08.html">8. Partial Differential Equations and Computational Methods</a><a href="appendix-a.html">Appendix A. Introduction to R and RStudio</a><a href="appendix-b.html">Appendix B. Introduction to Python and Jupyter</a><a href="resources.html">Computational resources</a><a href="about.html">About this book</a><div class="nav-label">Series</div><a href="https://aayebo.github.io/applied-precalculus/">Volume I · Applied Precalculus</a><a href="https://aayebo.github.io/applied-calculus/">Volume II · Applied Calculus</a></nav><header class="topbar"><button aria-expanded="false" class="menu">Contents</button><span>Applied Mathematics · Volume III</span><span class="spacer"></span><a href="resources.html">Code &amp; resources</a></header><div class="page-grid"><main id="main"><h1>4. Gradients, Taylor Approximations, and Optimization</h1><p><span id="ch:optimization" label="ch:optimization"></span></p>
+<div class="learning-box example"><p><strong>Learning.</strong> After studying this chapter, you should be
+able to interpret the gradient geometrically; derive tangent-line and
+tangent-plane approximations; compute second-order Taylor polynomials
+and Hessian matrices; classify nondegenerate critical points; explain
+the limitations of the second-derivative test; optimize functions on
+closed bounded regions; solve constrained problems using substitution
+and Lagrange multipliers; formulate least-squares models; distinguish
+local from global optimality; and implement and verify optimization
+algorithms using R and Python, with analytic verification and numerical
+interpretation.</p></div>
+<section class="mv-lab" id="interactive-investigation"><h2>Interactive investigation: Gradient and directional derivatives</h2><p>For f(x,y)=x²+2y² at (1,1), vary the unit direction.</p><div data-mv-lab="4"></div><p><strong>Explore:</strong> Which direction gives the largest derivative? When is it zero?</p><noscript>Enable JavaScript to use this investigation.</noscript></section><h2 id="the-gradient-as-a-geometric-and-analytical-tool">The gradient as
+a geometric and analytical tool</h2>
+<p>For a differentiable scalar field <span class="math inline">\(f:\mathbb{R}^n\to\mathbb{R}\)</span>, its gradient
+is the vector of first partial derivatives, <span class="math display">\[\nabla f(\boldsymbol{x})=\left(\frac{\partial
+f}{\partial x_1},\ldots,\frac{\partial f}{\partial x_n}\right).\]</span>
+The gradient summarizes the local response to every small change of
+input. In particular, differentiability at <span class="math inline">\(\boldsymbol{a}\)</span> means <span class="math display">\[f(\boldsymbol{a}+\boldsymbol{h})=f(\boldsymbol{a})+\nabla
+f(\boldsymbol{a})\cdot\boldsymbol{h}+o(\left\lVert
+\boldsymbol{h}\right\rVert)\quad\text{as
+}\boldsymbol{h}\to\boldsymbol{0}.\]</span> This is stronger than the
+mere existence of partial derivatives: it asserts that a single linear
+map approximates all sufficiently small displacements.</p>
+<div class="learning-box example"><p><strong>Theorem — Directional derivative and steepest
+ascent.</strong> If <span class="math inline">\(f\)</span> is
+differentiable at <span class="math inline">\(\boldsymbol{a}\)</span>
+and <span class="math inline">\(\boldsymbol{u}\)</span> is a unit
+vector, then <span class="math display">\[D_{\boldsymbol{u}}f(\boldsymbol{a})=\nabla
+f(\boldsymbol{a})\cdot\boldsymbol{u}.\]</span> When <span class="math inline">\(\nabla
+f(\boldsymbol{a})\ne\boldsymbol{0}\)</span>, the largest possible
+directional derivative is <span class="math inline">\(\left\lVert \nabla
+f(\boldsymbol{a})\right\rVert\)</span>, attained in the direction <span class="math inline">\(\nabla f(\boldsymbol{a})/\left\lVert \nabla
+f(\boldsymbol{a})\right\rVert\)</span>. The smallest is its negative,
+attained in the opposite direction.</p></div>
+<div class="learning-box example"><p><strong>Proof.</strong> Set <span class="math inline">\(\boldsymbol{h}=t\boldsymbol{u}\)</span> in the
+differentiability expansion and divide by <span class="math inline">\(t\)</span>. The remainder divided by <span class="math inline">\(t\)</span> tends to zero because <span class="math inline">\(\left\lVert \boldsymbol{u}\right\rVert=1\)</span>.
+The extremal values follow from Cauchy–Schwarz: <span class="math inline">\(\nabla f\cdot\boldsymbol{u}\le\left\lVert \nabla
+f\right\rVert\left\lVert \boldsymbol{u}\right\rVert=\left\lVert \nabla
+f\right\rVert\)</span>, with equality when the vectors are parallel and
+point in the same direction.</p></div>
+<div class="learning-box example"><p><strong>Example — A spatial concentration field.</strong> Let <span class="math inline">\(C(x,y)=12-2x^2-y^2+2xy\)</span>. At <span class="math inline">\((1,0)\)</span>, <span class="math inline">\(\nabla
+C=(-4,2)\)</span>. The direction of fastest increase is <span class="math inline">\((-2,1)/\sqrt5\)</span>, and the maximum rate of
+increase is <span class="math inline">\(2\sqrt5\)</span> concentration
+units per unit distance. A person moving in direction <span class="math inline">\((1,1)/\sqrt2\)</span> measures rate <span class="math inline">\(-\sqrt2\)</span>.</p></div>
+<figure id="fig:ch4grad">
+<img alt="Contour curves and gradient arrows for a quadratic scalar field. The gradient is normal to a regular level curve and points toward increasing values. Original Python figure." src="figures/ch4_gradient.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">Contour curves and gradient arrows for a
+quadratic scalar field. The gradient is normal to a regular level curve
+and points toward increasing values. Original Python
+figure.</figcaption>
+</figure>
+<h3 id="level-sets-and-normal-directions">Level sets and normal
+directions</h3>
+<p>If <span class="math inline">\(f(\boldsymbol{x})=c\)</span> defines a
+smooth level surface and <span class="math inline">\(\boldsymbol{r}(t)\)</span> is a differentiable
+curve in that surface, then <span class="math inline">\(f(\boldsymbol{r}(t))=c\)</span>. Differentiating
+gives <span class="math inline">\(\nabla
+f(\boldsymbol{r}(t))\cdot\boldsymbol{r}'(t)=0\)</span>. Hence the
+gradient is orthogonal to every tangent direction wherever it is
+nonzero. For an implicit surface <span class="math inline">\(F(x,y,z)=0\)</span>, the tangent plane at <span class="math inline">\(\boldsymbol{p}\)</span> is therefore <span class="math display">\[\nabla
+F(\boldsymbol{p})\cdot(\boldsymbol{x}-\boldsymbol{p})=0,\quad\nabla
+F(\boldsymbol{p})\ne\boldsymbol{0}.\]</span> The condition on the
+gradient is essential: at singular points, this equation may not
+describe a unique tangent plane.</p>
+<h2 id="linearization-and-sensitivity-analysis">Linearization and
+sensitivity analysis</h2>
+<p>The linearization of a differentiable function <span class="math inline">\(f(x,y)\)</span> near <span class="math inline">\((a,b)\)</span> is <span class="math display">\[L(x,y)=f(a,b)+f_x(a,b)(x-a)+f_y(a,b)(y-b).\]</span>
+It is the height of the tangent plane to the graph <span class="math inline">\(z=f(x,y)\)</span>. It predicts small changes by
+the total differential <span class="math inline">\(\,\mathrm{d}f\approx
+f_x\,\mathrm{d}x+f_y\,\mathrm{d}y\)</span>.</p>
+<div class="learning-box example"><p><strong>Example — Estimating a nonlinear measurement.</strong> For
+<span class="math inline">\(f(x,y)=\sqrt{4+x^2+y^2}\)</span>, linearize
+at <span class="math inline">\((0,0)\)</span>. Since <span class="math inline">\(f(0,0)=2\)</span> and both first partial
+derivatives vanish there, <span class="math inline">\(L(x,y)=2\)</span>.
+This approximation has no first-order variation, but a second-order
+approximation will capture the increase in <span class="math inline">\(f\)</span> away from the origin. At <span class="math inline">\((0.2,0.1)\)</span>, the exact value is <span class="math inline">\(\sqrt{4.05}\approx2.01246\)</span>, while the
+linear estimate is <span class="math inline">\(2\)</span>.</p></div>
+<div class="learning-box check"><p><strong>Checkpoint.</strong> A rectangular sheet has dimensions <span class="math inline">\(x=20\)</span> cm and <span class="math inline">\(y=30\)</span> cm, each measured with possible
+error <span class="math inline">\(\pm0.1\)</span> cm. Use the
+differential of <span class="math inline">\(A=xy\)</span> to bound the
+first-order area error. Explain why the result is an approximation
+rather than an exact bound.</p></div>
+<h2 id="second-order-taylor-approximations">Second-order Taylor
+approximations</h2>
+<p>A linear approximation cannot detect whether a stationary point is a
+peak, valley, or saddle. Curvature enters through the second partial
+derivatives. For <span class="math inline">\(f\)</span> with continuous
+second derivatives near <span class="math inline">\(\boldsymbol{a}\)</span>, define its Hessian matrix
+by <span class="math display">\[H_f(\boldsymbol{a})=\begin{pmatrix}f_{xx}(\boldsymbol{a})&amp;f_{xy}(\boldsymbol{a})\\f_{yx}(\boldsymbol{a})&amp;f_{yy}(\boldsymbol{a})\end{pmatrix}.\]</span>
+Under these smoothness conditions, the mixed partial derivatives agree,
+so the Hessian is symmetric.</p>
+<div class="learning-box example"><p><strong>Theorem — Second-order Taylor formula.</strong> If <span class="math inline">\(f:\mathbb{R}^n\to\mathbb{R}\)</span> has
+continuous second derivatives near <span class="math inline">\(\boldsymbol{a}\)</span>, then <span class="math display">\[f(\boldsymbol{a}+\boldsymbol{h})=f(\boldsymbol{a})+\nabla
+f(\boldsymbol{a})^T\boldsymbol{h}+\tfrac12\boldsymbol{h}^T
+H_f(\boldsymbol{a})\boldsymbol{h}+o(\left\lVert
+\boldsymbol{h}\right\rVert^2).\]</span></p></div>
+<div class="learning-box example"><p><strong>Proof — Derivation along a line.</strong> For fixed <span class="math inline">\(\boldsymbol{h}\)</span>, define <span class="math inline">\(g(t)=f(\boldsymbol{a}+t\boldsymbol{h})\)</span>.
+The one-variable chain rule gives <span class="math inline">\(g'(0)=\nabla
+f(\boldsymbol{a})^T\boldsymbol{h}\)</span> and <span class="math inline">\(g''(0)=\boldsymbol{h}^TH_f(\boldsymbol{a})\boldsymbol{h}\)</span>.
+Applying the one-variable Taylor formula at <span class="math inline">\(t=0\)</span>, and using continuity of the second
+derivatives uniformly for small <span class="math inline">\(\boldsymbol{h}\)</span>, yields the stated
+remainder.</p></div>
+<p>For two variables, the quadratic term expands to <span class="math display">\[\tfrac12\bigl(f_{xx}h^2+2f_{xy}hk+f_{yy}k^2\bigr),\]</span>
+where derivatives are evaluated at the base point and <span class="math inline">\((h,k)\)</span> is the displacement. The mixed term
+has coefficient <span class="math inline">\(2\)</span> because it
+appears twice in the matrix product.</p>
+<div class="learning-box example"><p><strong>Example — A quadratic approximation with a cross
+term.</strong> For <span class="math inline">\(f(x,y)=e^x\cos
+y+xy\)</span>, at <span class="math inline">\((0,0)\)</span> we have
+<span class="math inline">\(f=1\)</span>, <span class="math inline">\(\nabla f=(1,0)\)</span>, and <span class="math display">\[H_f(0,0)=\begin{pmatrix}1&amp;1\\1&amp;-1\end{pmatrix}.\]</span>
+Thus <span class="math display">\[T_2(x,y)=1+x+\tfrac12x^2+xy-\tfrac12y^2.\]</span>
+At <span class="math inline">\((0.1,0.2)\)</span>, this predicts <span class="math inline">\(1.105\)</span>; the exact function is <span class="math inline">\(e^{0.1}\cos(0.2)+0.02\approx1.10314\)</span>. The
+approximation is accurate near the base point but need not improve for
+arbitrary large displacements.</p></div>
+<figure>
+<img alt="A nonlinear surface and its second-order Taylor approximation near the origin. Their agreement is local; differences grow farther from the expansion point." src="figures/ch4_taylor.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">A nonlinear surface and its second-order
+Taylor approximation near the origin. Their agreement is local;
+differences grow farther from the expansion point.</figcaption>
+</figure>
+<h3 class="unnumbered" id="computational-preview-symbolic-taylor-polynomials">Computational
+preview: symbolic Taylor polynomials</h3>
+<div class="learning-box example"><p><strong>Remark — Computational follow-up.</strong> We revisit this
+calculation in the paired R and Python laboratories, where the
+mathematical model and inputs are kept identical.</p></div>
+<p>The script constructs the quadratic polynomial from the gradient and
+Hessian rather than relying on separate one-variable expansions.</p>
+<h2 id="critical-points-and-local-extrema">Critical points and local
+extrema</h2>
+<div class="learning-box example"><p><strong>Definition.</strong> An interior point <span class="math inline">\(\boldsymbol{a}\)</span> is a <em>critical
+point</em> of <span class="math inline">\(f\)</span> if <span class="math inline">\(\nabla f(\boldsymbol{a})=\boldsymbol{0}\)</span>
+or if a required first partial derivative does not exist. A <em>local
+minimum</em> satisfies <span class="math inline">\(f(\boldsymbol{x})\ge
+f(\boldsymbol{a})\)</span> for all sufficiently nearby domain points;
+reverse the inequality for a local maximum.</p></div>
+<div class="learning-box example"><p><strong>Theorem — Necessary condition at an interior
+extremum.</strong> If <span class="math inline">\(f\)</span> is
+differentiable at an interior local maximum or minimum <span class="math inline">\(\boldsymbol{a}\)</span>, then <span class="math inline">\(\nabla
+f(\boldsymbol{a})=\boldsymbol{0}\)</span>.</p></div>
+<div class="learning-box example"><p><strong>Proof.</strong> For each coordinate direction <span class="math inline">\(\boldsymbol{e}_i\)</span>, the one-variable
+function <span class="math inline">\(t\mapsto
+f(\boldsymbol{a}+t\boldsymbol{e}_i)\)</span> has a local extremum at
+<span class="math inline">\(t=0\)</span>. Fermat’s theorem in one
+variable gives <span class="math inline">\(\partial f/\partial
+x_i(\boldsymbol{a})=0\)</span> for every <span class="math inline">\(i\)</span>.</p></div>
+<p>The converse is false: a critical point may be a saddle, or the
+function may have a degenerate stationary point not classified by
+quadratic information.</p>
+<h3 id="the-two-variable-hessian-test">The two-variable Hessian
+test</h3>
+<p>Let <span class="math inline">\(D=f_{xx}f_{yy}-f_{xy}^2\)</span> at a
+stationary point of a <span class="math inline">\(C^2\)</span> function.
+If <span class="math inline">\(D&gt;0\)</span> and <span class="math inline">\(f_{xx}&gt;0\)</span>, there is a strict local
+minimum; if <span class="math inline">\(D&gt;0\)</span> and <span class="math inline">\(f_{xx}&lt;0\)</span>, a strict local maximum; if
+<span class="math inline">\(D&lt;0\)</span>, a saddle point. When <span class="math inline">\(D=0\)</span>, the test is inconclusive. These
+conclusions follow because the sign of the leading quadratic form is
+determined by the eigenvalues of the symmetric Hessian.</p>
+<div class="learning-box example"><p><strong>Example — Three distinct stationary geometries.</strong> The
+function <span class="math inline">\(x^2+2y^2\)</span> has a strict
+minimum at the origin; <span class="math inline">\(-x^2-2y^2\)</span>
+has a strict maximum; and <span class="math inline">\(x^2-y^2\)</span>
+has a saddle. All have gradient zero at the origin, but their Hessians
+have different signs.</p></div>
+<div class="learning-box example"><p><strong>Example — Why the inconclusive case matters.</strong> At the
+origin, both <span class="math inline">\(f(x,y)=x^4+y^4\)</span> and
+<span class="math inline">\(g(x,y)=x^4-y^4\)</span> have zero gradient
+and zero Hessian. Yet <span class="math inline">\(f\)</span> has a
+strict local minimum while <span class="math inline">\(g\)</span> has a
+saddle. Higher-order terms, inequalities, or explicit path comparisons
+are needed.</p></div>
+<figure>
+<img alt="Contour signatures of a local minimum, local maximum, and saddle point. All three are stationary at the origin, but the surrounding geometry differs." src="figures/ch4_stationary.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">Contour signatures of a local minimum,
+local maximum, and saddle point. All three are stationary at the origin,
+but the surrounding geometry differs.</figcaption>
+</figure>
+<h3 id="the-hessian-test-in-higher-dimensions">The Hessian test in
+higher dimensions</h3>
+<p>At a stationary point in <span class="math inline">\(\mathbb{R}^n\)</span>, a positive definite Hessian
+implies a strict local minimum; a negative definite Hessian implies a
+strict local maximum; an indefinite Hessian implies a saddle. Positive
+semidefinite or negative semidefinite Hessians are inconclusive without
+additional information. A real symmetric Hessian is positive definite
+exactly when all its eigenvalues are positive.</p>
+<div class="learning-box example"><p><strong>Example — A quadratic model in three variables.</strong>
+Consider <span class="math inline">\(Q(x,y,z)=2x^2+y^2+3z^2+2xy\)</span>. Its Hessian
+is <span class="math display">\[H_Q=\begin{pmatrix}4&amp;2&amp;0\\2&amp;2&amp;0\\0&amp;0&amp;6\end{pmatrix}.\]</span>
+The leading principal minors are <span class="math inline">\(4\)</span>,
+<span class="math inline">\(4\)</span>, and <span class="math inline">\(24\)</span>, all positive. Sylvester’s criterion
+shows positive definiteness, hence the origin is a strict local (and
+global) minimum.</p></div>
+<h2 id="global-optimization-on-closed-and-bounded-regions">Global
+optimization on closed and bounded regions</h2>
+<div class="learning-box example"><p><strong>Theorem — Extreme value theorem.</strong> A continuous
+function on a nonempty compact subset of <span class="math inline">\(\mathbb{R}^n\)</span> attains both a global
+maximum and a global minimum.</p></div>
+<p>For a closed bounded planar region, candidate locations include
+interior critical points, boundary critical points found by
+parametrization or restriction, and corners or nonsmooth boundary
+points. Comparing only interior stationary values is not sufficient.</p>
+<div class="learning-box example"><p><strong>Example — A disk-constrained polynomial.</strong> Optimize
+<span class="math inline">\(f(x,y)=x+2y\)</span> on <span class="math inline">\(x^2+y^2\le9\)</span>. There are no interior
+stationary points because <span class="math inline">\(\nabla
+f=(1,2)\)</span>. By Cauchy–Schwarz, <span class="math display">\[-3\sqrt5\le x+2y\le3\sqrt5.\]</span> The maximum
+occurs at <span class="math inline">\((3/\sqrt5,6/\sqrt5)\)</span> and
+the minimum at its negative. The boundary can alternatively be
+parametrized as <span class="math inline">\((3\cos t,3\sin
+t)\)</span>.</p></div>
+<figure>
+<img alt="Linear objective contours meeting a disk. The extreme values occur where an objective contour is tangent to the circular boundary." src="figures/ch4_disk.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">Linear objective contours meeting a disk.
+The extreme values occur where an objective contour is tangent to the
+circular boundary.</figcaption>
+</figure>
+<div class="learning-box check"><p><strong>Checkpoint.</strong> Find the absolute extrema of <span class="math inline">\(f(x,y)=x^2+y^2-2x\)</span> on the rectangle <span class="math inline">\([-1,2]\times[-1,1]\)</span>. Explain how you check
+each edge and corner.</p></div>
+<h2 id="constrained-optimization-and-lagrange-multipliers">Constrained
+optimization and Lagrange multipliers</h2>
+<p>Suppose <span class="math inline">\(f\)</span> is optimized subject
+to <span class="math inline">\(g(x,y)=c\)</span>. At a regular
+constrained extremum, <span class="math inline">\(\nabla
+g\ne\boldsymbol{0}\)</span>, the objective has zero derivative in every
+tangent direction to the constraint. Since the gradient of <span class="math inline">\(g\)</span> is normal to the constraint, the two
+gradients must be parallel.</p>
+<div class="learning-box example"><p><strong>Theorem — One equality constraint.</strong> If <span class="math inline">\(f,g\)</span> are continuously differentiable and
+<span class="math inline">\(f\)</span> has a constrained local extremum
+at a point satisfying <span class="math inline">\(g=c\)</span> and <span class="math inline">\(\nabla g\ne\boldsymbol{0}\)</span>, then there
+exists <span class="math inline">\(\lambda\in\mathbb{R}\)</span> such
+that <span class="math display">\[\nabla f=\lambda\nabla g,\qquad
+g=c.\]</span></p></div>
+<p>This is a necessary condition, not a guarantee of an extremum.
+Singular constraint points where <span class="math inline">\(\nabla
+g=0\)</span> must be checked separately. In higher dimensions, for
+independent constraints <span class="math inline">\(g_1=c_1,\ldots,g_m=c_m\)</span>, the condition
+becomes <span class="math inline">\(\nabla f=\sum_j\lambda_j\nabla
+g_j\)</span>.</p>
+<div class="learning-box example"><p><strong>Example — Maximum product with a fixed sum.</strong> Maximize
+<span class="math inline">\(xy\)</span> subject to <span class="math inline">\(x+y=10\)</span> with <span class="math inline">\(x,y\ge0\)</span>. The equations <span class="math inline">\((y,x)=\lambda(1,1)\)</span> imply <span class="math inline">\(x=y\)</span>, so <span class="math inline">\(x=y=5\)</span> and <span class="math inline">\(xy=25\)</span>. Checking the boundary endpoints
+<span class="math inline">\((0,10)\)</span> and <span class="math inline">\((10,0)\)</span> gives product zero, confirming the
+global maximum. The nonnegativity constraints are part of the problem,
+not an automatic consequence of the multiplier equations.</p></div>
+<div class="learning-box example"><p><strong>Example — A closest-point problem.</strong> Find the point on
+the ellipse <span class="math inline">\(x^2+4y^2=4\)</span> closest to
+<span class="math inline">\((0,3)\)</span>. Minimize squared distance
+<span class="math inline">\(f=x^2+(y-3)^2\)</span> rather than its
+square root. Lagrange’s equations give <span class="math display">\[2x=2\lambda x,\qquad2(y-3)=8\lambda y,\qquad
+x^2+4y^2=4.\]</span> If <span class="math inline">\(x\ne0\)</span>, then
+<span class="math inline">\(\lambda=1\)</span> and <span class="math inline">\(y=-1\)</span>, which forces <span class="math inline">\(x=0\)</span>, a contradiction. Thus <span class="math inline">\(x=0\)</span> and <span class="math inline">\(y=\pm1\)</span>; the nearest point is <span class="math inline">\((0,1)\)</span> with distance <span class="math inline">\(2\)</span>. Explicit comparison distinguishes
+minimum from maximum.</p></div>
+<figure>
+<img alt="Elliptical constraint and squared-distance contours. At the closest point, a distance contour is tangent to the constraint." src="figures/ch4_lagrange.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">Elliptical constraint and
+squared-distance contours. At the closest point, a distance contour is
+tangent to the constraint.</figcaption>
+</figure>
+<h3 id="multipliers-as-sensitivity-coefficients">Multipliers as
+sensitivity coefficients</h3>
+<p>Under suitable regularity and smooth dependence on <span class="math inline">\(c\)</span>, if <span class="math inline">\(V(c)\)</span> denotes the optimized value of <span class="math inline">\(f\)</span> subject to <span class="math inline">\(g=c\)</span>, then the multiplier convention <span class="math inline">\(\nabla f=\lambda\nabla g\)</span> gives <span class="math inline">\(V'(c)=\lambda\)</span>. This can be
+interpreted as the marginal value of relaxing the constraint. The
+interpretation requires care when the optimum changes discontinuously,
+multiple optimizers exist, or regularity fails.</p>
+<h2 id="unconstrained-numerical-optimization">Unconstrained numerical
+optimization</h2>
+<p>Symbolic stationary equations are valuable when solvable, but real
+applications often involve nonlinear expressions for which no elementary
+solution exists. Numerical methods use an initial guess and repeatedly
+improve it.</p>
+<h3 id="gradient-descent">Gradient descent</h3>
+<p>Given a differentiable objective <span class="math inline">\(f\)</span>, gradient descent updates <span class="math display">\[\boldsymbol{x}_{k+1}=\boldsymbol{x}_k-\alpha_k\nabla
+f(\boldsymbol{x}_k),\]</span> where <span class="math inline">\(\alpha_k&gt;0\)</span> is the step size. A fixed
+step that is too large can cause divergence; a very small step can make
+convergence slow. A zero gradient alone does not certify global
+optimality.</p>
+<div class="learning-box example"><p><strong>Example — Quadratic objective.</strong> Let <span class="math inline">\(f(x,y)=(x-2)^2+4(y+1)^2\)</span>. Then <span class="math inline">\(\nabla f=(2(x-2),8(y+1))\)</span> and the unique
+minimizer is <span class="math inline">\((2,-1)\)</span>. With a fixed
+step <span class="math inline">\(\alpha\)</span>, the errors update as
+<span class="math inline">\(e_{x,k+1}=(1-2\alpha)e_{x,k}\)</span> and
+<span class="math inline">\(e_{y,k+1}=(1-8\alpha)e_{y,k}\)</span>.
+Convergence in both coordinates requires <span class="math inline">\(0&lt;\alpha&lt;1/4\)</span>.</p></div>
+<div class="learning-box example"><p><strong>Remark — Computational follow-up.</strong> We revisit this
+calculation in the paired R and Python laboratories, where the
+mathematical model and inputs are kept identical.</p></div>
+<figure>
+<img alt="Gradient descent iterates on a strictly convex quadratic. Different curvatures in the two coordinate directions produce a characteristic zigzag trajectory." src="figures/ch4_descent.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">Gradient descent iterates on a strictly
+convex quadratic. Different curvatures in the two coordinate directions
+produce a characteristic zigzag trajectory.</figcaption>
+</figure>
+<h3 id="newtons-method-and-hessian-information">Newton’s method and
+Hessian information</h3>
+<p>When the Hessian is invertible, Newton’s update for finding a
+stationary point is <span class="math display">\[\boldsymbol{x}_{k+1}=\boldsymbol{x}_k-H_f(\boldsymbol{x}_k)^{-1}\nabla
+f(\boldsymbol{x}_k).\]</span> In practice, solve a linear system rather
+than explicitly forming the inverse. Near a nondegenerate minimizer and
+under standard smoothness assumptions, Newton’s method can converge
+quadratically. However, an indefinite Hessian can produce a step toward
+a saddle or maximum, and a singular Hessian prevents the unmodified
+step.</p>
+<div class="learning-box example"><p><strong>Remark — Computational follow-up.</strong> We revisit this
+calculation in the paired R and Python laboratories, where the
+mathematical model and inputs are kept identical.</p></div>
+<p>The optimizer reports an approximate solution. Inspect the
+termination message, gradient norm, constraints, and sensitivity to the
+starting point before drawing a mathematical conclusion.</p>
+<h2 id="least-squares-as-an-optimization-problem">Least squares as an
+optimization problem</h2>
+<p>Suppose data <span class="math inline">\((x_i,y_i)\)</span> are
+modeled by a line <span class="math inline">\(\widehat
+y_i=a+bx_i\)</span>. The least-squares objective is <span class="math display">\[S(a,b)=\sum_{i=1}^n(y_i-a-bx_i)^2.\]</span>
+Differentiating and setting both partial derivatives to zero gives the
+normal equations <span class="math display">\[\begin{pmatrix}n&amp;\sum
+x_i\\\sum x_i&amp;\sum
+x_i^2\end{pmatrix}\begin{pmatrix}a\\b\end{pmatrix}=\begin{pmatrix}\sum
+y_i\\\sum x_i y_i\end{pmatrix}.\]</span> If the input values are not all
+equal, the design matrix has full column rank, the quadratic objective
+is strictly convex, and the solution is unique. Numerically, QR or
+singular-value decomposition is generally more stable than forming
+normal equations explicitly.</p>
+<div class="learning-box example"><p><strong>Example — A small calibration dataset.</strong> For the
+observations <span class="math inline">\((0,1)\)</span>, <span class="math inline">\((1,2)\)</span>, <span class="math inline">\((2,2)\)</span>, and <span class="math inline">\((3,4)\)</span>, the sample means are <span class="math inline">\(\bar x=1.5\)</span> and <span class="math inline">\(\bar y=2.25\)</span>. We obtain <span class="math display">\[b=\frac{\sum(x_i-\bar x)(y_i-\bar
+y)}{\sum(x_i-\bar x)^2}=\frac{4.5}{5}=0.9,\qquad
+a=2.25-0.9(1.5)=0.9.\]</span> The fitted line is <span class="math inline">\(\widehat y=0.9+0.9x\)</span>. The residual sum of
+squares is <span class="math inline">\(0.7\)</span>.</p></div>
+<div class="learning-box example"><p><strong>Remark — Computational follow-up.</strong> We revisit this
+calculation in the paired R and Python laboratories, where the
+mathematical model and inputs are kept identical.</p></div>
+<figure>
+<img alt="Least-squares line and vertical residuals for four observations. The fitted line minimizes the sum of squared vertical distances, not perpendicular distances." src="figures/ch4_leastsquares.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">Least-squares line and vertical residuals
+for four observations. The fitted line minimizes the sum of squared
+vertical distances, not perpendicular distances.</figcaption>
+</figure>
+<h2 id="optimization-in-modeling-decisions-and-limitations">Optimization
+in modeling: decisions and limitations</h2>
+<p>Optimization is useful only when the objective and feasible set
+represent the scientific question. In health, engineering, and
+economics, it is important to distinguish mathematical optimality from
+practical desirability. A model may ignore measurement error, fairness
+constraints, uncertainty, or safety requirements. Always state units,
+interpret parameters, and examine whether the optimum is stable under
+small changes in inputs.</p>
+<div class="learning-box example"><p><strong>Example — A resource allocation model.</strong> A laboratory
+allocates nonnegative hours <span class="math inline">\(x\)</span> and
+<span class="math inline">\(y\)</span> to two activities. A stylized
+benefit is <span class="math inline">\(B(x,y)=6x+4y-x^2-2y^2\)</span>
+with total time <span class="math inline">\(x+y\le5\)</span>. The
+unconstrained stationary point is <span class="math inline">\((3,1)\)</span>, which is feasible and yields <span class="math inline">\(B=11\)</span>. Because the Hessian is <span class="math inline">\(\operatorname{diag}(-2,-4)\)</span>, the objective
+is strictly concave, so this feasible point is the unique global
+maximizer over the convex feasible region. The mathematical model does
+not establish that the chosen benefit coefficients are empirically
+valid.</p></div>
+<h2 id="additional-mathematical-examples-from-the-r-manuscript">Additional
+mathematical examples from the R manuscript</h2>
+<h3 id="a-second-order-exponential-approximation">A second-order
+exponential approximation</h3>
+<p>For <span class="math inline">\(f(x,y)=e^{x+2y}\)</span> at <span class="math inline">\((0,0)\)</span>, the gradient is <span class="math inline">\((1,2)\)</span> and the Hessian is <span class="math inline">\(\begin{psmallmatrix}1&amp;2\\2&amp;4\end{psmallmatrix}\)</span>.
+Therefore <span class="math display">\[T_2(x,y)=1+x+2y+\tfrac12(x+2y)^2.\]</span> At
+<span class="math inline">\((0.1,0.05)\)</span> the exact value is <span class="math inline">\(e^{0.2}\approx1.22140276\)</span>, while the
+second-order prediction is <span class="math inline">\(1.22\)</span>.
+This model is distinct from the mixed-trigonometric Taylor example
+developed earlier and is retained to highlight approximation error along
+a one-dimensional linear combination.</p>
+<h3 id="global-extrema-on-a-unit-disk">Global extrema on a unit
+disk</h3>
+<p>For <span class="math inline">\(f(x,y)=x+2y\)</span> on <span class="math inline">\(x^2+y^2\le1\)</span>, the gradient <span class="math inline">\((1,2)\)</span> never vanishes. On the boundary,
+<span class="math inline">\((x,y)=(\cos t,\sin t)\)</span>, so <span class="math inline">\(f=\cos t+2\sin t\)</span>. The maximum is <span class="math inline">\(\sqrt5\)</span> at <span class="math inline">\((1,2)/\sqrt5\)</span> and the minimum is <span class="math inline">\(-\sqrt5\)</span> at <span class="math inline">\(-(1,2)/\sqrt5\)</span>. The Cauchy–Schwarz
+inequality provides an independent global proof.</p>
+<h3 id="nonconvexity-and-multiple-optimal-solutions">Nonconvexity and
+multiple optimal solutions</h3>
+<p>The objective <span class="math inline">\(f(x,y)=(x^2-1)^2+y^2\)</span> is nonnegative and
+vanishes at both <span class="math inline">\((1,0)\)</span> and <span class="math inline">\((-1,0)\)</span>. These are two distinct global
+minimizers. An algorithm started near one basin may not find the other.
+We will compare starting values in both languages.</p>
+<h3 id="two-equality-constraints-in-three-variables">Two equality
+constraints in three variables</h3>
+<p>Minimize <span class="math inline">\(x^2+y^2+z^2\)</span> subject to
+<span class="math inline">\(x+y+z=6\)</span> and <span class="math inline">\(x-y=0\)</span>. Substitution gives <span class="math inline">\(y=x\)</span>, <span class="math inline">\(z=6-2x\)</span>, and <span class="math inline">\(f(x)=6(x-2)^2+12\)</span>. The unique constrained
+minimizer is <span class="math inline">\((2,2,2)\)</span>. This
+illustrates why multiple constraints require independent constraint
+gradients in the multiplier method.</p>
+<h3 id="production-response-and-a-concave-objective">Production response
+and a concave objective</h3>
+<p>A stylized production response is <span class="math display">\[P(x,y)=12x+10y-x^2-2y^2-xy.\]</span> The
+stationary equations <span class="math inline">\(2x+y=12\)</span> and
+<span class="math inline">\(x+4y=10\)</span> give <span class="math inline">\((x,y)=(38/7,8/7)\)</span>. The Hessian <span class="math inline">\(\begin{psmallmatrix}-2&amp;-1\\-1&amp;-4\end{psmallmatrix}\)</span>
+is negative definite, so this point is the unique global maximizer. The
+coefficients are illustrative, not fitted empirical estimates.</p>
+<h2 id="solving-the-mathematical-problems-using-r">Solving the
+mathematical problems using R</h2>
+<p>The companion program <code>code/chapter04_paired.R</code> contains
+all of the following calculations. We use base R, <code>optim()</code>,
+<code>optimize()</code>, and <code>qr.solve()</code>, avoiding
+additional package dependencies.</p>
+<h3 id="taylor-approximation-and-error">Taylor approximation and
+error</h3>
+<div class="code-shell"><div class="code-bar">R<a href="code/chapter04-listing-01.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>f &lt;- function(x,y) exp(x+2*y)
+t1 &lt;- function(x,y) 1+x+2*y
+t2 &lt;- function(x,y) 1+x+2*y+.5*(x+2*y)^2
+print(c(exact=f(.1,.05),linear=t1(.1,.05),
+        quadratic=t2(.1,.05)))
+h &lt;- 10^seq(-3,-1,length.out=25)
+plot(h,abs(f(h,h)-t2(h,h)),log="xy",type="b",
+     xlab="Step size",ylab="Quadratic error")</code></pre></div>
+<h3 id="gradient-and-hessian-of-a-convex-objective">Gradient and Hessian
+of a convex objective</h3>
+<p>Consider <span class="math inline">\(q(x,y)=(x-2)^2+4(y+1)^2+3\)</span>. Its unique
+global minimizer is <span class="math inline">\((2,-1)\)</span> with
+value <span class="math inline">\(3\)</span> because its Hessian is
+<span class="math inline">\(\operatorname{diag}(2,8)&gt;0\)</span>.</p>
+<div class="code-shell"><div class="code-bar">R<a href="code/chapter04-listing-02.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>q &lt;- function(p) (p[1]-2)^2+4*(p[2]+1)^2+3
+grad &lt;- function(p) c(2*(p[1]-2),8*(p[2]+1))
+fit &lt;- optim(c(0,0),q,gr=grad,method="BFGS")
+print(c(fit$par,minimum=fit$value))
+stopifnot(max(abs(fit$par-c(2,-1)))&lt;1e-5)</code></pre></div>
+<h3 id="nonconvex-starts-a-disk-boundary-and-a-fixed-sum-constraint">Nonconvex
+starts, a disk boundary, and a fixed-sum constraint</h3>
+<div class="code-shell"><div class="code-bar">R<a href="code/chapter04-listing-03.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>nonconvex &lt;- function(p) (p[1]^2-1)^2+p[2]^2
+starts &lt;- list(c(-2,1),c(2,1),c(-.7,-1),c(.7,-1))
+print(do.call(rbind,lapply(starts,function(s)
+  c(optim(s,nonconvex,method="BFGS")$par))))
+angle &lt;- optimize(function(t) -(cos(t)+2*sin(t)),
+                  c(0,2*pi))
+print(c(disk_max=-angle$objective,exact=sqrt(5)))
+fixed_sum &lt;- optimize(function(x) -x*(10-x),c(0,10))
+print(c(x=fixed_sum$minimum,y=10-fixed_sum$minimum,
+        product=-fixed_sum$objective))</code></pre></div>
+<h3 id="least-squares-estimation-and-numerical-conditioning">Least-squares
+estimation and numerical conditioning</h3>
+<div class="code-shell"><div class="code-bar">R<a href="code/chapter04-listing-04.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>x &lt;- c(0,1,2,3); y &lt;- c(1,2,2,4)
+X &lt;- cbind(1,x)
+print(qr.solve(X,y))
+print(coef(lm(y~x)))
+stopifnot(max(abs(qr.solve(X,y)-c(.9,.9)))&lt;1e-10)</code></pre></div>
+<h3 id="maximizing-the-production-response">Maximizing the production
+response</h3>
+<div class="code-shell"><div class="code-bar">R<a href="code/chapter04-listing-05.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>P &lt;- function(p) 12*p[1]+10*p[2]-p[1]^2-2*p[2]^2-p[1]*p[2]
+fit &lt;- optim(c(1,1),function(p) -P(p),method="BFGS")
+print(c(fit$par,benefit=P(fit$par)))
+print(c(exact_x=38/7,exact_y=8/7))</code></pre></div>
+<h2 id="solving-the-same-problems-using-python">Solving the same
+problems using Python</h2>
+<p>The Python program <code>code/chapter04_paired.py</code> uses the
+same inputs and objectives as the R program. Symbolic differentiation is
+added to verify the derivatives analytically.</p>
+<h3 id="taylor-approximation-and-error-1">Taylor approximation and
+error</h3>
+<div class="code-shell"><div class="code-bar">Python<a href="code/chapter04-listing-06.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>import numpy as np
+import matplotlib.pyplot as plt
+f=lambda x,y:np.exp(x+2*y)
+t1=lambda x,y:1+x+2*y
+t2=lambda x,y:1+x+2*y+.5*(x+2*y)**2
+print(f(.1,.05),t1(.1,.05),t2(.1,.05))
+h=np.logspace(-3,-1,25)
+plt.loglog(h,abs(f(h,h)-t2(h,h)),'o-')
+plt.xlabel('Step size');plt.ylabel('Quadratic error')</code></pre></div>
+<h3 id="symbolic-derivatives-and-numerical-minimization">Symbolic
+derivatives and numerical minimization</h3>
+<div class="code-shell"><div class="code-bar">Python<a href="code/chapter04-listing-07.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>import sympy as sp
+from scipy.optimize import minimize
+x,y=sp.symbols('x y')
+q=(x-2)**2+4*(y+1)**2+3
+print([sp.diff(q,z) for z in (x,y)])
+print(sp.hessian(q,(x,y)))
+fun=lambda p:(p[0]-2)**2+4*(p[1]+1)**2+3
+jac=lambda p:np.array([2*(p[0]-2),8*(p[1]+1)])
+fit=minimize(fun,[0,0],jac=jac,method='BFGS')
+print(fit.x,fit.fun)
+assert np.allclose(fit.x,[2,-1],atol=1e-5)</code></pre></div>
+<h3 id="the-same-nonconvex-disk-and-fixed-sum-problems">The same
+nonconvex, disk, and fixed-sum problems</h3>
+<div class="code-shell"><div class="code-bar">Python<a href="code/chapter04-listing-08.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>from scipy.optimize import minimize, minimize_scalar
+nonconvex=lambda p:(p[0]**2-1)**2+p[1]**2
+starts=[[-2,1],[2,1],[-.7,-1],[.7,-1]]
+print([minimize(nonconvex,s,method='BFGS').x for s in starts])
+res=minimize_scalar(lambda t:-(np.cos(t)+2*np.sin(t)),
+                    bounds=(0,2*np.pi),method='bounded')
+print('disk maximum',-res.fun,'exact',np.sqrt(5))
+res=minimize_scalar(lambda x:-x*(10-x),bounds=(0,10),
+                    method='bounded')
+print('fixed-sum optimum',res.x,10-res.x,-res.fun)</code></pre></div>
+<h3 id="least-squares-and-the-production-response">Least squares and the
+production response</h3>
+<div class="code-shell"><div class="code-bar">Python<a href="code/chapter04-listing-09.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>xx=np.array([0,1,2,3]); yy=np.array([1,2,2,4])
+X=np.column_stack([np.ones_like(xx),xx])
+beta=np.linalg.lstsq(X,yy,rcond=None)[0]
+print('least squares',beta)
+assert np.allclose(beta,[.9,.9])
+P=lambda p:12*p[0]+10*p[1]-p[0]**2-2*p[1]**2-p[0]*p[1]
+fit=minimize(lambda p:-P(p),[1,1],method='BFGS')
+print('production optimum',fit.x,'exact',[38/7,8/7])
+assert np.allclose(fit.x,[38/7,8/7],atol=1e-4)</code></pre></div>
+<h2 id="comparing-r-and-python">Comparing R and Python</h2>
+<p>Both implementations recover the same mathematical optima, but their
+optimizer interfaces differ: R’s <code>optim()</code> takes a starting
+vector and objective; SciPy’s <code>minimize()</code> provides multiple
+algorithms and detailed termination diagnostics. The QR-based
+least-squares solver in R and <code>numpy.linalg.lstsq</code> in Python
+avoid explicit inversion of <span class="math inline">\(X^TX\)</span>.
+Small discrepancies between outputs reflect tolerances and
+floating-point arithmetic. Neither numerical agreement nor a success
+message proves global optimality; the positive-definite or
+negative-definite Hessian arguments provide that guarantee for the
+quadratic models.</p>
+<h2 id="real-world-application-allocating-laboratory-time">Real-world
+application: allocating laboratory time</h2>
+<p>A laboratory has a total of five hours available for two activities.
+Consider the illustrative benefit model <span class="math inline">\(B(x,y)=6x+4y-x^2-2y^2\)</span> subject to <span class="math inline">\(x\ge0\)</span>, <span class="math inline">\(y\ge0\)</span>, and <span class="math inline">\(x+y\le5\)</span>. Its gradient vanishes at <span class="math inline">\((3,1)\)</span>, which satisfies all constraints,
+and its Hessian <span class="math inline">\(\operatorname{diag}(-2,-4)\)</span> is negative
+definite. Thus <span class="math inline">\(B(3,1)=11\)</span> is the
+unique global maximum on the feasible region. R and Python can verify
+the result numerically by minimizing <span class="math inline">\(-B\)</span>; however, the coefficients would
+require empirical estimation before using the result to schedule real
+laboratory work. A responsible report would include units, feasibility,
+sensitivity to the coefficients, and the possible omission of staffing
+and equipment constraints.</p>
+<h2 id="convexity-optimality-and-the-geometry-of-algorithms">Convexity,
+optimality, and the geometry of algorithms</h2>
+<div class="learning-box example"><p><strong>Definition — Convex sets and functions.</strong> A set <span class="math inline">\(C\subseteq\mathbb{R}^n\)</span> is convex if <span class="math inline">\((1-t)\boldsymbol{x}+t\boldsymbol{y}\in C\)</span>
+whenever <span class="math inline">\(\boldsymbol{x},\boldsymbol{y}\in
+C\)</span> and <span class="math inline">\(0\le t\le1\)</span>. A
+function <span class="math inline">\(f:C\to\mathbb{R}\)</span> is convex
+if <span class="math display">\[f((1-t)\boldsymbol{x}+t\boldsymbol{y})\le(1-t)f(\boldsymbol{x})+tf(\boldsymbol{y}).\]</span>
+It is strictly convex when the inequality is strict for distinct points
+and <span class="math inline">\(0&lt;t&lt;1\)</span>.</p></div>
+<div class="learning-box example"><p><strong>Theorem — First-order convexity criterion.</strong> Let <span class="math inline">\(C\)</span> be an open convex set and <span class="math inline">\(f\)</span> differentiable on <span class="math inline">\(C\)</span>. Then <span class="math inline">\(f\)</span> is convex if and only if <span class="math display">\[f(\boldsymbol{y})\ge f(\boldsymbol{x})+\nabla
+f(\boldsymbol{x})^T(\boldsymbol{y}-\boldsymbol{x})\qquad(\boldsymbol{x},\boldsymbol{y}\in
+C).\]</span> Consequently every stationary point of a differentiable
+convex function is a global minimizer.</p></div>
+<div class="learning-box example"><p><strong>Proof.</strong> For fixed <span class="math inline">\(\boldsymbol{x},\boldsymbol{y}\)</span> define
+<span class="math inline">\(g(t)=f(\boldsymbol{x}+t(\boldsymbol{y}-\boldsymbol{x}))\)</span>.
+If <span class="math inline">\(f\)</span> is convex, <span class="math inline">\(g\)</span> is convex and the secant slope is no
+smaller than the right derivative at zero: <span class="math inline">\(g(1)-g(0)\ge g'(0)\)</span>. The chain rule
+gives the inequality. Conversely, apply the supporting-hyperplane
+inequality at <span class="math inline">\(\boldsymbol{z}=(1-t)\boldsymbol{x}+t\boldsymbol{y}\)</span>
+separately to <span class="math inline">\(\boldsymbol{x}\)</span> and
+<span class="math inline">\(\boldsymbol{y}\)</span>, multiply by <span class="math inline">\(1-t\)</span> and <span class="math inline">\(t\)</span>, and add. The gradient terms cancel,
+giving the convexity inequality.</p></div>
+<div class="learning-box example"><p><strong>Theorem — Second-order convexity criterion.</strong> If <span class="math inline">\(f\in C^2(C)\)</span> on an open convex set, <span class="math inline">\(f\)</span> is convex precisely when <span class="math inline">\(\boldsymbol{v}^TH_f(\boldsymbol{x})\boldsymbol{v}\ge0\)</span>
+for all <span class="math inline">\(\boldsymbol{x}\in C\)</span> and
+<span class="math inline">\(\boldsymbol{v}\in\mathbb{R}^n\)</span>. A
+positive definite Hessian everywhere is sufficient for strict convexity,
+but not necessary.</p></div>
+<div class="learning-box example"><p><strong>Proof.</strong> Restrict <span class="math inline">\(f\)</span> to each line segment. Its second
+derivative is <span class="math inline">\(g''(t)=\boldsymbol{v}^TH_f(\boldsymbol{x}+t\boldsymbol{v})\boldsymbol{v}\)</span>.
+A twice differentiable one-variable function is convex exactly when its
+second derivative is nonnegative. If this derivative is strictly
+positive on each nonconstant segment, strict convexity follows.</p></div>
+<div class="learning-box example"><p><strong>Example — Strict convexity without a positive Hessian at
+every point.</strong> The function <span class="math inline">\(f(x)=x^4\)</span> is strictly convex on <span class="math inline">\(\mathbb{R}\)</span>, yet <span class="math inline">\(f''(0)=0\)</span>. Thus positive
+definiteness of the Hessian is a sufficient condition, not an
+equivalence, for strict convexity.</p></div>
+<h3 id="a-quantitative-convergence-bound-for-gradient-descent">A
+quantitative convergence bound for gradient descent</h3>
+<p>Suppose <span class="math inline">\(f\)</span> has an <span class="math inline">\(L\)</span>-Lipschitz gradient: <span class="math inline">\(\|\nabla f(\boldsymbol{x})-\nabla
+f(\boldsymbol{y})\|\le L\|\boldsymbol{x}-\boldsymbol{y}\|\)</span>. The
+descent lemma states <span class="math display">\[f(\boldsymbol{x}+\boldsymbol{h})\le
+f(\boldsymbol{x})+\nabla f(\boldsymbol{x})^T\boldsymbol{h}+\frac
+L2\|\boldsymbol{h}\|^2.\]</span> Taking <span class="math inline">\(\boldsymbol{h}=-\alpha\nabla
+f(\boldsymbol{x})\)</span> yields <span class="math display">\[f(\boldsymbol{x}-\alpha\nabla
+f(\boldsymbol{x}))\le f(\boldsymbol{x})-\alpha(1-L\alpha/2)\|\nabla
+f(\boldsymbol{x})\|^2.\]</span> Thus a fixed step <span class="math inline">\(0&lt;\alpha&lt;2/L\)</span> decreases the
+objective whenever the gradient is nonzero. This is a descent guarantee,
+not by itself a global convergence guarantee for a nonconvex
+objective.</p>
+<div class="learning-box example"><p><strong>Proof — Descent lemma.</strong> Integrate the directional
+derivative along <span class="math inline">\(\boldsymbol{x}+t\boldsymbol{h}\)</span>: <span class="math inline">\(f(\boldsymbol{x}+\boldsymbol{h})-f(\boldsymbol{x})=\int_0^1\nabla
+f(\boldsymbol{x}+t\boldsymbol{h})^T\boldsymbol{h}\,dt\)</span>. Subtract
+<span class="math inline">\(\nabla
+f(\boldsymbol{x})^T\boldsymbol{h}\)</span> and apply Cauchy–Schwarz and
+Lipschitz continuity to bound the remainder by <span class="math inline">\(\int_0^1
+Lt\|\boldsymbol{h}\|^2dt=L\|\boldsymbol{h}\|^2/2\)</span>.</p></div>
+<div class="learning-box example"><p><strong>Example — Predicting stable steps.</strong> For <span class="math inline">\(q(x,y)=(x-2)^2+4(y+1)^2\)</span>, <span class="math inline">\(H_q=\operatorname{diag}(2,8)\)</span>, so <span class="math inline">\(L=8\)</span>. The bound <span class="math inline">\(0&lt;\alpha&lt;1/4\)</span> exactly matches the
+coordinatewise stability condition derived earlier. With <span class="math inline">\(\alpha=1/8\)</span>, the <span class="math inline">\(y\)</span>-coordinate reaches its minimizer in one
+step, while the <span class="math inline">\(x\)</span> error is
+multiplied by <span class="math inline">\(3/4\)</span> at every
+iteration.</p></div>
+<h2 id="constraints-with-inequalities-first-order-conditions">Constraints
+with inequalities: first-order conditions</h2>
+<p>Equality multipliers alone cannot distinguish an active budget from
+an inactive one. Consider minimizing <span class="math inline">\(f(\boldsymbol{x})\)</span> subject to
+differentiable inequalities <span class="math inline">\(g_i(\boldsymbol{x})\le0\)</span> and equalities
+<span class="math inline">\(h_j(\boldsymbol{x})=0\)</span>. Under an
+appropriate constraint qualification, the Karush–Kuhn–Tucker (KKT)
+conditions at a local minimizer are <span class="math display">\[\nabla
+f+\sum_i\lambda_i\nabla g_i+\sum_j\mu_j\nabla h_j=0,\quad
+\lambda_i\ge0,\quad g_i\le0,\quad \lambda_i g_i=0,\quad h_j=0.\]</span>
+The final product condition is called <em>complementary slackness</em>.
+If a constraint is inactive (<span class="math inline">\(g_i&lt;0\)</span>), its multiplier must vanish.
+KKT conditions are generally necessary only under regularity
+assumptions; in convex problems with affine equalities and suitable
+constraint qualifications they can also certify global optimality.</p>
+<div class="learning-box example"><p><strong>Example — A budget-limited quadratic benefit.</strong>
+Maximize <span class="math inline">\(B(x,y)=6x+4y-x^2-2y^2\)</span> with
+<span class="math inline">\(x,y\ge0\)</span> and <span class="math inline">\(x+y\le3\)</span>. The unconstrained optimum <span class="math inline">\((3,1)\)</span> violates the budget. On the active
+boundary <span class="math inline">\(y=3-x\)</span>, <span class="math display">\[B(x,3-x)=-6+14x-3x^2,\quad 0\le x\le3.\]</span>
+The unique maximum on the boundary occurs at <span class="math inline">\(x=7/3\)</span>, <span class="math inline">\(y=2/3\)</span>, with benefit <span class="math inline">\(31/3\)</span>. At this point <span class="math inline">\(\nabla B=(4/3,4/3)\)</span> is parallel to the
+budget normal <span class="math inline">\((1,1)\)</span>. The budget is
+active, and both activities remain positive.</p></div>
+<div class="learning-box check"><p><strong>Checkpoint.</strong> Verify the correct boundary polynomial
+in the preceding example by direct expansion. Compare the benefit at the
+interior stationary point of the boundary, the endpoints <span class="math inline">\((0,3)\)</span> and <span class="math inline">\((3,0)\)</span>, and any feasible interior
+stationary points. Explain the economic meaning of the positive budget
+multiplier.</p></div>
+<h2 id="numerical-conditioning-and-reproducibility">Numerical
+conditioning and reproducibility</h2>
+<h3 id="why-solving-normal-equations-can-lose-accuracy">Why solving
+normal equations can lose accuracy</h3>
+<p>If <span class="math inline">\(X\)</span> has full column rank, the
+least-squares estimator solves <span class="math inline">\(X^TX\boldsymbol{\beta}=X^T\boldsymbol{y}\)</span>.
+In the Euclidean condition number, <span class="math inline">\(\kappa_2(X^TX)=\kappa_2(X)^2\)</span>. Therefore
+forming <span class="math inline">\(X^TX\)</span> can amplify
+sensitivity when predictor columns are nearly linearly dependent. QR
+factorization avoids squaring the condition number; singular-value
+decomposition also reveals rank deficiency. The normal equations remain
+important for derivation but need not be the preferred numerical
+algorithm.</p>
+<div class="learning-box example"><p><strong>Example — Nearly redundant predictors.</strong> Suppose a
+regression includes columns <span class="math inline">\(x_i\)</span> and
+<span class="math inline">\(x_i+10^{-6}z_i\)</span>. Both may convey
+almost the same information. Small measurement changes can lead to large
+coefficient changes even when predictions remain comparatively stable.
+Centering or scaling variables does not eliminate exact linear
+dependence, and an optimizer’s convergence message does not establish
+parameter identifiability.</p></div>
+<h3 id="a-verification-checklist-for-numerical-optimization">A
+verification checklist for numerical optimization</h3>
+<p>For every reported numerical solution, identify the objective and
+units, the feasible domain, the initial value, the algorithm and
+tolerances, the termination condition, the final gradient or KKT
+residual, and an independent analytic or numerical check. For nonconvex
+models, compare multiple starting values. For constrained models, report
+the constraint residuals. Use fixed random seeds for stochastic
+experiments and retain the full script in the project directory.</p>
+<h2 id="extended-paired-laboratory-projected-gradient-descent">Extended
+paired laboratory: projected gradient descent</h2>
+<p>Consider minimizing <span class="math inline">\(q(x,y)=(x-2)^2+4(y+1)^2\)</span> subject to <span class="math inline">\(x\ge0\)</span> and <span class="math inline">\(y\ge0\)</span>. The unconstrained minimizer <span class="math inline">\((2,-1)\)</span> is infeasible, so the constrained
+minimizer is <span class="math inline">\((2,0)\)</span>, with <span class="math inline">\(q(2,0)=4\)</span>. A projected gradient method
+alternates a gradient step with Euclidean projection onto the
+nonnegative quadrant: <span class="math display">\[\boldsymbol{x}_{k+1}=\Pi_{\mathbb{R}^2_+}\bigl(\boldsymbol{x}_k-\alpha\nabla
+q(\boldsymbol{x}_k)\bigr),\qquad
+\Pi_{\mathbb{R}^2_+}(a,b)=(\max(a,0),\max(b,0)).\]</span> For <span class="math inline">\(\alpha=1/8\)</span> the iterates converge to <span class="math inline">\((2,0)\)</span>. Both programs below use the same
+starting point and iteration count.</p>
+<h3 id="r-implementation">R implementation</h3>
+<div class="code-shell"><div class="code-bar">R<a href="code/chapter04-listing-10.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>q &lt;- function(z) (z[1]-2)^2+4*(z[2]+1)^2
+grad &lt;- function(z) c(2*(z[1]-2),8*(z[2]+1))
+z &lt;- c(0,3); alpha &lt;- 1/8
+path &lt;- matrix(z,nrow=1)
+for (k in 1:100) {
+  z &lt;- pmax(0,z-alpha*grad(z))
+  path &lt;- rbind(path,z)
+}
+print(c(x=z[1],y=z[2],objective=q(z)))
+stopifnot(max(abs(z-c(2,0)))&lt;1e-10)
+plot(path[,1],path[,2],type='o',pch=16,
+     xlab='x',ylab='y',main='Projected gradient iterates')</code></pre></div>
+<h3 id="python-implementation">Python implementation</h3>
+<div class="code-shell"><div class="code-bar">Python<a href="code/chapter04-listing-11.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>import numpy as np
+q = lambda z: (z[0]-2)**2 + 4*(z[1]+1)**2
+grad = lambda z: np.array([2*(z[0]-2),8*(z[1]+1)])
+z = np.array([0.,3.]); alpha = 1/8
+path = [z.copy()]
+for k in range(100):
+    z = np.maximum(0,z-alpha*grad(z))
+    path.append(z.copy())
+print('solution:',z,'objective:',q(z))
+assert np.allclose(z,[2,0],atol=1e-10)</code></pre></div>
+<h3 id="interpretation">Interpretation</h3>
+<p>The feasible boundary changes the solution from <span class="math inline">\((2,-1)\)</span> to <span class="math inline">\((2,0)\)</span>. The <span class="math inline">\(y\)</span> component is projected to zero, while
+the <span class="math inline">\(x\)</span> component approaches two
+geometrically. The algorithm is not a substitute for the analytic proof:
+because <span class="math inline">\(q\)</span> is strictly convex and
+the feasible quadrant is convex, this feasible minimizer is unique.</p>
+<div class="learning-box check"><p><strong>Checkpoint.</strong> Modify the code to use <span class="math inline">\(\alpha=1/16\)</span> and <span class="math inline">\(\alpha=1/5\)</span>. Compare convergence speed and
+explain why the projection does not remove the need to choose a sensible
+step size.</p></div>
+<h2 id="additional-exercises-rigorous-optimization-and-verification">Additional
+exercises: rigorous optimization and verification</h2>
+<ol type="1">
+<li><p>Prove that the intersection of two convex sets is convex. Give an
+example of a union of convex sets that is not convex.</p></li>
+<li><p>Show from the definition that every affine function is both
+convex and concave.</p></li>
+<li><p>For <span class="math inline">\(f(x,y)=x^4+2y^2\)</span>,
+establish strict convexity without claiming its Hessian is positive
+definite everywhere.</p></li>
+<li><p>Find the global minimum of <span class="math inline">\(f(x,y)=3x^2+2xy+2y^2-8x+4y\)</span> by completing
+the square and by solving the gradient equations.</p></li>
+<li><p>Determine the Lipschitz constant <span class="math inline">\(L\)</span> of the gradient for the quadratic in
+the preceding problem and a sufficient interval of fixed descent
+steps.</p></li>
+<li><p>Solve <span class="math inline">\(\min\{(x-3)^2+(y+1)^2:x\ge0,\
+y\ge0\}\)</span> analytically and by projected gradient
+descent.</p></li>
+<li><p>Maximize <span class="math inline">\(6x+4y-x^2-2y^2\)</span>
+subject to <span class="math inline">\(x,y\ge0\)</span> and <span class="math inline">\(x+y\le3\)</span>; identify all active constraints
+and verify the KKT conditions.</p></li>
+<li><p>Derive the normal equations for weighted least squares <span class="math inline">\(\sum_i w_i(y_i-a-bx_i)^2\)</span>, with strictly
+positive weights.</p></li>
+<li><p>Explain with a numerical example why a small gradient norm alone
+need not establish that a point is a minimum.</p></li>
+<li><p>Design a comparison of three starting values for a nonconvex
+objective, documenting the objective values and stopping criteria in
+both R and Python.</p></li>
+</ol>
+<h2 id="chapter-summary">Chapter summary</h2>
+<p>The gradient determines first-order sensitivity and steepest ascent.
+The Hessian records second-order curvature and classifies nondegenerate
+stationary points. Compactness ensures existence of global extrema for
+continuous functions, but candidates on the boundary must be examined.
+Lagrange multipliers characterize regular constrained extrema. Numerical
+optimizers are powerful computational tools, but they require checks for
+convergence, feasibility, and global validity. Least squares is an
+important application in which calculus leads directly to statistical
+estimation.</p>
+<h2 id="exercises">Exercises</h2>
+<p><strong>Conceptual and geometric reasoning</strong></p>
+<ol type="1">
+<li><p>Explain why <span class="math inline">\(\nabla f\)</span> is
+normal to a regular level curve, and identify the hypothesis needed for
+the argument.</p></li>
+<li><p>Find the fastest-increase direction for <span class="math inline">\(f(x,y)=x^2+3xy+2y^2\)</span> at <span class="math inline">\((1,-1)\)</span>.</p></li>
+<li><p>Find the directional derivative of <span class="math inline">\(f(x,y,z)=xyz+x^2\)</span> at <span class="math inline">\((1,2,-1)\)</span> in the direction <span class="math inline">\((2,-1,2)\)</span>.</p></li>
+<li><p>Find the tangent plane to <span class="math inline">\(x^2+2y^2+3z^2=12\)</span> at <span class="math inline">\((1,2,1)\)</span>, and check that the point lies on
+the surface before proceeding.</p></li>
+<li><p>Explain why a function may have all first partial derivatives at
+a point but fail to have a linear approximation there.</p></li>
+<li><p>Use differentials to estimate the change in <span class="math inline">\(f(x,y)=\log(x^2+y^2)\)</span> near <span class="math inline">\((1,1)\)</span> when <span class="math inline">\(x\)</span> increases by <span class="math inline">\(0.02\)</span> and <span class="math inline">\(y\)</span> decreases by <span class="math inline">\(0.01\)</span>.</p></li>
+<li><p>Derive the second-order Taylor polynomial of <span class="math inline">\(e^{x+y}\)</span> at the origin.</p></li>
+<li><p>Derive the second-order Taylor polynomial of <span class="math inline">\(\sin x\cos y\)</span> at <span class="math inline">\((0,0)\)</span>. Explain why some terms
+vanish.</p></li>
+<li><p>Compute the Hessian of <span class="math inline">\(f(x,y)=x^3y+\cos(xy)\)</span>.</p></li>
+<li><p>For a symmetric <span class="math inline">\(2\times2\)</span>
+Hessian, explain why a negative determinant implies directions of both
+positive and negative quadratic curvature.</p></li>
+<li><p>Classify the stationary points of <span class="math inline">\(f(x,y)=x^2+4y^2-2x+8y\)</span>.</p></li>
+<li><p>Classify the stationary points of <span class="math inline">\(f(x,y)=x^2-4y^2+2xy\)</span>.</p></li>
+<li><p>Determine the local behavior of <span class="math inline">\(f(x,y)=x^4+y^4\)</span> at the origin despite its
+vanishing Hessian.</p></li>
+<li><p>Determine the local behavior of <span class="math inline">\(f(x,y)=x^3+y^2\)</span> at the origin. Explain why
+the Hessian test is inconclusive.</p></li>
+<li><p>Find and classify all critical points of <span class="math inline">\(f(x,y)=x^3-3x+y^2\)</span>.</p></li>
+<li><p>Find the stationary point of <span class="math inline">\(f(x,y,z)=x^2+y^2+z^2+xy-2z\)</span> and prove it
+is a global minimum.</p></li>
+</ol>
+<p><strong>Global and constrained optimization</strong></p>
+<ol type="1">
+<li><p>Find absolute extrema of <span class="math inline">\(f(x,y)=x+y\)</span> on <span class="math inline">\(x^2+y^2\le4\)</span>.</p></li>
+<li><p>Find absolute extrema of <span class="math inline">\(f(x,y)=x^2+y^2\)</span> on the triangle with
+vertices <span class="math inline">\((0,0)\)</span>, <span class="math inline">\((2,0)\)</span>, and <span class="math inline">\((0,3)\)</span>.</p></li>
+<li><p>Find absolute extrema of <span class="math inline">\(f(x,y)=xy\)</span> on the square <span class="math inline">\([-1,1]^2\)</span>.</p></li>
+<li><p>Maximize <span class="math inline">\(xy\)</span> subject to <span class="math inline">\(x+2y=12\)</span> and <span class="math inline">\(x,y\ge0\)</span>.</p></li>
+<li><p>Find extrema of <span class="math inline">\(x^2+2y^2\)</span>
+subject to <span class="math inline">\(x^2+y^2=1\)</span>.</p></li>
+<li><p>Find the points on <span class="math inline">\(x^2+4y^2=4\)</span> closest to and farthest from
+the origin.</p></li>
+<li><p>Maximize <span class="math inline">\(xyz\)</span> for nonnegative
+<span class="math inline">\(x,y,z\)</span> with <span class="math inline">\(x+y+z=12\)</span>.</p></li>
+<li><p>Find the point on the plane <span class="math inline">\(x+2y+2z=9\)</span> closest to the origin.</p></li>
+<li><p>Discuss why the Lagrange multiplier condition may fail to detect
+extrema at singular constraint points, using <span class="math inline">\(g(x,y)=x^2+y^2=0\)</span>.</p></li>
+<li><p>Optimize <span class="math inline">\(f(x,y)=x^2+y^2\)</span>
+subject to <span class="math inline">\(x+y=1\)</span> and interpret the
+multiplier as the constraint value changes.</p></li>
+</ol>
+<p><strong>Python, modeling, and numerical methods</strong></p>
+<ol type="1">
+<li><p>Use SymPy to compute the gradient and Hessian of <span class="math inline">\(e^{xy}+x^2y\)</span>; verify the mixed partial
+derivatives agree.</p></li>
+<li><p>Plot contours and gradient arrows for <span class="math inline">\(f(x,y)=2x^2+xy+3y^2\)</span> and explain their
+orientation.</p></li>
+<li><p>Compare a quadratic Taylor approximation to <span class="math inline">\(\cos x\cos y\)</span> at the origin for
+displacements of length <span class="math inline">\(0.1\)</span>, <span class="math inline">\(0.5\)</span>, and <span class="math inline">\(1\)</span>.</p></li>
+<li><p>Implement gradient descent for <span class="math inline">\((x-3)^2+9(y+1)^2\)</span>. Find experimentally a
+stable fixed step and compare with a bound derived from the Hessian
+eigenvalues.</p></li>
+<li><p>Use SciPy to minimize the Rosenbrock function <span class="math inline">\((1-x)^2+100(y-x^2)^2\)</span> from at least three
+starting points. Explain why a returned success flag alone is not a
+global proof.</p></li>
+<li><p>Fit a least-squares line to the data <span class="math inline">\((0,1),(1,2),(2,2),(3,4)\)</span> using both
+symbolic normal equations and <code>numpy.linalg.lstsq</code>.</p></li>
+<li><p>Generate synthetic data <span class="math inline">\(y=2+3x+\varepsilon\)</span> with a fixed random
+seed, fit a line, and explain the effects of noise and sample
+size.</p></li>
+<li><p>For <span class="math inline">\(f(x,y)=x^4+y^4-2x^2-2y^2\)</span>, numerically
+locate several stationary points. Classify them analytically and
+investigate sensitivity to initialization.</p></li>
+<li><p>Verify the ellipse closest-point example using a one-parameter
+boundary parametrization and numerical minimization.</p></li>
+<li><p>Write a short critique of an optimization model of your choice,
+discussing units, constraints, uncertainty, and whether the objective
+measures what the decision maker actually values.</p></li>
+</ol>
+<h2 id="chapter-project-optimize-a-resource-allocation-model">Chapter
+project: optimize a resource allocation model</h2>
+<p><strong>Question.</strong> How should two limited resources be
+allocated when benefits exhibit diminishing returns and a shared budget
+imposes a constraint? Study <span class="math display">\[U(x,y)=8x+6y-x^2-2y^2-xy,\quad x,y\ge0,\quad
+2x+y\le8.\]</span></p>
+<ol type="1">
+<li><p>Derive the gradient and Hessian and determine whether the
+objective is concave.</p></li>
+<li><p>Find the unconstrained stationary point. Check its feasibility
+against all constraints.</p></li>
+<li><p>Parametrize the active boundary <span class="math inline">\(2x+y=8\)</span> and analyze the resulting
+one-variable objective; also check the coordinate axes and
+vertices.</p></li>
+<li><p>Solve the constrained problem using R and Python. If a solver
+supports constraints, document its algorithm and tolerance; otherwise
+eliminate one variable on each boundary segment.</p></li>
+<li><p>Produce comparable contour plots with the feasible region and
+optimal point labeled.</p></li>
+<li><p>Perturb the coefficients of <span class="math inline">\(U\)</span> by 10% and assess sensitivity of the
+allocation and optimal benefit.</p></li>
+<li><p>Submit a report containing derivations, source code in both
+languages, plots, numerical comparison, and limitations of the
+model.</p></li>
+</ol>
+<p><strong>Suggested rubric (100 points):</strong> mathematical
+formulation and proof (30); R implementation (20); Python implementation
+(20); figures and reproducibility (15); interpretation and limitations
+(15).</p>
+<footer><a href="chapter03.html">3. Functions of Several Variables and Partial Differentiation ←</a><a href="chapter05.html">5. Multiple Integration and Applications →</a></footer></main><aside class="chapter-toc"><strong>On this page</strong><ul><li><a href="#interactive-investigation">Interactive investigation</a></li><li><a href="#the-gradient-as-a-geometric-and-analytical-tool">The gradient as
+a geometric and analytical tool</a></li><li><a href="#level-sets-and-normal-directions">Level sets and normal
+directions</a></li><li><a href="#linearization-and-sensitivity-analysis">Linearization and
+sensitivity analysis</a></li><li><a href="#second-order-taylor-approximations">Second-order Taylor
+approximations</a></li><li><a href="#computational-preview-symbolic-taylor-polynomials">Computational
+preview: symbolic Taylor polynomials</a></li><li><a href="#critical-points-and-local-extrema">Critical points and local
+extrema</a></li><li><a href="#the-two-variable-hessian-test">The two-variable Hessian
+test</a></li><li><a href="#the-hessian-test-in-higher-dimensions">The Hessian test in
+higher dimensions</a></li><li><a href="#global-optimization-on-closed-and-bounded-regions">Global
+optimization on closed and bounded regions</a></li><li><a href="#constrained-optimization-and-lagrange-multipliers">Constrained
+optimization and Lagrange multipliers</a></li><li><a href="#multipliers-as-sensitivity-coefficients">Multipliers as
+sensitivity coefficients</a></li><li><a href="#unconstrained-numerical-optimization">Unconstrained numerical
+optimization</a></li><li><a href="#gradient-descent">Gradient descent</a></li><li><a href="#newtons-method-and-hessian-information">Newton’s method and
+Hessian information</a></li><li><a href="#least-squares-as-an-optimization-problem">Least squares as an
+optimization problem</a></li><li><a href="#optimization-in-modeling-decisions-and-limitations">Optimization
+in modeling: decisions and limitations</a></li><li><a href="#additional-mathematical-examples-from-the-r-manuscript">Additional
+mathematical examples from the R manuscript</a></li><li><a href="#a-second-order-exponential-approximation">A second-order
+exponential approximation</a></li><li><a href="#global-extrema-on-a-unit-disk">Global extrema on a unit
+disk</a></li><li><a href="#nonconvexity-and-multiple-optimal-solutions">Nonconvexity and
+multiple optimal solutions</a></li><li><a href="#two-equality-constraints-in-three-variables">Two equality
+constraints in three variables</a></li><li><a href="#production-response-and-a-concave-objective">Production response
+and a concave objective</a></li><li><a href="#solving-the-mathematical-problems-using-r">Solving the
+mathematical problems using R</a></li><li><a href="#taylor-approximation-and-error">Taylor approximation and
+error</a></li><li><a href="#gradient-and-hessian-of-a-convex-objective">Gradient and Hessian
+of a convex objective</a></li><li><a href="#nonconvex-starts-a-disk-boundary-and-a-fixed-sum-constraint">Nonconvex
+starts, a disk boundary, and a fixed-sum constraint</a></li><li><a href="#least-squares-estimation-and-numerical-conditioning">Least-squares
+estimation and numerical conditioning</a></li><li><a href="#maximizing-the-production-response">Maximizing the production
+response</a></li><li><a href="#solving-the-same-problems-using-python">Solving the same
+problems using Python</a></li><li><a href="#taylor-approximation-and-error-1">Taylor approximation and
+error</a></li><li><a href="#symbolic-derivatives-and-numerical-minimization">Symbolic
+derivatives and numerical minimization</a></li><li><a href="#the-same-nonconvex-disk-and-fixed-sum-problems">The same
+nonconvex, disk, and fixed-sum problems</a></li><li><a href="#least-squares-and-the-production-response">Least squares and the
+production response</a></li><li><a href="#comparing-r-and-python">Comparing R and Python</a></li><li><a href="#real-world-application-allocating-laboratory-time">Real-world
+application: allocating laboratory time</a></li><li><a href="#convexity-optimality-and-the-geometry-of-algorithms">Convexity,
+optimality, and the geometry of algorithms</a></li><li><a href="#a-quantitative-convergence-bound-for-gradient-descent">A
+quantitative convergence bound for gradient descent</a></li><li><a href="#constraints-with-inequalities-first-order-conditions">Constraints
+with inequalities: first-order conditions</a></li><li><a href="#numerical-conditioning-and-reproducibility">Numerical
+conditioning and reproducibility</a></li><li><a href="#why-solving-normal-equations-can-lose-accuracy">Why solving
+normal equations can lose accuracy</a></li><li><a href="#a-verification-checklist-for-numerical-optimization">A
+verification checklist for numerical optimization</a></li><li><a href="#extended-paired-laboratory-projected-gradient-descent">Extended
+paired laboratory: projected gradient descent</a></li><li><a href="#r-implementation">R implementation</a></li><li><a href="#python-implementation">Python implementation</a></li><li><a href="#interpretation">Interpretation</a></li><li><a href="#additional-exercises-rigorous-optimization-and-verification">Additional
+exercises: rigorous optimization and verification</a></li><li><a href="#chapter-summary">Chapter summary</a></li><li><a href="#exercises">Exercises</a></li><li><a href="#chapter-project-optimize-a-resource-allocation-model">Chapter
+project: optimize a resource allocation model</a></li></ul></aside></div><script src="search-index.js"></script><script src="site.js"></script><script src="investigations.js"></script></body></html>

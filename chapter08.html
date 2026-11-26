@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><title>Partial Differential Equations and Computational Methods | Applied Multivariate Calculus Using R and Python</title><link href="site.css" rel="stylesheet"/><script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]}};</script><script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script></head><body><a class="skip" href="#main">Skip to content</a><nav aria-label="Book navigation" class="site-nav"><a class="brand" href="index.html">Applied Multivariate Calculus Using R and Python</a><p class="subtitle">Volume III · Abraham Ayebo</p><label for="book-search">Search book</label><input id="book-search" placeholder="Search chapters" type="search"/><div aria-live="polite" class="search-results" id="search-results"></div><div class="nav-label">Contents</div><a href="index.html">Welcome</a><a href="chapter01.html">1. Vectors and Geometry in Three-Dimensional Space</a><a href="chapter02.html">2. Curves, Surfaces, and Coordinate Systems</a><a href="chapter03.html">3. Functions of Several Variables and Partial Differentiation</a><a href="chapter04.html">4. Gradients, Taylor Approximations, and Optimization</a><a href="chapter05.html">5. Multiple Integration and Applications</a><a href="chapter06.html">6. Vector Fields and Integral Theorems</a><a href="chapter07.html">7. Introduction to Tensor Calculus and Differential Geometry</a><a aria-current="page" class="active" href="chapter08.html">8. Partial Differential Equations and Computational Methods</a><a href="appendix-a.html">Appendix A. Introduction to R and RStudio</a><a href="appendix-b.html">Appendix B. Introduction to Python and Jupyter</a><a href="resources.html">Computational resources</a><a href="about.html">About this book</a><div class="nav-label">Series</div><a href="https://aayebo.github.io/applied-precalculus/">Volume I · Applied Precalculus</a><a href="https://aayebo.github.io/applied-calculus/">Volume II · Applied Calculus</a></nav><header class="topbar"><button aria-expanded="false" class="menu">Contents</button><span>Applied Mathematics · Volume III</span><span class="spacer"></span><a href="resources.html">Code &amp; resources</a></header><div class="page-grid"><main id="main"><h1>8. Partial Differential Equations and Computational Methods</h1><div class="learning-box example"><p><strong>Learning.</strong> After completing this chapter, students
+should be able to classify common second-order PDEs; derive and use
+characteristic curves for transport equations; formulate heat, wave, and
+Laplace boundary-value problems; solve elementary PDEs by separation of
+variables and Fourier series; explain stability and convergence of
+finite-difference schemes; implement and assess R and Python solvers;
+and interpret the relationship between mathematical models and their
+physical assumptions.</p></div>
+<section class="mv-lab" id="interactive-investigation"><h2>Interactive investigation: Heat diffusion</h2><p>Explore the exact heat equation solution u(x,t)=exp(−κπ²t) sin(πx) on [0,1], with zero boundary values.</p><div data-mv-lab="8"></div><p><strong>Explore:</strong> How does diffusivity affect the decay of the temperature profile?</p><noscript>Enable JavaScript to use this investigation.</noscript></section><h2 id="why-partial-differential-equations">Why partial differential
+equations?</h2>
+<p>A partial differential equation (PDE) constrains an unknown function
+of two or more independent variables through its partial derivatives.
+Unlike an ordinary differential equation, a PDE often describes how a
+quantity changes in both space and time. Examples include temperature
+<span class="math inline">\(u(x,t)\)</span>, string displacement <span class="math inline">\(u(x,t)\)</span>, and electrostatic potential <span class="math inline">\(u(x,y)\)</span>. PDEs connect the differential
+calculus of Chapters 3–4 to the integration and vector-field ideas of
+Chapters 5–6.</p>
+<div class="learning-box example"><p><strong>Definition.</strong> A PDE is <em>linear</em> in <span class="math inline">\(u\)</span> when <span class="math inline">\(u\)</span> and its derivatives occur to the first
+power, with coefficients depending only on independent variables. Its
+<em>order</em> is the highest derivative order present. A homogeneous
+linear PDE has zero forcing term.</p></div>
+<p>The heat equation <span class="math inline">\(u_t=\alpha
+u_{xx}\)</span>, wave equation <span class="math inline">\(u_{tt}=c^2u_{xx}\)</span>, and Laplace equation
+<span class="math inline">\(u_{xx}+u_{yy}=0\)</span> are second-order
+linear PDEs. The nonlinear equation <span class="math inline">\(u_t+uu_x=0\)</span> is first-order but not linear.
+A PDE alone rarely determines a unique solution: initial data and/or
+boundary conditions are essential.</p>
+<h3 id="classification-of-second-order-equations">Classification of
+second-order equations</h3>
+<p>For the principal part <span class="math inline">\(Au_{xx}+2Bu_{xy}+Cu_{yy}\)</span>, with
+coefficients evaluated at a point, define <span class="math inline">\(\Delta=B^2-AC\)</span>. The equation is elliptic
+where <span class="math inline">\(\Delta&lt;0\)</span>, parabolic where
+<span class="math inline">\(\Delta=0\)</span>, and hyperbolic where
+<span class="math inline">\(\Delta&gt;0\)</span>. Laplace’s equation is
+elliptic; the heat equation is parabolic in space–time; the wave
+equation is hyperbolic. Classification helps predict qualitative
+behavior, but does not substitute for specifying a domain and data.</p>
+<div class="learning-box example"><p><strong>Example.</strong> For <span class="math inline">\(3u_{xx}+4u_{xy}+u_{yy}=0\)</span>, <span class="math inline">\(A=3\)</span>, <span class="math inline">\(B=2\)</span>, <span class="math inline">\(C=1\)</span>, so <span class="math inline">\(B^2-AC=1&gt;0\)</span>: the equation is
+hyperbolic. For <span class="math inline">\(u_{xx}+u_{yy}=0\)</span>,
+<span class="math inline">\(A=C=1\)</span>, <span class="math inline">\(B=0\)</span>, so <span class="math inline">\(\Delta=-1\)</span> and the equation is
+elliptic.</p></div>
+<h2 id="first-order-transport-and-characteristics">First-order transport
+and characteristics</h2>
+<p>Consider <span class="math inline">\(u_t+cu_x=0\)</span> on the real
+line, with <span class="math inline">\(u(x,0)=f(x)\)</span> and constant
+speed <span class="math inline">\(c\)</span>. Along a path <span class="math inline">\(x(t)\)</span>, <span class="math display">\[\frac{\mathrm d}{\mathrm
+dt}u(x(t),t)=u_t+x'(t)u_x.\]</span> Choosing <span class="math inline">\(x'(t)=c\)</span> makes the right side zero.
+Thus <span class="math inline">\(u\)</span> is constant along lines
+<span class="math inline">\(x-ct=\xi\)</span>.</p>
+<div class="learning-box example"><p><strong>Theorem — Transport solution.</strong> If <span class="math inline">\(f\)</span> is continuously differentiable, then
+<span class="math inline">\(u(x,t)=f(x-ct)\)</span> solves <span class="math inline">\(u_t+cu_x=0\)</span> and <span class="math inline">\(u(x,0)=f(x)\)</span>.</p></div>
+<div class="learning-box example"><p><strong>Proof.</strong> The chain rule gives <span class="math inline">\(u_t=-cf'(x-ct)\)</span> and <span class="math inline">\(u_x=f'(x-ct)\)</span>; their weighted sum
+vanishes. Setting <span class="math inline">\(t=0\)</span> gives <span class="math inline">\(f(x)\)</span>.</p></div>
+<div class="learning-box example"><p><strong>Example.</strong> If <span class="math inline">\(f(x)=\exp(-4x^2)\)</span> and <span class="math inline">\(c=2\)</span>, then <span class="math inline">\(u(x,t)=\exp[-4(x-2t)^2]\)</span>. The Gaussian
+pulse moves right at speed <span class="math inline">\(2\)</span>
+without changing shape. Figure <a data-reference="fig:transport" data-reference-type="ref" href="#fig:transport">1</a> shows
+several time slices.</p></div>
+<figure id="fig:transport">
+<img alt="Translation of a Gaussian pulse along characteristic lines. Generated with Python." src="figures/ch08_transport.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">Translation of a Gaussian pulse along
+characteristic lines. Generated with Python.</figcaption>
+</figure>
+<p>For variable velocity <span class="math inline">\(a(x,t)\)</span>,
+the equation <span class="math inline">\(u_t+a(x,t)u_x=0\)</span> uses
+the characteristic ODE <span class="math inline">\(x'(t)=a(x(t),t)\)</span>. When a forcing term
+<span class="math inline">\(g\)</span> is present, <span class="math inline">\(u_t+a u_x=g\)</span>, the value evolves according
+to <span class="math inline">\(\mathrm du/\mathrm dt=g\)</span> along
+each characteristic. Nonlinear transport can form intersecting
+characteristics and shocks; classical differentiable solutions may then
+cease to exist.</p>
+<h2 id="the-heat-equation-and-diffusion">The heat equation and
+diffusion</h2>
+<p>Consider a thin homogeneous insulated rod of length <span class="math inline">\(L\)</span> with fixed endpoint temperatures. Let
+<span class="math inline">\(u(x,t)\)</span> denote its temperature
+relative to a reference temperature. Conservation of energy and
+Fourier’s law <span class="math inline">\(q=-k u_x\)</span> lead to
+<span class="math display">\[\rho C u_t=k u_{xx},\qquad u_t=\alpha
+u_{xx},\quad \alpha=\frac{k}{\rho C}&gt;0.\]</span> Here <span class="math inline">\(\rho\)</span> is density, <span class="math inline">\(C\)</span> specific heat, and <span class="math inline">\(\alpha\)</span> thermal diffusivity. We first
+impose <span class="math display">\[u(0,t)=u(L,t)=0,\qquad
+u(x,0)=f(x).\]</span></p>
+<h3 id="separation-of-variables">Separation of variables</h3>
+<p>Seek a nonzero product <span class="math inline">\(u(x,t)=X(x)T(t)\)</span>. Substitution gives <span class="math display">\[\frac{T'}{\alpha
+T}=\frac{X''}{X}=-\lambda,\]</span> so <span class="math inline">\(X''+\lambda X=0\)</span> with <span class="math inline">\(X(0)=X(L)=0\)</span>, and <span class="math inline">\(T'+\alpha\lambda T=0\)</span>. The nontrivial
+spatial eigenfunctions and eigenvalues are <span class="math display">\[X_n(x)=\sin\frac{n\pi x}{L},\qquad
+\lambda_n=\left(\frac{n\pi}{L}\right)^2,\quad n=1,2,\ldots.\]</span>
+Superposition yields <span class="math display">\[\label{eq:heat-series}u(x,t)=\sum_{n=1}^{\infty}b_n\sin\left(\frac{n\pi
+x}{L}\right)\exp\left[-\alpha\left(\frac{n\pi}{L}\right)^2t\right],\qquad
+b_n=\frac2L\int_0^L f(x)\sin\frac{n\pi x}{L}\,\mathrm dx.\]</span> For
+piecewise smooth initial data satisfying the boundary conditions, this
+series gives the classical solution for <span class="math inline">\(t&gt;0\)</span> and approaches the initial profile
+in the usual Fourier sense as <span class="math inline">\(t\downarrow0\)</span>. Higher-frequency modes
+decay faster, which mathematically explains diffusion’s smoothing
+effect.</p>
+<div class="learning-box example"><p><strong>Example.</strong> For <span class="math inline">\(L=1\)</span>, <span class="math inline">\(\alpha=0.1\)</span>, and <span class="math inline">\(f(x)=\sin(\pi x)+\tfrac12\sin(3\pi x)\)</span>,
+<span class="math display">\[u(x,t)=e^{-0.1\pi^2t}\sin(\pi
+x)+\tfrac12e^{-0.9\pi^2t}\sin(3\pi x).\]</span> The third mode decays
+nine times as fast in its exponent as the first mode.</p></div>
+<figure id="fig:heat">
+<img alt="Heat-equation evolution for a two-mode initial temperature profile." src="figures/ch08_heat.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">Heat-equation evolution for a two-mode
+initial temperature profile.</figcaption>
+</figure>
+<h3 id="an-energy-estimate">An energy estimate</h3>
+<p>For a sufficiently smooth solution with zero endpoint values, let
+<span class="math inline">\(E(t)=\tfrac12\int_0^L u(x,t)^2\,\mathrm
+dx\)</span>. Differentiating and integrating by parts, <span class="math display">\[E'(t)=\alpha\int_0^L uu_{xx}\,\mathrm
+dx=-\alpha\int_0^L u_x^2\,\mathrm dx\le0.\]</span> The boundary term
+<span class="math inline">\([uu_x]_0^L\)</span> vanishes. Thus the
+squared-temperature energy cannot increase. This estimate also gives
+uniqueness: apply it to the difference of two solutions having identical
+initial and boundary data.</p>
+<h2 id="fourier-series-as-a-computational-tool">Fourier series as a
+computational tool</h2>
+<p>For <span class="math inline">\(f(x)=x(1-x)\)</span> on <span class="math inline">\([0,1]\)</span>, the sine coefficients can be
+computed by integration: <span class="math display">\[b_n=2\int_0^1
+x(1-x)\sin(n\pi x)\,\mathrm dx=\frac{4(1-(-1)^n)}{n^3\pi^3}.\]</span>
+Only odd modes occur, and <span class="math inline">\(b_n=8/(n^3\pi^3)\)</span> for odd <span class="math inline">\(n\)</span>. A truncated solution <span class="math inline">\(u_N\)</span> retains the first <span class="math inline">\(N\)</span> modes. Because of exponential damping,
+truncation typically becomes more accurate for fixed <span class="math inline">\(N\)</span> as <span class="math inline">\(t\)</span> increases. A large coefficient error
+near <span class="math inline">\(t=0\)</span> should not be mistaken for
+instability of the PDE.</p>
+<div class="learning-box example"><p><strong>Remark — Computational connection.</strong> The full
+reproducible numerical implementation is supplied in the companion code,
+with parallel R and Python solutions later in this chapter.</p></div>
+<div class="learning-box check"><p><strong>Checkpoint.</strong> Why does <span class="math inline">\(\sin(5\pi x/L)\)</span> decay <span class="math inline">\(25\)</span> times as fast in the exponential rate
+as <span class="math inline">\(\sin(\pi x/L)\)</span>? Which assumptions
+were used to derive the sine basis?</p></div>
+<h2 id="finite-differences-for-the-heat-equation">Finite differences for
+the heat equation</h2>
+<p>Let <span class="math inline">\(x_j=jh\)</span> and <span class="math inline">\(t_n=n\Delta t\)</span>. Centered spatial
+differences and a forward time difference give <span class="math display">\[\frac{U_j^{n+1}-U_j^n}{\Delta
+t}=\alpha\frac{U_{j-1}^n-2U_j^n+U_{j+1}^n}{h^2},\]</span> so <span class="math display">\[\label{eq:ftcs}U_j^{n+1}=rU_{j-1}^n+(1-2r)U_j^n+rU_{j+1}^n,\qquad
+r=\frac{\alpha\Delta t}{h^2}.\]</span> For this explicit forward-time,
+centered-space (FTCS) scheme in one spatial dimension, the standard
+stability requirement is <span class="math inline">\(0\le
+r\le\tfrac12\)</span>. To see its origin, insert a Fourier mode <span class="math inline">\(U_j^n=G^n e^{ij\theta}\)</span> into the scheme:
+<span class="math display">\[G=1-4r\sin^2(\theta/2).\]</span> Demanding
+<span class="math inline">\(|G|\le1\)</span> for every <span class="math inline">\(\theta\)</span> yields <span class="math inline">\(r\le\tfrac12\)</span>. With smooth solutions,
+local truncation error is <span class="math inline">\(O(\Delta
+t+h^2)\)</span>, and the stable scheme converges under the usual
+regularity assumptions.</p>
+<div class="learning-box example"><p><strong>Remark — Computational connection.</strong> The full
+reproducible numerical implementation is supplied in the companion code,
+with parallel R and Python solutions later in this chapter.</p></div>
+<figure id="fig:heat-error">
+<img alt="Grid refinement for FTCS: numerical solutions approach the exact single-mode solution." src="figures/ch08_heat_error.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">Grid refinement for FTCS: numerical
+solutions approach the exact single-mode solution.</figcaption>
+</figure>
+<p>An <em>implicit</em> backward Euler method evaluates the second
+spatial difference at time <span class="math inline">\(n+1\)</span>; it
+requires solving a linear system but avoids the restrictive FTCS
+stability limit. Crank–Nicolson averages the spatial operator across the
+old and new times and is second order in time for smooth solutions.
+Neither unconditional linear stability nor a small residual guarantees
+accuracy on a coarse grid.</p>
+<h2 id="the-wave-equation-and-vibrating-strings">The wave equation and
+vibrating strings</h2>
+<p>For a taut string with constant tension <span class="math inline">\(T\)</span> and linear mass density <span class="math inline">\(\mu\)</span>, small transverse displacements
+satisfy <span class="math display">\[u_{tt}=c^2u_{xx},\qquad
+c=\sqrt{T/\mu}.\]</span> For fixed endpoints <span class="math inline">\(u(0,t)=u(L,t)=0\)</span>, initial displacement
+<span class="math inline">\(f(x)\)</span>, and initial velocity <span class="math inline">\(g(x)\)</span>, separation of variables gives <span class="math display">\[\begin{aligned}
+u(x,t)&amp;=\sum_{n=1}^{\infty}\left[A_n\cos\left(\frac{cn\pi
+t}{L}\right)+B_n\sin\left(\frac{cn\pi
+t}{L}\right)\right]\sin\left(\frac{n\pi x}{L}\right),\\
+A_n&amp;=\frac2L\int_0^L f(x)\sin\left(\frac{n\pi x}{L}\right)\,\mathrm
+dx,\\
+B_n&amp;=\frac{2}{cn\pi}\int_0^L g(x)\sin\left(\frac{n\pi
+x}{L}\right)\,\mathrm dx.
+\end{aligned}\]</span> Unlike the heat equation, ideal undamped wave
+modes oscillate rather than decay. For a string with initial shape <span class="math inline">\(\sin(\pi x/L)\)</span> and zero initial velocity,
+<span class="math inline">\(u(x,t)=\sin(\pi x/L)\cos(c\pi
+t/L)\)</span>.</p>
+<h3 id="dalemberts-formula">D’Alembert’s formula</h3>
+<p>On the entire real line, the solution of <span class="math inline">\(u_{tt}=c^2u_{xx}\)</span> with <span class="math inline">\(u(x,0)=f(x)\)</span> and <span class="math inline">\(u_t(x,0)=g(x)\)</span> is <span class="math display">\[u(x,t)=\frac{f(x-ct)+f(x+ct)}2+\frac1{2c}\int_{x-ct}^{x+ct}g(s)\,\mathrm
+ds.\]</span> This formula exhibits finite propagation speed: the value
+at <span class="math inline">\((x,t)\)</span> depends only on initial
+data from the interval <span class="math inline">\([x-ct,x+ct]\)</span>.
+It does not apply unchanged to a finite string with reflecting boundary
+conditions.</p>
+<figure id="fig:wave">
+<img alt="An undamped standing wave: snapshots at several times." src="figures/ch08_wave.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">An undamped standing wave: snapshots at
+several times.</figcaption>
+</figure>
+<h3 id="energy-and-numerical-stability">Energy and numerical
+stability</h3>
+<p>For a smooth fixed-end string, the mechanical energy <span class="math display">\[\mathcal
+E(t)=\frac12\int_0^L\left(u_t^2+c^2u_x^2\right)\,\mathrm dx\]</span> is
+constant: differentiate, use <span class="math inline">\(u_{tt}=c^2u_{xx}\)</span>, integrate by parts, and
+use the endpoint conditions. A centered scheme, <span class="math display">\[U_j^{n+1}=2U_j^n-U_j^{n-1}+\lambda^2(U_{j-1}^n-2U_j^n+U_{j+1}^n),\qquad\lambda=\frac{c\Delta
+t}{h},\]</span> requires <span class="math inline">\(\lambda\le1\)</span> for standard stability in one
+dimension. The first time step needs a separate initialization using the
+prescribed initial velocity; simply copying the initial displacement to
+time step one introduces an error.</p>
+<h2 id="laplaces-equation-and-harmonic-functions">Laplace’s equation and
+harmonic functions</h2>
+<p>A twice continuously differentiable function <span class="math inline">\(u\)</span> is <em>harmonic</em> if <span class="math display">\[\Delta u=u_{xx}+u_{yy}=0.\]</span> This equation
+models steady-state temperature without internal sources, electrostatic
+potential in charge-free regions, and idealized incompressible potential
+flow. The polynomial <span class="math inline">\(u(x,y)=x^2-y^2\)</span>
+is harmonic because <span class="math inline">\(u_{xx}=2\)</span> and
+<span class="math inline">\(u_{yy}=-2\)</span>.</p>
+<div class="learning-box example"><p><strong>Theorem — Maximum principle, informal version.</strong> A
+nonconstant harmonic function on a bounded connected domain cannot
+attain a strict maximum or minimum at an interior point. For a
+continuous harmonic function on the closure of a bounded domain, extrema
+occur on the boundary.</p></div>
+<p>This principle explains why boundary values control the interior
+solution. It also implies uniqueness for the Dirichlet problem: if two
+harmonic functions agree on the boundary, their difference has zero
+boundary values and must vanish throughout the domain.</p>
+<h3 id="the-five-point-stencil">The five-point stencil</h3>
+<p>On a uniform square grid with spacing <span class="math inline">\(h\)</span>, approximate <span class="math inline">\(\Delta u=0\)</span> by <span class="math display">\[U_{i,j}=\frac14\left(U_{i+1,j}+U_{i-1,j}+U_{i,j+1}+U_{i,j-1}\right).\]</span>
+Thus every interior value is the average of its four nearest neighbors.
+Jacobi iteration replaces all interior values simultaneously using the
+previous iteration; Gauss–Seidel updates in place. Convergence may be
+slow on fine grids, making sparse linear solvers and multigrid methods
+attractive alternatives.</p>
+<div class="learning-box example"><p><strong>Remark — Computational connection.</strong> The full
+reproducible numerical implementation is supplied in the companion code,
+with parallel R and Python solutions later in this chapter.</p></div>
+<p>The stopping rule above measures successive updates, not the true
+error. A practical implementation should also examine the discrete
+Laplacian residual and compare solutions across successively refined
+grids.</p>
+<figure id="fig:laplace">
+<img alt="Steady-state temperature on a square with a sinusoidally heated top edge." src="figures/ch08_laplace.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">Steady-state temperature on a square with
+a sinusoidally heated top edge.</figcaption>
+</figure>
+<h2 id="poissons-equation-and-source-terms">Poisson’s equation and
+source terms</h2>
+<p>With an internal source <span class="math inline">\(s(x,y)\)</span>,
+a common model is <span class="math inline">\(-\Delta u=s\)</span>. The
+five-point stencil becomes <span class="math display">\[4U_{i,j}-U_{i+1,j}-U_{i-1,j}-U_{i,j+1}-U_{i,j-1}=h^2s(x_i,y_j).\]</span>
+In matrix form, <span class="math inline">\(A\boldsymbol{U}=\boldsymbol{b}\)</span>, where
+<span class="math inline">\(A\)</span> is sparse. For large problems,
+storing <span class="math inline">\(A\)</span> as a dense array wastes
+memory. SciPy’s <code>scipy.sparse</code> and
+<code>scipy.sparse.linalg</code> offer efficient solvers. The sign of
+the source term depends on the modeling convention; always verify the
+PDE before interpreting the solution.</p>
+<h2 id="two-dimensional-diffusion-and-vibrating-membranes">Two-dimensional
+diffusion and vibrating membranes</h2>
+<p>For <span class="math inline">\(u(x,y,t)\)</span>, the
+two-dimensional heat equation is <span class="math inline">\(u_t=\alpha(u_{xx}+u_{yy})\)</span>. An explicit
+five-point update with equal spatial spacings has the form <span class="math display">\[U_{i,j}^{n+1}=U_{i,j}^n+r\big(U_{i+1,j}^n+U_{i-1,j}^n+U_{i,j+1}^n+U_{i,j-1}^n-4U_{i,j}^n\big),\]</span>
+where <span class="math inline">\(r=\alpha\Delta t/h^2\)</span>; the
+standard stability condition is <span class="math inline">\(r\le1/4\)</span>. For a vibrating membrane, <span class="math inline">\(u_{tt}=c^2(u_{xx}+u_{yy})\)</span>. Rectangular
+domains admit separated sine modes, while circular domains lead to
+Bessel functions. The geometry of the domain determines the
+eigenfunctions and their frequencies.</p>
+<h2 id="boundary-conditions-and-mathematical-modeling">Boundary
+conditions and mathematical modeling</h2>
+<p>Three common boundary types are <em>Dirichlet</em> (<span class="math inline">\(u\)</span> prescribed), <em>Neumann</em> (normal
+derivative <span class="math inline">\(\partial u/\partial n\)</span>
+prescribed), and <em>Robin</em> (a linear combination of <span class="math inline">\(u\)</span> and <span class="math inline">\(\partial u/\partial n\)</span> prescribed). For
+heat flow, Dirichlet conditions model controlled endpoint temperatures,
+Neumann conditions model imposed flux (including insulation when zero),
+and Robin conditions model heat exchange with the surroundings.
+Different conditions can change the long-time state, conserved
+quantities, and admissible eigenfunctions.</p>
+<div class="learning-box check"><p><strong>Checkpoint.</strong> A student models an insulated rod using
+<span class="math inline">\(u(0,t)=u(L,t)=0\)</span>. Explain why this
+is not the same as insulation. Write the appropriate homogeneous Neumann
+conditions.</p></div>
+<h2 id="a-complete-computational-investigation">A complete computational
+investigation</h2>
+<p><strong>Question.</strong> How does mesh refinement affect the
+accuracy of an explicit numerical heat solver? Use <span class="math inline">\(L=1\)</span>, <span class="math inline">\(\alpha=0.1\)</span>, <span class="math inline">\(f(x)=\sin(\pi x)\)</span>, and <span class="math inline">\(t_*=0.2\)</span>. The exact solution is <span class="math display">\[u(x,t_*)=\exp(-\alpha\pi^2t_*)\sin(\pi
+x).\]</span> For <span class="math inline">\(N=21,41,81,161\)</span>
+spatial grid points, select time steps so that <span class="math inline">\(r\approx0.45\)</span>, compute the maximum error,
+and plot error against <span class="math inline">\(h\)</span> on
+logarithmic axes. Since <span class="math inline">\(\Delta t\propto
+h^2\)</span>, the global error is expected to behave approximately like
+<span class="math inline">\(O(h^2)\)</span> for this smooth example.
+Estimate the slope by linear regression of <span class="math inline">\(\log(\mathrm{error})\)</span> against <span class="math inline">\(\log h\)</span>; a slope near <span class="math inline">\(2\)</span> supports the predicted convergence
+order. Repeat with <span class="math inline">\(r&gt;1/2\)</span> and
+observe the instability <em>only in a controlled computational
+experiment</em>; do not treat unstable results as physically
+meaningful.</p>
+<figure id="fig:convergence">
+<img alt="Measured maximum error versus grid spacing for stable FTCS refinement." src="figures/ch08_convergence.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">Measured maximum error versus grid
+spacing for stable FTCS refinement.</figcaption>
+</figure>
+<h2 id="further-connections-spectral-methods-and-uncertainty">Further
+connections: spectral methods and uncertainty</h2>
+<p>Finite differences approximate derivatives locally; spectral methods
+approximate the solution in a global basis such as Fourier modes. For
+sufficiently smooth periodic solutions, spectral approximations can
+converge much faster with increasing mode count than low-order finite
+differences. However, discontinuities can create oscillatory artifacts,
+and nonperiodic boundaries require appropriate bases or numerical
+treatment. In any simulation, distinguish discretization error,
+iteration error, floating-point effects, uncertain model parameters, and
+discrepancies between the mathematical model and reality. A visually
+smooth plot does not establish numerical correctness.</p>
+<h2 id="additional-mathematical-examples-from-the-r-manuscript">Additional
+mathematical examples from the R manuscript</h2>
+<h3 id="variable-speed-transport">Variable-speed transport</h3>
+<p>Consider <span class="math inline">\(u_t+xu_x=0\)</span> with <span class="math inline">\(u(x,0)=x^2\)</span>. The characteristic equations
+are <span class="math inline">\(x'(t)=x(t)\)</span> and <span class="math inline">\(u'(t)=0\)</span>, giving <span class="math inline">\(x(t)=\xi e^t\)</span> and <span class="math inline">\(\xi=xe^{-t}\)</span>. Thus <span class="math display">\[u(x,t)=x^2e^{-2t}.\]</span> Direct
+differentiation confirms <span class="math inline">\(u_t=-2x^2e^{-2t}\)</span> and <span class="math inline">\(xu_x=2x^2e^{-2t}\)</span>.</p>
+<h3 id="a-harmonic-polynomial-and-boundary-data">A harmonic polynomial
+and boundary data</h3>
+<p>The function <span class="math inline">\(u(x,y)=x^2-y^2\)</span> is
+harmonic because <span class="math inline">\(u_{xx}+u_{yy}=2-2=0\)</span>. Prescribing its
+trace on a bounded domain gives a Dirichlet problem with this known
+solution. This provides an exact benchmark for a numerical Laplace
+solver.</p>
+<h3 id="a-single-standing-wave-mode">A single standing-wave mode</h3>
+<p>For fixed endpoints on <span class="math inline">\([0,L]\)</span>,
+<span class="math inline">\(u(x,0)=\sin(\pi x/L)\)</span> and <span class="math inline">\(u_t(x,0)=0\)</span> produce <span class="math display">\[u(x,t)=\sin(\pi x/L)\cos(c\pi t/L).\]</span>
+Differentiation verifies <span class="math inline">\(u_{tt}=c^2u_{xx}\)</span> and both initial
+conditions.</p>
+<h2 id="solving-the-same-pde-problems-using-r">Solving the same PDE
+problems using R</h2>
+<p>We first check the exact heat solution and then approximate it by
+forward-time centered-space differences. Set <span class="math inline">\(L=1\)</span>, <span class="math inline">\(\alpha=0.1\)</span>, and <span class="math inline">\(u(x,0)=\sin(\pi x)\)</span> with zero-temperature
+endpoints. For <span class="math inline">\(t_*=0.2\)</span>, the exact
+benchmark is <span class="math display">\[u(x,t_*)=e^{-0.1\pi^2t_*}\sin(\pi x).\]</span>
+The companion file <code>code/chapter08_paired.R</code> is a
+self-contained base-R implementation. It uses <span class="math inline">\(r=0.4\)</span> and adjusts the number of time
+steps to reach the requested final time exactly.</p>
+<div class="code-shell"><div class="code-bar">R<a href="code/chapter08-listing-01.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>heat_ftcs &lt;- function(N=41, alpha=0.1, T=0.2) {
+  x &lt;- seq(0, 1, length.out=N); h &lt;- x[2]-x[1]
+  steps &lt;- ceiling(T*alpha/(0.4*h^2))
+  dt &lt;- T/steps; r &lt;- alpha*dt/h^2
+  u &lt;- sin(pi*x)
+  for (k in seq_len(steps)) {
+    v &lt;- u
+    v[2:(N-1)] &lt;- u[2:(N-1)] + r*(
+      u[1:(N-2)]-2*u[2:(N-1)]+u[3:N])
+    u &lt;- v
+  }
+  exact &lt;- exp(-alpha*pi^2*T)*sin(pi*x)
+  list(h=h, error=max(abs(u-exact)), r=r)
+}
+print(heat_ftcs())
+stopifnot(heat_ftcs()$r &lt;= 0.5)</code></pre></div>
+<h2 id="solving-the-same-pde-problems-using-python">Solving the same PDE
+problems using Python</h2>
+<p>The companion file <code>code/chapter08_paired.py</code> performs
+precisely the same computation using NumPy. The explicit update and
+benchmark are intentionally aligned with the R implementation.</p>
+<div class="code-shell"><div class="code-bar">Python<a href="code/chapter08-listing-02.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>import numpy as np
+
+def heat_ftcs(N=41, alpha=0.1, T=0.2):
+    x = np.linspace(0, 1, N)
+    h = x[1]-x[0]
+    steps = int(np.ceil(T*alpha/(0.4*h*h)))
+    dt = T/steps
+    r = alpha*dt/(h*h)
+    u = np.sin(np.pi*x)
+    for _ in range(steps):
+        v = u.copy()
+        v[1:-1] = u[1:-1]+r*(u[:-2]-2*u[1:-1]+u[2:])
+        u = v
+    exact = np.exp(-alpha*np.pi**2*T)*np.sin(np.pi*x)
+    return h, np.max(np.abs(u-exact)), r
+
+print(heat_ftcs())
+assert heat_ftcs()[2] &lt;= 0.5</code></pre></div>
+<h2 id="comparing-r-and-python-solutions">Comparing R and Python
+solutions</h2>
+<p>Both programs use the same physical model, initial and boundary
+conditions, grid spacing, final time, and stability-controlled time
+step. Evaluate <span class="math inline">\(N=21,41,81,161\)</span> and
+compare maximum errors; use a log–log plot to estimate convergence
+order. Agreement between implementations is a useful reproducibility
+check, but convergence toward an independent exact solution is stronger
+numerical evidence.</p>
+<h2 id="real-world-application-thermal-diffusion-in-a-laboratory-specimen">Real-world
+application: thermal diffusion in a laboratory specimen</h2>
+<p>A thin specimen is held at a reference temperature at both ends,
+while its initial temperature has a single sinusoidal peak. Under
+constant thermal diffusivity and one-dimensional conduction, the heat
+equation predicts how the profile decays. The decay time depends on
+<span class="math inline">\(\alpha/L^2\)</span>; therefore a specimen
+twice as long relaxes four times more slowly under otherwise identical
+assumptions. Students should explain why internal heat sources,
+temperature-dependent conductivity, and imperfect boundary control would
+require a more elaborate model.</p>
+<h2 id="advanced-extension-from-the-r-manuscript-power-series-and-frobenius-methods">Advanced
+extension from the R manuscript: power series and Frobenius methods</h2>
+<p>Separation of variables sometimes produces an ordinary differential
+equation whose solutions are not elementary. A regular-point power
+series seeks <span class="math inline">\(y(x)=\sum_{n=0}^{\infty}a_nx^n\)</span> and
+derives a recurrence by substitution. At a regular singular point, the
+Frobenius ansatz <span class="math inline">\(y(x)=x^r\sum_{n=0}^{\infty}a_nx^n\)</span> may be
+required. For the illustrative Euler equation <span class="math display">\[x^2y''+xy'-\nu^2y=0,\qquad
+x&gt;0,\]</span> substituting <span class="math inline">\(y=x^r\)</span>
+gives the indicial equation <span class="math inline">\(r(r-1)+r-\nu^2=r^2-\nu^2=0\)</span>. For <span class="math inline">\(\nu&gt;0\)</span>, independent solutions are <span class="math inline">\(x^\nu\)</span> and <span class="math inline">\(x^{-\nu}\)</span>. When <span class="math inline">\(\nu=0\)</span>, a repeated root leads to solutions
+<span class="math inline">\(1\)</span> and <span class="math inline">\(\log x\)</span>. This extension is included
+because the original R manuscript develops power-series methods; it is
+not presented as a prerequisite for the main finite-difference
+investigations.</p>
+<h2 id="mathematical-foundations-weak-formulations-and-conservation">Mathematical
+foundations: weak formulations and conservation</h2>
+<h3 id="conservation-laws-and-fluxes">Conservation laws and fluxes</h3>
+<p>A conservation equation expresses the fact that change within a
+region equals inflow plus generation. If <span class="math inline">\(u\)</span> is the density of a conserved quantity,
+<span class="math inline">\(\mathbf J\)</span> its flux, and <span class="math inline">\(q\)</span> a volumetric source, the integral
+balance on a fixed region <span class="math inline">\(\Omega\)</span> is
+<span class="math display">\[\frac{\mathrm d}{\mathrm dt}\int_\Omega
+u\,\mathrm dV=-\int_{\partial\Omega}\mathbf J\cdot\mathbf n\,\mathrm
+dS+\int_\Omega q\,\mathrm dV.\]</span> Applying the divergence theorem
+and localizing gives <span class="math inline">\(u_t+\nabla\cdot\mathbf
+J=q\)</span>. Fourier’s law <span class="math inline">\(\mathbf
+J=-\alpha\nabla u\)</span> yields <span class="math inline">\(u_t=\alpha\Delta u+q\)</span> for constant <span class="math inline">\(\alpha\)</span>. When diffusivity depends on
+location, the correct form is <span class="math inline">\(u_t=\nabla\cdot(\alpha(x)\nabla u)+q\)</span>, not
+<span class="math inline">\(\alpha(x)\Delta u+q\)</span>; the difference
+is <span class="math inline">\(\nabla\alpha\cdot\nabla u\)</span>.</p>
+<div class="learning-box example"><p><strong>Example — A spatially varying diffusivity.</strong> For <span class="math inline">\(\alpha(x)=1+x\)</span> and <span class="math inline">\(u(x,t)=x^2\)</span>, the diffusion operator is
+<span class="math inline">\(\partial_x((1+x)2x)=2+4x\)</span>. The
+expression <span class="math inline">\(\alpha u_{xx}\)</span> gives only
+<span class="math inline">\(2+2x\)</span>. Thus the two models are not
+interchangeable.</p></div>
+<h3 id="the-weak-form-of-a-diffusion-equation">The weak form of a
+diffusion equation</h3>
+<p>Let <span class="math inline">\(u_t-\alpha\Delta u=f\)</span> on a
+bounded region <span class="math inline">\(\Omega\)</span>, with <span class="math inline">\(u=0\)</span> on its boundary. Multiply by a smooth
+test function <span class="math inline">\(v\)</span> vanishing on the
+boundary and integrate: <span class="math display">\[\int_\Omega u_t
+v\,\mathrm dV+\alpha\int_\Omega \nabla u\cdot\nabla v\,\mathrm
+dV=\int_\Omega fv\,\mathrm dV.\]</span> Integration by parts removes the
+second spatial derivatives and reveals why boundary conditions matter.
+This is the starting point of finite-element methods, which complement
+the finite-difference methods emphasized in this chapter. The statement
+is a formulation, not a claim that all solutions possess classical
+second derivatives.</p>
+<div class="learning-box check"><p><strong>Checkpoint.</strong> Explain why a discontinuity in material
+conductivity is more naturally represented by <span class="math inline">\(\nabla\cdot(\alpha\nabla u)\)</span> than by <span class="math inline">\(\alpha\Delta u\)</span>.</p></div>
+<h2 id="a-closer-look-at-uniqueness-and-maximum-principles">A closer
+look at uniqueness and maximum principles</h2>
+<h3 id="heat-equation-uniqueness-by-energy-estimates">Heat-equation
+uniqueness by energy estimates</h3>
+<p>Suppose <span class="math inline">\(u\)</span> and <span class="math inline">\(v\)</span> solve the same heat equation with the
+same initial data and homogeneous Dirichlet boundary values. Their
+difference <span class="math inline">\(w=u-v\)</span> satisfies <span class="math inline">\(w_t=\alpha w_{xx}\)</span> and zero data. For
+<span class="math inline">\(E(t)=\tfrac12\int_0^L w(x,t)^2\,\mathrm
+dx\)</span>, integration by parts gives <span class="math display">\[E'(t)=\alpha\int_0^L w w_{xx}\,\mathrm
+dx=-\alpha\int_0^L w_x^2\,\mathrm dx\le0.\]</span> Because <span class="math inline">\(E(0)=0\)</span> and <span class="math inline">\(E\ge0\)</span>, <span class="math inline">\(E(t)=0\)</span> for all <span class="math inline">\(t\)</span>, so <span class="math inline">\(w=0\)</span>. This proves uniqueness in the stated
+regularity class. It does not by itself prove existence.</p>
+<h3 id="the-maximum-principle-for-harmonic-functions">The maximum
+principle for harmonic functions</h3>
+<p>If <span class="math inline">\(u\)</span> is harmonic in a bounded
+connected domain and continuous up to the boundary, its maximum and
+minimum occur on the boundary unless it is constant. Consequently, the
+Dirichlet problem has at most one classical solution: the difference of
+two solutions is harmonic and vanishes on the boundary. This theorem
+also provides a valuable numerical diagnostic: a converged discrete
+Laplace solution with nonnegative boundary temperatures should not
+develop a larger interior maximum.</p>
+<div class="learning-box example"><p><strong>Example — A diagnostic for a steady-state solver.</strong> A
+square plate has boundary values between <span class="math inline">\(0\)</span> and <span class="math inline">\(10\)</span>. A numerical interior temperature of
+<span class="math inline">\(12\)</span> is inconsistent with the maximum
+principle for source-free steady-state conduction; investigate the
+boundary indexing, source term, and update formula before interpreting
+the plot.</p></div>
+<h2 id="finite-difference-accuracy-stability-and-consistency">Finite-difference
+accuracy, stability, and consistency</h2>
+<h3 id="local-truncation-error">Local truncation error</h3>
+<p>For a smooth exact solution, Taylor expansion about <span class="math inline">\((x_j,t_n)\)</span> gives <span class="math display">\[\frac{u(x_j,t_{n+1})-u(x_j,t_n)}{\Delta
+t}=u_t+\frac{\Delta t}{2}u_{tt}+O(\Delta t^2),\]</span> and <span class="math display">\[\frac{u(x_{j-1},t_n)-2u(x_j,t_n)+u(x_{j+1},t_n)}{h^2}=u_{xx}+\frac{h^2}{12}u_{xxxx}+O(h^4).\]</span>
+Therefore the forward-time centered-space (FTCS) scheme is first-order
+in time and second-order in space: <span class="math inline">\(O(\Delta
+t+h^2)\)</span> under sufficient smoothness. If stability forces <span class="math inline">\(\Delta t=O(h^2)\)</span>, its overall error may be
+second-order as the mesh is refined.</p>
+<h3 id="a-discrete-energy-and-positivity-argument">A discrete energy and
+positivity argument</h3>
+<p>The update can be written <span class="math inline">\(U_j^{n+1}=rU_{j-1}^n+(1-2r)U_j^n+rU_{j+1}^n\)</span>,
+where <span class="math inline">\(r=\alpha\Delta t/h^2\)</span>. When
+<span class="math inline">\(0\le r\le1/2\)</span>, all three
+coefficients are nonnegative and sum to one. Every new interior value is
+a convex combination of old neighboring values. Thus the scheme
+preserves bounds under compatible fixed boundary conditions. This
+intuitive maximum-principle argument is separate from, but consistent
+with, Fourier-mode stability analysis.</p>
+<div class="learning-box example"><p><strong>Example — Stability is not accuracy.</strong> With <span class="math inline">\(\alpha=0.1\)</span>, <span class="math inline">\(h=0.1\)</span>, and <span class="math inline">\(\Delta t=0.04\)</span>, <span class="math inline">\(r=0.4\)</span>, so FTCS satisfies the usual
+stability restriction. A stable computation may still have substantial
+error on a coarse grid; stability prevents amplification of certain
+perturbations, not discretization error itself.</p></div>
+<h3 id="why-an-unstable-run-can-look-harmless-at-first">Why an unstable
+run can look harmless at first</h3>
+<p>For a discrete Fourier mode <span class="math inline">\(U_j^n=G^n
+e^{\mathrm i j\theta}\)</span>, substitution gives <span class="math display">\[G(\theta)=1-4r\sin^2(\theta/2).\]</span> When
+<span class="math inline">\(r&gt;1/2\)</span>, some modes satisfy <span class="math inline">\(|G|&gt;1\)</span>. Smooth initial data can contain
+very little energy in those modes, so numerical instability may emerge
+only after roundoff or boundary perturbations excite them.
+Demonstrations of instability should therefore report the grid,
+duration, and observed amplitude rather than relying on a single
+snapshot.</p>
+<h3 id="the-implicit-backward-euler-alternative">The implicit
+backward-Euler alternative</h3>
+<p>The backward-Euler discretization evaluates the second difference at
+the new time: <span class="math display">\[\frac{U_j^{n+1}-U_j^n}{\Delta
+t}=\alpha\frac{U_{j-1}^{n+1}-2U_j^{n+1}+U_{j+1}^{n+1}}{h^2}.\]</span>
+For the interior vector <span class="math inline">\(\mathbf
+U^n\)</span>, this is <span class="math inline">\(A\mathbf
+U^{n+1}=\mathbf U^n\)</span>, where <span class="math inline">\(A\)</span> is tridiagonal with diagonal <span class="math inline">\(1+2r\)</span> and neighboring diagonals <span class="math inline">\(-r\)</span>. For constant-coefficient diffusion
+the method is unconditionally stable in the usual linear sense, but it
+is only first-order accurate in time. Large steps may be stable yet
+physically inaccurate.</p>
+<div class="learning-box example"><p><strong>Example — Explicit versus implicit.</strong> Take <span class="math inline">\(L=1\)</span>, <span class="math inline">\(\alpha=0.1\)</span>, <span class="math inline">\(h=0.05\)</span>, and <span class="math inline">\(\Delta t=0.02\)</span>. Then <span class="math inline">\(r=0.8\)</span>. FTCS violates <span class="math inline">\(r\le1/2\)</span>, while backward Euler remains
+linearly stable. Compare both against <span class="math inline">\(u(x,t)=e^{-\alpha\pi^2t}\sin(\pi x)\)</span> and
+explain why stability alone cannot determine the preferable time
+step.</p></div>
+<h2 id="a-deeper-connection-fourier-modes-and-physical-time-scales">A
+deeper connection: Fourier modes and physical time scales</h2>
+<p>For the heat equation on <span class="math inline">\([0,L]\)</span>
+with zero endpoints, mode <span class="math inline">\(n\)</span> decays
+as <span class="math inline">\(\exp(-t/\tau_n)\)</span>, where <span class="math display">\[\tau_n=\frac{L^2}{\alpha n^2\pi^2}.\]</span> Thus
+<span class="math inline">\(\tau_1\)</span> is the slowest
+characteristic decay time; <span class="math inline">\(\tau_3=\tau_1/9\)</span>. Dimensional analysis
+independently predicts the scale <span class="math inline">\(L^2/\alpha\)</span>. This is a useful check on
+both formulas and code: changing <span class="math inline">\(L\)</span>
+by a factor of two while keeping <span class="math inline">\(\alpha\)</span> fixed multiplies the fundamental
+decay time by four.</p>
+<div class="learning-box example"><p><strong>Example — Dimensional prediction.</strong> Two geometrically
+similar rods have lengths <span class="math inline">\(L\)</span> and
+<span class="math inline">\(2L\)</span> and the same diffusivity. Their
+fundamental relaxation times are in the ratio <span class="math inline">\(1:4\)</span>. A numerical experiment that predicts
+the opposite trend likely contains an incorrect spatial scaling or
+diffusivity parameter.</p></div>
+<h3 id="nondimensionalization">Nondimensionalization</h3>
+<p>Let <span class="math inline">\(\xi=x/L\)</span>, <span class="math inline">\(\tau=\alpha t/L^2\)</span>, and <span class="math inline">\(v(\xi,\tau)=u(L\xi,L^2\tau/\alpha)\)</span>. Then
+<span class="math inline">\(v_\tau=v_{\xi\xi}\)</span> on <span class="math inline">\(0&lt;\xi&lt;1\)</span>. The transformation removes
+the physical parameters from the interior equation and clarifies which
+numerical comparisons are meaningful. In the wave equation, the
+corresponding nondimensional time is <span class="math inline">\(\tau=ct/L\)</span>.</p>
+<h2 id="paired-computational-laboratory-explicit-and-implicit-heat-solvers">Paired
+computational laboratory: explicit and implicit heat solvers</h2>
+<p>The following paired algorithms solve the <em>same</em>
+initial-boundary value problem: <span class="math inline">\(u_t=0.1u_{xx}\)</span> on <span class="math inline">\(0&lt;x&lt;1\)</span>, <span class="math inline">\(u(0,t)=u(1,t)=0\)</span>, and <span class="math inline">\(u(x,0)=\sin(\pi x)\)</span>. Both use <span class="math inline">\(N\)</span> subintervals, the same final time <span class="math inline">\(T\)</span>, and the exact solution <span class="math inline">\(e^{-0.1\pi^2T}\sin(\pi x)\)</span> as an
+independent benchmark. Full executable programs are included in the
+source archive.</p>
+<h3 id="r-implementation">R implementation</h3>
+<div class="code-shell"><div class="code-bar">R<a href="code/chapter08-listing-03.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>heat_ftcs &lt;- function(N = 40, T = 0.2, alpha = 0.1) {
+  x &lt;- seq(0, 1, length.out = N + 1)
+  h &lt;- 1 / N
+  steps &lt;- ceiling(T * alpha / (0.4 * h^2))
+  dt &lt;- T / steps
+  r &lt;- alpha * dt / h^2
+  u &lt;- sin(pi * x)
+  for (step in seq_len(steps)) {
+    v &lt;- u
+    v[2:N] &lt;- u[2:N] + r *
+      (u[1:(N-1)] - 2*u[2:N] + u[3:(N+1)])
+    u &lt;- v
+  }
+  exact &lt;- exp(-alpha*pi^2*T) * sin(pi*x)
+  c(h=h, r=r, error=max(abs(u-exact)))
+}
+print(heat_ftcs())</code></pre></div>
+<h3 id="python-implementation">Python implementation</h3>
+<div class="code-shell"><div class="code-bar">Python<a href="code/chapter08-listing-04.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>import numpy as np
+
+def heat_ftcs(N=40, T=0.2, alpha=0.1):
+    x = np.linspace(0.0, 1.0, N+1)
+    h = 1.0/N
+    steps = int(np.ceil(T*alpha/(0.4*h*h)))
+    dt = T/steps
+    r = alpha*dt/(h*h)
+    u = np.sin(np.pi*x)
+    for _ in range(steps):
+        v = u.copy()
+        v[1:-1] = u[1:-1] + r*(u[:-2]-2*u[1:-1]+u[2:])
+        u = v
+    exact = np.exp(-alpha*np.pi**2*T)*np.sin(np.pi*x)
+    return h, r, np.max(np.abs(u-exact))
+
+print(heat_ftcs())</code></pre></div>
+<h3 id="a-reproducibility-protocol">A reproducibility protocol</h3>
+<p>Run <span class="math inline">\(N=20,40,80,160\)</span> in each
+language. Tabulate <span class="math inline">\(h\)</span>, <span class="math inline">\(\Delta t\)</span>, <span class="math inline">\(r\)</span>, and maximum error. For consecutive
+meshes estimate <span class="math inline">\(p=\log(E_h/E_{h/2})/\log
+2\)</span>. Explain why the measured order approaches two when the time
+step is chosen proportional to <span class="math inline">\(h^2\)</span>.
+Extend the laboratory by implementing backward Euler and solving the
+tridiagonal system. <em>Numerical agreement between languages is not
+sufficient validation</em>: compare both against the analytical mode
+solution.</p>
+<h2 id="additional-source-connections-and-worked-extensions">Additional
+source connections and worked extensions</h2>
+<h3 id="a-variable-speed-transport-model">A variable-speed transport
+model</h3>
+<p>For <span class="math inline">\(u_t+xu_x=0\)</span> and initial data
+<span class="math inline">\(u(x,0)=f(x)\)</span>, characteristics solve
+<span class="math inline">\(x'=x\)</span>; hence <span class="math inline">\(x(t)=\xi e^t\)</span> and <span class="math inline">\(\xi=xe^{-t}\)</span>. Therefore <span class="math inline">\(u(x,t)=f(xe^{-t})\)</span>. For <span class="math inline">\(f(x)=e^{-x^2}\)</span> the pulse spreads as <span class="math inline">\(e^{-x^2e^{-2t}}\)</span>. This retains the
+variable-speed transport topic developed in the original R chapter.</p>
+<h3 id="an-elementary-harmonic-function">An elementary harmonic
+function</h3>
+<p>For <span class="math inline">\(u(x,y)=x^3-3xy^2\)</span>, <span class="math inline">\(u_{xx}=6x\)</span> and <span class="math inline">\(u_{yy}=-6x\)</span>, so <span class="math inline">\(\Delta u=0\)</span>. Its boundary values on a
+selected domain determine a valid Laplace Dirichlet problem, while the
+polynomial itself provides a benchmark for a numerical solver.</p>
+<h3 id="wave-modes-and-a-caution-about-numerical-dissipation">Wave modes
+and a caution about numerical dissipation</h3>
+<p>A fixed string with <span class="math inline">\(u(0,t)=u(L,t)=0\)</span> admits the standing wave
+<span class="math inline">\(u_n(x,t)=A\sin(n\pi x/L)\cos(n\pi
+ct/L)\)</span>. Unlike heat modes, its amplitude does not decay in the
+ideal undamped model. A solver that systematically damps these
+oscillations may be numerically dissipative, even if its plots appear
+smooth.</p>
+<h3 id="the-original-r-manuscripts-series-method-extension">The original
+R manuscript’s series-method extension</h3>
+<p>The R source develops ordinary differential equation power series and
+Frobenius techniques after its PDE sections. They remain an advanced
+extension here, rather than being removed as off-topic. A more complete
+treatment should compare regular points, regular singular points,
+indicial roots, and the special case of repeated roots; these methods
+arise naturally when separation of variables yields non-elementary
+spatial ODEs.</p>
+<h2 id="advanced-exercises-for-mathematical-verification">Advanced
+exercises for mathematical verification</h2>
+<ol type="1">
+<li><p>Derive <span class="math inline">\(u_t=\nabla\cdot(\alpha\nabla
+u)+q\)</span> from an integral conservation statement, clearly stating
+the sign convention for flux.</p></li>
+<li><p>For <span class="math inline">\(\alpha(x)=1+x^2\)</span>, compute
+<span class="math inline">\(\partial_x(\alpha u_x)\)</span> for <span class="math inline">\(u=x^3\)</span> and compare it with <span class="math inline">\(\alpha u_{xx}\)</span>.</p></li>
+<li><p>Prove uniqueness for the homogeneous heat equation using an
+energy argument, and explain which boundary terms vanish.</p></li>
+<li><p>Derive the FTCS local truncation error through the first nonzero
+omitted Taylor terms.</p></li>
+<li><p>Explain why the coefficient condition <span class="math inline">\(0\le r\le1/2\)</span> implies a discrete maximum
+principle.</p></li>
+<li><p>Derive the backward-Euler tridiagonal matrix for four interior
+nodes and explain the role of boundary data in the right-hand
+side.</p></li>
+<li><p>For a single sine mode, compute the backward-Euler amplification
+factor and compare it with the exact exponential factor.</p></li>
+<li><p>Derive the nondimensional heat equation using <span class="math inline">\(\xi=x/L\)</span> and <span class="math inline">\(\tau=\alpha t/L^2\)</span>.</p></li>
+<li><p>Design a numerical experiment that distinguishes an unstable
+method from an inaccurate but stable method.</p></li>
+<li><p>Compare <span class="math inline">\(\nabla\cdot(\alpha\nabla
+u)\)</span> and <span class="math inline">\(\alpha\Delta u\)</span> for
+a spatially heterogeneous material; explain the physical
+difference.</p></li>
+<li><p>Implement both explicit and implicit schemes in R and Python, and
+verify them using an exact mode solution for at least four mesh
+sizes.</p></li>
+<li><p>Use the harmonic polynomial <span class="math inline">\(x^3-3xy^2\)</span> as manufactured Dirichlet data
+on a square; calculate the maximum residual of a five-point numerical
+solution.</p></li>
+</ol>
+<h2 id="chapter-project-diffusion-discretization-and-model-validation">Chapter
+project: diffusion, discretization, and model validation</h2>
+<p><strong>Project question.</strong> How accurately can R and Python
+predict the cooling of a one-dimensional specimen?</p>
+<ol type="1">
+<li><p>Derive the heat equation from conservation of energy and
+Fourier’s law. Define every physical quantity and state
+assumptions.</p></li>
+<li><p>Obtain the exact solution for the initial profile <span class="math inline">\(\sin(\pi x/L)\)</span> under zero-temperature
+endpoint conditions.</p></li>
+<li><p>Derive the FTCS update and its stability restriction <span class="math inline">\(\alpha\Delta t/h^2\le1/2\)</span>.</p></li>
+<li><p>Implement identical numerical experiments in R and Python for at
+least four grid sizes and calculate maximum errors at <span class="math inline">\(t=0.2\)</span>.</p></li>
+<li><p>Create temperature-profile plots and a log–log
+error-versus-grid-size plot in each language; estimate convergence
+order.</p></li>
+<li><p>Investigate the effect of changing thermal diffusivity and
+discuss the implications for cooling time.</p></li>
+<li><p>Compare the languages’ outputs, distinguish numerical from
+modeling error, and submit a reproducible technical report.</p></li>
+</ol>
+<p><strong>Suggested rubric (100 points):</strong> model derivation 20;
+exact solution and stability 20; R implementation 15; Python
+implementation 15; convergence and visualizations 20; interpretation and
+reproducibility 10.</p>
+<h2 id="exercises">Exercises</h2>
+<h3 class="unnumbered" id="conceptual-and-analytical-exercises">Conceptual and analytical
+exercises</h3>
+<ol type="1">
+<li><p>Classify <span class="math inline">\(u_{xx}-6u_{xy}+5u_{yy}=0\)</span> and explain the
+role of the factor <span class="math inline">\(2B\)</span>.</p></li>
+<li><p>Classify <span class="math inline">\(4u_{xx}+4u_{xy}+u_{yy}=0\)</span>.</p></li>
+<li><p>Determine whether <span class="math inline">\(u_t+u^2u_x=0\)</span> is linear; explain.</p></li>
+<li><p>Verify directly that <span class="math inline">\(u(x,t)=\cos(3(x-2t))\)</span> solves <span class="math inline">\(u_t+2u_x=0\)</span>.</p></li>
+<li><p>Solve <span class="math inline">\(u_t-3u_x=0\)</span> with <span class="math inline">\(u(x,0)=e^{-x^2}\)</span>.</p></li>
+<li><p>Derive the characteristic equations for <span class="math inline">\(u_t+xu_x=0\)</span> and find the solution with
+<span class="math inline">\(u(x,0)=x^2\)</span>.</p></li>
+<li><p>Solve <span class="math inline">\(u_t+u_x=2t\)</span> with <span class="math inline">\(u(x,0)=\sin x\)</span>.</p></li>
+<li><p>Explain why boundary data are required for a heat equation on a
+finite rod.</p></li>
+<li><p>Verify that <span class="math inline">\(e^{-4\alpha\pi^2t}\sin(2\pi x)\)</span> solves the
+heat equation on <span class="math inline">\([0,1]\)</span>.</p></li>
+<li><p>Derive the spatial eigenvalues for <span class="math inline">\(X''+\lambda X=0\)</span> with <span class="math inline">\(X(0)=X(L)=0\)</span>.</p></li>
+<li><p>Compute the first three sine coefficients of <span class="math inline">\(f(x)=\sin(\pi x)+2\sin(4\pi x)\)</span>.</p></li>
+<li><p>Show that the heat energy <span class="math inline">\(E(t)=\frac12\int_0^L u^2\,dx\)</span> is
+nonincreasing under homogeneous Dirichlet conditions.</p></li>
+<li><p>Derive the sine coefficient formula using orthogonality.</p></li>
+<li><p>Determine the exact heat solution for <span class="math inline">\(f(x)=3\sin(\pi x)-\sin(2\pi x)\)</span>.</p></li>
+<li><p>Explain why high-frequency heat modes disappear faster than
+low-frequency modes.</p></li>
+<li><p>Derive the FTCS update from Taylor approximations of <span class="math inline">\(u_t\)</span> and <span class="math inline">\(u_{xx}\)</span>.</p></li>
+<li><p>Compute <span class="math inline">\(r\)</span> when <span class="math inline">\(\alpha=0.2\)</span>, <span class="math inline">\(h=0.05\)</span>, and <span class="math inline">\(\Delta t=0.004\)</span>; is FTCS stable?</p></li>
+<li><p>Derive the amplification factor <span class="math inline">\(G=1-4r\sin^2(\theta/2)\)</span>.</p></li>
+<li><p>Explain why halving <span class="math inline">\(h\)</span>
+requires approximately four times as many time steps for fixed final
+time and stable FTCS.</p></li>
+<li><p>Show that <span class="math inline">\(u(x,t)=\sin(2\pi
+x)\cos(2\pi ct)\)</span> solves the wave equation for <span class="math inline">\(L=1\)</span>.</p></li>
+<li><p>Compute the standing-wave frequencies for a string of length
+<span class="math inline">\(2\)</span> with <span class="math inline">\(c=3\)</span>.</p></li>
+<li><p>Verify d’Alembert’s formula for zero initial velocity and <span class="math inline">\(f(x)=\cos x\)</span>.</p></li>
+<li><p>Derive conservation of string energy under fixed-end boundary
+conditions.</p></li>
+<li><p>Explain why the wave equation propagates signals at finite speed
+but the classical heat equation does not.</p></li>
+<li><p>Verify that <span class="math inline">\(u(x,y)=x^3-3xy^2\)</span>
+is harmonic.</p></li>
+<li><p>Find a harmonic polynomial of the form <span class="math inline">\(u(x,y)=ax^2+by^2\)</span> with <span class="math inline">\(a\ne0\)</span>.</p></li>
+<li><p>Derive the five-point Laplace stencil by centered
+differences.</p></li>
+<li><p>Explain why a harmonic function with zero boundary values must
+vanish in a bounded connected domain.</p></li>
+<li><p>Distinguish Dirichlet, Neumann, and Robin conditions with
+physical examples.</p></li>
+<li><p>Write the five-point equation for <span class="math inline">\(-\Delta u=5\)</span> at an interior grid
+point.</p></li>
+</ol>
+<h3 class="unnumbered" id="r-python-and-investigation-exercises">R,
+Python, and investigation exercises</h3>
+<ol type="1">
+<li><p>Plot transport solutions for positive and negative velocities;
+describe how the direction changes.</p></li>
+<li><p>Use symbolic differentiation or direct derivatives to check the
+PDE residual for <span class="math inline">\(u(x,t)=e^{-\alpha\pi^2t}\sin(\pi
+x)\)</span>.</p></li>
+<li><p>Compute the first <span class="math inline">\(20\)</span> Fourier
+sine coefficients of <span class="math inline">\(x(1-x)\)</span> using
+numerical quadrature in R and Python and compare them with the exact
+formula.</p></li>
+<li><p>Compare <span class="math inline">\(N=3,7,15,30\)</span>
+heat-series truncations at <span class="math inline">\(t=0\)</span> and
+<span class="math inline">\(t=0.2\)</span>.</p></li>
+<li><p>Implement FTCS with <span class="math inline">\(r=0.4\)</span>
+and <span class="math inline">\(r=0.6\)</span> for sufficiently many
+steps; compare maximum amplitudes.</p></li>
+<li><p>Use <span class="math inline">\(N=21,41,81,161\)</span> to
+estimate the convergence order of FTCS.</p></li>
+<li><p>Plot the first three standing-wave modes and identify their
+nodes.</p></li>
+<li><p>Implement a centered wave solver and test the Courant restriction
+<span class="math inline">\(c\Delta t/h\le1\)</span>.</p></li>
+<li><p>Change the heated edge in the Laplace solver and describe the new
+equilibrium field.</p></li>
+<li><p>Compare Jacobi iteration counts for <span class="math inline">\(21\times21\)</span> and <span class="math inline">\(41\times41\)</span> grids at the same update
+tolerance.</p></li>
+<li><p>Calculate the maximum discrete Laplace residual for a converged
+Jacobi solution.</p></li>
+<li><p>Solve a Poisson equation on a square using a sparse linear system
+in R or Python and verify the sign convention against a known polynomial
+solution.</p></li>
+<li><p>Investigate the difference between insulated and
+fixed-temperature endpoints for a rod.</p></li>
+<li><p>Use R or Python to animate a standing wave and identify the times
+at which the displacement is zero everywhere.</p></li>
+<li><p>Write a brief reproducibility report: state the PDE, domain,
+conditions, grid, method, stability restriction, error measure, and
+results.</p></li>
+</ol>
+<h2 id="chapter-summary">Chapter summary</h2>
+<p>PDEs describe the interaction of derivatives in multiple variables.
+Characteristics track first-order transport, Fourier eigenfunctions
+resolve heat and wave evolution, and finite differences turn continuous
+equations into computational updates. Laplace’s equation characterizes
+equilibria; maximum principles and energy estimates explain uniqueness
+and stability. R and Python are most useful when their output is
+connected to these analytical principles and checked through convergence
+tests.</p>
+<footer><a href="chapter07.html">7. Introduction to Tensor Calculus and Differential Geometry ←</a><a href="appendix-a.html">Appendix A. Introduction to R and RStudio →</a></footer></main><aside class="chapter-toc"><strong>On this page</strong><ul><li><a href="#interactive-investigation">Interactive investigation</a></li><li><a href="#why-partial-differential-equations">Why partial differential
+equations?</a></li><li><a href="#classification-of-second-order-equations">Classification of
+second-order equations</a></li><li><a href="#first-order-transport-and-characteristics">First-order transport
+and characteristics</a></li><li><a href="#the-heat-equation-and-diffusion">The heat equation and
+diffusion</a></li><li><a href="#separation-of-variables">Separation of variables</a></li><li><a href="#an-energy-estimate">An energy estimate</a></li><li><a href="#fourier-series-as-a-computational-tool">Fourier series as a
+computational tool</a></li><li><a href="#finite-differences-for-the-heat-equation">Finite differences for
+the heat equation</a></li><li><a href="#the-wave-equation-and-vibrating-strings">The wave equation and
+vibrating strings</a></li><li><a href="#dalemberts-formula">D’Alembert’s formula</a></li><li><a href="#energy-and-numerical-stability">Energy and numerical
+stability</a></li><li><a href="#laplaces-equation-and-harmonic-functions">Laplace’s equation and
+harmonic functions</a></li><li><a href="#the-five-point-stencil">The five-point stencil</a></li><li><a href="#poissons-equation-and-source-terms">Poisson’s equation and
+source terms</a></li><li><a href="#two-dimensional-diffusion-and-vibrating-membranes">Two-dimensional
+diffusion and vibrating membranes</a></li><li><a href="#boundary-conditions-and-mathematical-modeling">Boundary
+conditions and mathematical modeling</a></li><li><a href="#a-complete-computational-investigation">A complete computational
+investigation</a></li><li><a href="#further-connections-spectral-methods-and-uncertainty">Further
+connections: spectral methods and uncertainty</a></li><li><a href="#additional-mathematical-examples-from-the-r-manuscript">Additional
+mathematical examples from the R manuscript</a></li><li><a href="#variable-speed-transport">Variable-speed transport</a></li><li><a href="#a-harmonic-polynomial-and-boundary-data">A harmonic polynomial
+and boundary data</a></li><li><a href="#a-single-standing-wave-mode">A single standing-wave mode</a></li><li><a href="#solving-the-same-pde-problems-using-r">Solving the same PDE
+problems using R</a></li><li><a href="#solving-the-same-pde-problems-using-python">Solving the same PDE
+problems using Python</a></li><li><a href="#comparing-r-and-python-solutions">Comparing R and Python
+solutions</a></li><li><a href="#real-world-application-thermal-diffusion-in-a-laboratory-specimen">Real-world
+application: thermal diffusion in a laboratory specimen</a></li><li><a href="#advanced-extension-from-the-r-manuscript-power-series-and-frobenius-methods">Advanced
+extension from the R manuscript: power series and Frobenius methods</a></li><li><a href="#mathematical-foundations-weak-formulations-and-conservation">Mathematical
+foundations: weak formulations and conservation</a></li><li><a href="#conservation-laws-and-fluxes">Conservation laws and fluxes</a></li><li><a href="#the-weak-form-of-a-diffusion-equation">The weak form of a
+diffusion equation</a></li><li><a href="#a-closer-look-at-uniqueness-and-maximum-principles">A closer
+look at uniqueness and maximum principles</a></li><li><a href="#heat-equation-uniqueness-by-energy-estimates">Heat-equation
+uniqueness by energy estimates</a></li><li><a href="#the-maximum-principle-for-harmonic-functions">The maximum
+principle for harmonic functions</a></li><li><a href="#finite-difference-accuracy-stability-and-consistency">Finite-difference
+accuracy, stability, and consistency</a></li><li><a href="#local-truncation-error">Local truncation error</a></li><li><a href="#a-discrete-energy-and-positivity-argument">A discrete energy and
+positivity argument</a></li><li><a href="#why-an-unstable-run-can-look-harmless-at-first">Why an unstable
+run can look harmless at first</a></li><li><a href="#the-implicit-backward-euler-alternative">The implicit
+backward-Euler alternative</a></li><li><a href="#a-deeper-connection-fourier-modes-and-physical-time-scales">A
+deeper connection: Fourier modes and physical time scales</a></li><li><a href="#nondimensionalization">Nondimensionalization</a></li><li><a href="#paired-computational-laboratory-explicit-and-implicit-heat-solvers">Paired
+computational laboratory: explicit and implicit heat solvers</a></li><li><a href="#r-implementation">R implementation</a></li><li><a href="#python-implementation">Python implementation</a></li><li><a href="#a-reproducibility-protocol">A reproducibility protocol</a></li><li><a href="#additional-source-connections-and-worked-extensions">Additional
+source connections and worked extensions</a></li><li><a href="#a-variable-speed-transport-model">A variable-speed transport
+model</a></li><li><a href="#an-elementary-harmonic-function">An elementary harmonic
+function</a></li><li><a href="#wave-modes-and-a-caution-about-numerical-dissipation">Wave modes
+and a caution about numerical dissipation</a></li><li><a href="#the-original-r-manuscripts-series-method-extension">The original
+R manuscript’s series-method extension</a></li><li><a href="#advanced-exercises-for-mathematical-verification">Advanced
+exercises for mathematical verification</a></li><li><a href="#chapter-project-diffusion-discretization-and-model-validation">Chapter
+project: diffusion, discretization, and model validation</a></li><li><a href="#exercises">Exercises</a></li><li><a href="#conceptual-and-analytical-exercises">Conceptual and analytical
+exercises</a></li><li><a href="#r-python-and-investigation-exercises">R,
+Python, and investigation exercises</a></li><li><a href="#chapter-summary">Chapter summary</a></li></ul></aside></div><script src="search-index.js"></script><script src="site.js"></script><script src="investigations.js"></script></body></html>

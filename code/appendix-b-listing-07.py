@@ -1,0 +1,11 @@
+import matplotlib.pyplot as plt
+t = np.linspace(0, 2*np.pi, 400)
+fig, ax = plt.subplots()
+ax.plot(np.cos(t), np.sin(t), label="unit circle")
+ax.set_aspect("equal", adjustable="box")
+ax.set_xlabel("x")
+ax.set_ylabel("y")
+ax.set_title("A parametrized circle")
+ax.legend()
+fig.tight_layout()
+plt.show()

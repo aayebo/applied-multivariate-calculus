@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><title>Introduction to Tensor Calculus and Differential Geometry | Applied Multivariate Calculus Using R and Python</title><link href="site.css" rel="stylesheet"/><script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]}};</script><script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script></head><body><a class="skip" href="#main">Skip to content</a><nav aria-label="Book navigation" class="site-nav"><a class="brand" href="index.html">Applied Multivariate Calculus Using R and Python</a><p class="subtitle">Volume III · Abraham Ayebo</p><label for="book-search">Search book</label><input id="book-search" placeholder="Search chapters" type="search"/><div aria-live="polite" class="search-results" id="search-results"></div><div class="nav-label">Contents</div><a href="index.html">Welcome</a><a href="chapter01.html">1. Vectors and Geometry in Three-Dimensional Space</a><a href="chapter02.html">2. Curves, Surfaces, and Coordinate Systems</a><a href="chapter03.html">3. Functions of Several Variables and Partial Differentiation</a><a href="chapter04.html">4. Gradients, Taylor Approximations, and Optimization</a><a href="chapter05.html">5. Multiple Integration and Applications</a><a href="chapter06.html">6. Vector Fields and Integral Theorems</a><a aria-current="page" class="active" href="chapter07.html">7. Introduction to Tensor Calculus and Differential Geometry</a><a href="chapter08.html">8. Partial Differential Equations and Computational Methods</a><a href="appendix-a.html">Appendix A. Introduction to R and RStudio</a><a href="appendix-b.html">Appendix B. Introduction to Python and Jupyter</a><a href="resources.html">Computational resources</a><a href="about.html">About this book</a><div class="nav-label">Series</div><a href="https://aayebo.github.io/applied-precalculus/">Volume I · Applied Precalculus</a><a href="https://aayebo.github.io/applied-calculus/">Volume II · Applied Calculus</a></nav><header class="topbar"><button aria-expanded="false" class="menu">Contents</button><span>Applied Mathematics · Volume III</span><span class="spacer"></span><a href="resources.html">Code &amp; resources</a></header><div class="page-grid"><main id="main"><h1>7. Introduction to Tensor Calculus and Differential Geometry</h1><p><span id="ch:tensors" label="ch:tensors"></span></p>
+<div class="learning-box example"><p><strong>Learning.</strong> After studying this chapter, you should be
+able to distinguish coordinates from geometric objects; construct
+tangent vectors and metrics on parametrized surfaces; transform vector
+and covector components; use Einstein notation; calculate Christoffel
+symbols and covariant derivatives; formulate and solve geodesic
+equations; compute Gaussian curvature and interpret the Riemann
+curvature tensor; derive the Frenet–Serret equations; and use R and
+Python to investigate geometric problems.</p></div>
+<section class="mv-lab" id="interactive-investigation"><h2>Interactive investigation: Surface curvature</h2><p>Compare z=x²+c y² at the origin as c varies.</p><div data-mv-lab="7"></div><p><strong>Explore:</strong> How does the sign of Gaussian curvature distinguish saddle and bowl geometry?</p><noscript>Enable JavaScript to use this investigation.</noscript></section><h2 id="why-geometry-requires-more-than-cartesian-coordinates">Why
+geometry requires more than Cartesian coordinates</h2>
+<p>A plane can be described by Cartesian coordinates, polar coordinates,
+or a rotated grid without changing the plane itself. A sphere can be
+represented using longitude and latitude, but the coordinate
+singularities at its poles are not singularities of the sphere. The
+central task of differential geometry is to distinguish
+<em>intrinsic</em> geometric information from artifacts of coordinates.
+Tensor calculus provides a systematic language for making this
+distinction.</p>
+<p>A smooth coordinate chart labels points using coordinates <span class="math inline">\(q^1,\ldots,q^n\)</span>. In Euclidean space an
+immersion <span class="math inline">\(\boldsymbol{X}(q^1,\ldots,q^n)\)</span> produces
+coordinate tangent vectors <span class="math display">\[\boldsymbol{e}_i=\frac{\partial\boldsymbol{X}}{\partial
+q^i}.\]</span> A vector <span class="math inline">\(\boldsymbol{v}\)</span> has coordinate components
+<span class="math inline">\(v^i\)</span> when <span class="math inline">\(\boldsymbol{v}=v^i\boldsymbol{e}_i\)</span>; here
+and below, a repeated upper and lower index is summed over its range
+(Einstein convention). The superscript <span class="math inline">\(i\)</span> is a component label, not an
+exponent.</p>
+<div class="learning-box example"><p><strong>Example — Polar coordinates.</strong> For <span class="math inline">\(\boldsymbol{X}(r,\theta)=(r\cos\theta,r\sin\theta)\)</span>,
+<span class="math display">\[\boldsymbol{e}_r=(\cos\theta,\sin\theta),\qquad
+\boldsymbol{e}_\theta=(-r\sin\theta,r\cos\theta).\]</span> The second
+coordinate basis vector has length <span class="math inline">\(r\)</span>, not <span class="math inline">\(1\)</span>. The associated unit angular direction
+is <span class="math inline">\(\widehat{\boldsymbol{e}}_\theta=\boldsymbol{e}_\theta/r\)</span>
+for <span class="math inline">\(r&gt;0\)</span>. This distinction
+matters when differentiating vector components.</p></div>
+<figure>
+<img alt="Polar coordinate grid and its unit radial and angular directions. The coordinate basis vector \partial\boldsymbol{X}/\partial\theta has length r." src="figures/ch7_polar_basis.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">Polar coordinate grid and its unit radial
+and angular directions. The coordinate basis vector <span class="math inline">\(\partial\boldsymbol{X}/\partial\theta\)</span> has
+length <span class="math inline">\(r\)</span>.</figcaption>
+</figure>
+<h2 id="tangent-spaces-differentials-and-covectors">Tangent spaces,
+differentials, and covectors</h2>
+<p>A tangent vector at a point describes an infinitesimal direction
+along a curve or surface. For a surface <span class="math inline">\(\boldsymbol{X}(u,v)\)</span> with linearly
+independent <span class="math inline">\(\boldsymbol{X}_u,\boldsymbol{X}_v\)</span>, its
+tangent plane is spanned by those two vectors. If <span class="math inline">\(f\)</span> is a differentiable scalar field, its
+differential <span class="math inline">\(\,\mathrm{d}f\)</span> is a
+<em>covector</em>: it takes a tangent vector <span class="math inline">\(\boldsymbol{v}\)</span> to the directional rate of
+change <span class="math inline">\(\,\mathrm{d}f(\boldsymbol{v})\)</span>. In
+coordinates, <span class="math display">\[\,\mathrm{d}f=\frac{\partial
+f}{\partial q^i}\,\,\mathrm{d}q^i,\qquad
+\,\mathrm{d}f(\boldsymbol{v})=\frac{\partial f}{\partial
+q^i}v^i.\]</span> A covector and a vector are different mathematical
+objects, even though a Euclidean dot product can identify them. On a
+curved surface, the metric makes this identification precise.</p>
+<figure>
+<img alt="A tangent plane to a cylinder, spanned by the derivatives of its parametrization." src="figures/ch7_tangent_cylinder.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">A tangent plane to a cylinder, spanned by
+the derivatives of its parametrization.</figcaption>
+</figure>
+<div class="learning-box check"><p><strong>Checkpoint.</strong> Why does the angular coordinate vector
+in polar coordinates have length <span class="math inline">\(r\)</span>,
+while the angular unit vector has length <span class="math inline">\(1\)</span>? Explain geometrically using a small
+change <span class="math inline">\(\Delta\theta\)</span>.</p></div>
+<h2 id="coordinate-transformations-and-tensor-components">Coordinate
+transformations and tensor components</h2>
+<p>Suppose <span class="math inline">\(q^i=q^i(\widetilde
+q^1,\ldots,\widetilde q^n)\)</span> is a smooth change of coordinates
+with invertible Jacobian. The chain rule gives <span class="math display">\[\widetilde{\boldsymbol{e}}_a=\frac{\partial
+q^i}{\partial\widetilde q^a}\boldsymbol{e}_i,\qquad \widetilde
+v^a=\frac{\partial\widetilde q^a}{\partial q^i}v^i.\]</span> Thus
+<em>contravariant</em> vector components transform with the inverse
+Jacobian of the basis transformation. Covector components transform in
+the opposite manner: <span class="math display">\[\widetilde\omega_a=\frac{\partial
+q^i}{\partial\widetilde q^a}\omega_i.\]</span> Their contraction <span class="math inline">\(\omega_i v^i\)</span> is independent of
+coordinates. A type <span class="math inline">\((1,1)\)</span> tensor
+<span class="math inline">\(T^i{}_j\)</span> has one contravariant and
+one covariant index and transforms by applying the appropriate Jacobian
+factor to each index. The key idea is not the placement of symbols by
+itself but the transformation law.</p>
+<div class="learning-box example"><p><strong>Example — A radial vector.</strong> At <span class="math inline">\((x,y)=(1,1)\)</span>, the Cartesian vector <span class="math inline">\(\boldsymbol{v}=(1,1)\)</span> points radially
+outward. In polar coordinates <span class="math inline">\((r,\theta)=(\sqrt2,\pi/4)\)</span>, its coordinate
+components are <span class="math inline">\((v^r,v^\theta)=(\sqrt2,0)\)</span>. This does not
+mean the vector has changed: the coordinate basis has changed.</p></div>
+<div class="learning-box example"><p><strong>Remark — Computational connection.</strong> This derivation
+is implemented in both languages in the paired computational sections
+and in the companion source files.</p></div>
+<h2 id="the-metric-tensor-and-geometric-measurement">The metric tensor
+and geometric measurement</h2>
+<div class="learning-box example"><p><strong>Definition.</strong> A Riemannian metric assigns to each
+point a symmetric, positive-definite bilinear form <span class="math inline">\(g\)</span> on its tangent space. In local
+coordinates, its components are <span class="math inline">\(g_{ij}=g(\boldsymbol{e}_i,\boldsymbol{e}_j)\)</span>,
+so <span class="math display">\[\,\mathrm{d}s^2=g_{ij}\,\,\mathrm{d}q^i\,\mathrm{d}q^j,\qquad
+\left\lVert \boldsymbol{v}\right\rVert_g^2=g_{ij}v^iv^j.\]</span></p></div>
+<p>For a surface embedded in Euclidean three-space, <span class="math inline">\(g_{ij}=\boldsymbol{X}_i\cdot\boldsymbol{X}_j\)</span>.
+In the classical first fundamental form notation, <span class="math inline">\(E=\boldsymbol{X}_u\cdot\boldsymbol{X}_u\)</span>,
+<span class="math inline">\(F=\boldsymbol{X}_u\cdot\boldsymbol{X}_v\)</span>,
+<span class="math inline">\(G=\boldsymbol{X}_v\cdot\boldsymbol{X}_v\)</span>,
+and <span class="math display">\[\,\mathrm{d}s^2=E\,\,\mathrm{d}u^2+2F\,\,\mathrm{d}u\,\mathrm{d}v+G\,\,\mathrm{d}v^2.\]</span>
+The induced area element is <span class="math inline">\(\,\mathrm{d}A=\sqrt{EG-F^2}\,\,\mathrm{d}u\,\mathrm{d}v=\sqrt{\det(g)}\,\,\mathrm{d}u\,\mathrm{d}v\)</span>.</p>
+<div class="learning-box example"><p><strong>Example — Plane in polar coordinates.</strong> The coordinate
+vectors above yield <span class="math inline">\(g_{rr}=1\)</span>, <span class="math inline">\(g_{r\theta}=0\)</span>, and <span class="math inline">\(g_{\theta\theta}=r^2\)</span>. Consequently <span class="math display">\[\,\mathrm{d}s^2=\,\mathrm{d}r^2+r^2\,\mathrm{d}\theta^2,\qquad
+\,\mathrm{d}A=r\,\,\mathrm{d}r\,\mathrm{d}\theta.\]</span> The factor
+<span class="math inline">\(r\)</span> in the area element is a
+geometric consequence of the metric and agrees with the Jacobian in
+multivariable integration.</p></div>
+<div class="learning-box example"><p><strong>Example — Unit sphere.</strong> With <span class="math inline">\(\boldsymbol{X}(\vartheta,\varphi)=(\sin\vartheta\cos\varphi,\sin\vartheta\sin\varphi,\cos\vartheta)\)</span>,
+<span class="math inline">\(0&lt;\vartheta&lt;\pi\)</span>, <span class="math display">\[g=\begin{pmatrix}1&amp;0\\0&amp;\sin^2\vartheta\end{pmatrix},\qquad
+\,\mathrm{d}A=\sin\vartheta\,\,\mathrm{d}\vartheta\,\mathrm{d}\varphi.\]</span>
+The metric degenerates at the poles only because this particular chart
+is singular there; the sphere remains smooth.</p></div>
+<figure>
+<img alt="Coordinate grids can look different while representing geometric information through an appropriate metric. A deformation of the drawing alone is not a proof of an isometry." src="figures/ch7_metric_grid.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">Coordinate grids can look different while
+representing geometric information through an appropriate metric. A
+deformation of the drawing alone is not a proof of an
+isometry.</figcaption>
+</figure>
+<h2 id="raising-and-lowering-indices">Raising and lowering indices</h2>
+<p>Because the metric is positive definite, its matrix has an inverse
+<span class="math inline">\((g^{ij})\)</span>, defined by <span class="math inline">\(g^{ik}g_{kj}=\delta^i_j\)</span>. It converts
+vector components to covector components and conversely: <span class="math display">\[v_i=g_{ij}v^j,\qquad v^i=g^{ij}v_j.\]</span> For
+a scalar field <span class="math inline">\(f\)</span>, the differential
+has components <span class="math inline">\(\partial_i f\)</span>, while
+the <em>gradient vector</em> has components <span class="math display">\[(\operatorname{grad}f)^i=g^{ij}\partial_j
+f.\]</span> In polar coordinates this yields <span class="math display">\[\operatorname{grad}f=f_r\,\boldsymbol{e}_r+\frac{f_\theta}{r^2}\,\boldsymbol{e}_\theta
+=f_r\,\widehat{\boldsymbol{e}}_r+\frac{f_\theta}{r}\,\widehat{\boldsymbol{e}}_\theta.\]</span></p>
+<div class="learning-box example"><p><strong>Example — Gradient of an angular function.</strong> For <span class="math inline">\(f(r,\theta)=\theta\)</span> on a sector not
+crossing a branch cut, <span class="math inline">\(\,\mathrm{d}f=\,\mathrm{d}\theta\)</span> and
+<span class="math inline">\(\operatorname{grad}f=r^{-2}\boldsymbol{e}_\theta=r^{-1}\widehat{\boldsymbol{e}}_\theta\)</span>.
+Its magnitude is <span class="math inline">\(1/r\)</span>: the angular
+coordinate changes more rapidly per unit distance near the origin.</p></div>
+<h2 id="christoffel-symbols-and-covariant-differentiation">Christoffel
+symbols and covariant differentiation</h2>
+<p>Ordinary derivatives of vector components do not generally transform
+as tensor components, because the coordinate basis changes with
+position. The <em>Levi–Civita connection</em> is the unique connection
+that is torsion-free and compatible with the metric. Its Christoffel
+symbols are <span class="math display">\[\Gamma^k_{ij}=\frac12
+g^{k\ell}\big(\partial_i g_{j\ell}+\partial_j g_{i\ell}-\partial_\ell
+g_{ij}\big).\]</span> For a vector field <span class="math inline">\(V=V^k\boldsymbol{e}_k\)</span>, the covariant
+derivative is <span class="math display">\[(\nabla_i V)^k=\partial_i
+V^k+\Gamma^k_{ij}V^j.\]</span> For a covector field <span class="math inline">\(\omega_j\)</span> the correction has the opposite
+sign: <span class="math display">\[(\nabla_i\omega)_j=\partial_i\omega_j-\Gamma^k_{ij}\omega_k.\]</span>
+The Christoffel symbols themselves are not tensor components. In
+particular, nonzero Christoffel symbols do <em>not</em> by themselves
+imply intrinsic curvature.</p>
+<div class="learning-box example"><p><strong>Example — Polar connection.</strong> For <span class="math inline">\(g=\operatorname{diag}(1,r^2)\)</span>, the only
+nonzero Christoffel symbols are <span class="math display">\[\Gamma^r_{\theta\theta}=-r,\qquad
+\Gamma^\theta_{r\theta}=\Gamma^\theta_{\theta r}=\frac1r.\]</span> The
+Euclidean plane has zero intrinsic curvature, even though these
+coefficients are nonzero in polar coordinates.</p></div>
+<div class="learning-box example"><p><strong>Remark — Computational connection.</strong> This derivation
+is implemented in both languages in the paired computational sections
+and in the companion source files.</p></div>
+<div class="learning-box check"><p><strong>Checkpoint.</strong> Compute <span class="math inline">\(\nabla_\theta V\)</span> when <span class="math inline">\(V^r=1\)</span> and <span class="math inline">\(V^\theta=0\)</span> in polar coordinates. Why is
+its angular component not zero?</p></div>
+<h2 id="geodesics-locally-straight-paths-on-curved-spaces">Geodesics:
+locally straight paths on curved spaces</h2>
+<div class="learning-box example"><p><strong>Definition.</strong> A geodesic <span class="math inline">\(q^k(t)\)</span> for an affine parameter <span class="math inline">\(t\)</span> satisfies <span class="math display">\[\frac{\,\mathrm{d}^2q^k}{\,\mathrm{d}t^2}+\Gamma^k_{ij}(q)\frac{\,\mathrm{d}q^i}{\,\mathrm{d}t}\frac{\,\mathrm{d}q^j}{\,\mathrm{d}t}=0.\]</span></p></div>
+<p>The equation arises from stationary points of the energy functional
+<span class="math inline">\(E[q]=\frac12\int g_{ij}(q)\dot q^i\dot
+q^j\,\,\mathrm{d}t\)</span>. The Euler–Lagrange equations simplify to
+the geodesic equation above. Geodesics are locally length-minimizing for
+sufficiently short segments, but a long geodesic need not be globally
+shortest between its endpoints.</p>
+<div class="learning-box example"><p><strong>Example — Geodesics in polar coordinates.</strong> The
+equations become <span class="math display">\[\ddot
+r-r\dot\theta^2=0,\qquad \ddot\theta+\frac{2}{r}\dot
+r\dot\theta=0.\]</span> These describe ordinary straight lines in the
+Euclidean plane. A path of constant <span class="math inline">\(r\)</span> with nonzero <span class="math inline">\(\dot\theta\)</span> is not a geodesic: the radial
+equation would require <span class="math inline">\(-r\dot\theta^2=0\)</span>.</p></div>
+<div class="learning-box example"><p><strong>Example — Great circles on a sphere.</strong> For the unit
+sphere, <span class="math inline">\(g=\operatorname{diag}(1,\sin^2\vartheta)\)</span>,
+and <span class="math display">\[\Gamma^\vartheta_{\varphi\varphi}=-\sin\vartheta\cos\vartheta,\qquad
+\Gamma^\varphi_{\vartheta\varphi}=\Gamma^\varphi_{\varphi\vartheta}=\cot\vartheta.\]</span>
+The equator <span class="math inline">\(\vartheta=\pi/2\)</span>, <span class="math inline">\(\varphi=t\)</span> satisfies the equations. A
+latitude with fixed <span class="math inline">\(\vartheta\ne\pi/2\)</span> generally does not. All
+great circles are geodesics, but only the shorter arc between
+non-antipodal points is globally minimizing.</p></div>
+<figure>
+<img alt="A great circle is a geodesic of the round sphere; a non-equatorial latitude circle is not." src="figures/ch7_sphere_geodesic.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">A great circle is a geodesic of the round
+sphere; a non-equatorial latitude circle is not.</figcaption>
+</figure>
+<h3 id="numerical-geodesics-with-scipy">Numerical geodesics with
+SciPy</h3>
+<p>To solve geodesic equations numerically, introduce velocities <span class="math inline">\(v^k=\dot q^k\)</span> and write a first-order
+system <span class="math display">\[\dot q^k=v^k,\qquad \dot
+v^k=-\Gamma^k_{ij}(q)v^iv^j.\]</span> For polar coordinates, the
+right-hand side is <span class="math inline">\((v_r,v_\theta,r
+v_\theta^2,-2v_rv_\theta/r)\)</span>. Numerical integration should avoid
+the coordinate singularity <span class="math inline">\(r=0\)</span>,
+even when the underlying Euclidean trajectory is smooth.</p>
+<div class="learning-box example"><p><strong>Remark — Computational connection.</strong> This derivation
+is implemented in both languages in the paired computational sections
+and in the companion source files.</p></div>
+<p>The initial Cartesian point is <span class="math inline">\((1,0)\)</span> with initial Cartesian velocity
+<span class="math inline">\((0,1)\)</span>, so the exact path is the
+straight line <span class="math inline">\((x,y)=(1,t)\)</span>.</p>
+<h2 id="curvature-detecting-intrinsic-bending">Curvature: detecting
+intrinsic bending</h2>
+<p>For a regular surface <span class="math inline">\(\boldsymbol{X}(u,v)\)</span> with a chosen unit
+normal <span class="math inline">\(\boldsymbol{n}\)</span>, the second
+fundamental form has coefficients <span class="math display">\[L=\boldsymbol{X}_{uu}\cdot\boldsymbol{n},\qquad
+M=\boldsymbol{X}_{uv}\cdot\boldsymbol{n},\qquad
+N=\boldsymbol{X}_{vv}\cdot\boldsymbol{n}.\]</span> Its Gaussian
+curvature and mean curvature (with the convention <span class="math inline">\(H=(k_1+k_2)/2\)</span>) are <span class="math display">\[K=\frac{LN-M^2}{EG-F^2},\qquad
+H=\frac{EN-2FM+GL}{2(EG-F^2)}.\]</span> The sign of <span class="math inline">\(H\)</span> depends on the normal orientation;
+<span class="math inline">\(K\)</span> does not. At a point, positive
+<span class="math inline">\(K\)</span> indicates principal curvatures of
+the same sign, negative <span class="math inline">\(K\)</span> indicates
+opposite signs, and <span class="math inline">\(K=0\)</span> indicates
+at least one zero principal curvature.</p>
+<div class="learning-box example"><p><strong>Example — Plane, cylinder, and sphere.</strong> A plane has
+<span class="math inline">\(K=0\)</span>. A circular cylinder also has
+<span class="math inline">\(K=0\)</span> because it bends in only one
+principal direction. A sphere of radius <span class="math inline">\(a\)</span> has <span class="math inline">\(K=1/a^2\)</span> everywhere. Although the cylinder
+appears curved in three-space, its intrinsic geometry is locally
+flat.</p></div>
+<div class="learning-box example"><p><strong>Example — Graph curvature.</strong> For a graph <span class="math inline">\(z=f(x,y)\)</span>, <span class="math display">\[K=\frac{f_{xx}f_{yy}-f_{xy}^2}{(1+f_x^2+f_y^2)^2}.\]</span>
+For <span class="math inline">\(f=x^2+y^2\)</span>, <span class="math inline">\(K=4/(1+4x^2+4y^2)^2&gt;0\)</span>. For <span class="math inline">\(f=x^2-y^2\)</span>, <span class="math inline">\(K=-4/(1+4x^2+4y^2)^2&lt;0\)</span>.</p></div>
+<figure>
+<img alt="Three local curvature behaviors: flat, elliptic, and hyperbolic." src="figures/ch7_curvature_surfaces.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">Three local curvature behaviors: flat,
+elliptic, and hyperbolic.</figcaption>
+</figure>
+<h2 id="riemann-curvature-and-coordinate-independence">Riemann curvature
+and coordinate independence</h2>
+<p>The Riemann curvature tensor measures the failure of covariant
+derivatives to commute. With the convention <span class="math display">\[(\nabla_i\nabla_j-\nabla_j\nabla_i)V^\ell=R^\ell{}_{kij}V^k,\]</span>
+its coordinate components are <span class="math display">\[R^\ell{}_{kij}=\partial_i\Gamma^\ell_{jk}-\partial_j\Gamma^\ell_{ik}+\Gamma^\ell_{im}\Gamma^m_{jk}-\Gamma^\ell_{jm}\Gamma^m_{ik}.\]</span>
+The Ricci tensor is the contraction <span class="math inline">\(R_{kj}=R^i{}_{kij}\)</span> and scalar curvature
+is <span class="math inline">\(S=g^{kj}R_{kj}\)</span>. On a
+two-dimensional surface <span class="math inline">\(S=2K\)</span> under
+this convention. A sphere of radius <span class="math inline">\(a\)</span> has <span class="math inline">\(S=2/a^2\)</span>; the Euclidean plane has <span class="math inline">\(S=0\)</span> in every smooth coordinate chart.</p>
+<div class="learning-box example"><p><strong>Remark.</strong> Curvature sign conventions differ across
+references. Always state the defining commutator and the index order
+when comparing formulas. Tensor curvature is intrinsic, whereas the
+second fundamental form depends on an embedding and a chosen normal.</p></div>
+<div class="learning-box example"><p><strong>Remark — Computational connection.</strong> This derivation
+is implemented in both languages in the paired computational sections
+and in the companion source files.</p></div>
+<h2 id="the-frenetserret-frame-of-a-space-curve">The Frenet–Serret frame
+of a space curve</h2>
+<p>Let <span class="math inline">\(\boldsymbol{r}(s)\)</span> be a
+regular curve parametrized by arc length. The unit tangent is <span class="math inline">\(\boldsymbol{T}=\boldsymbol{r}'(s)\)</span>.
+When <span class="math inline">\(\kappa=\left\lVert
+\boldsymbol{T}'(s)\right\rVert&gt;0\)</span>, define <span class="math inline">\(\boldsymbol{N}=\boldsymbol{T}'/\kappa\)</span>
+and <span class="math inline">\(\boldsymbol{B}=\boldsymbol{T}\times\boldsymbol{N}\)</span>.
+The Frenet–Serret equations are <span class="math display">\[\boldsymbol{T}'=\kappa\boldsymbol{N},\qquad
+\boldsymbol{N}'=-\kappa\boldsymbol{T}+\tau\boldsymbol{B},\qquad
+\boldsymbol{B}'=-\tau\boldsymbol{N}.\]</span> For an arbitrary
+regular parameter <span class="math inline">\(t\)</span>, <span class="math display">\[\kappa=\frac{\left\lVert
+\boldsymbol{r}'\times\boldsymbol{r}''\right\rVert}{\left\lVert
+\boldsymbol{r}'\right\rVert^3},\qquad
+\tau=\frac{\det(\boldsymbol{r}',\boldsymbol{r}'',\boldsymbol{r}''')}{\left\lVert
+\boldsymbol{r}'\times\boldsymbol{r}''\right\rVert^2},\]</span>
+where the torsion formula requires <span class="math inline">\(\boldsymbol{r}'\times\boldsymbol{r}''\ne0\)</span>.
+Curvature measures turning; torsion measures the rotation of the
+osculating plane.</p>
+<div class="learning-box example"><p><strong>Example — Circular helix.</strong> For <span class="math inline">\(\boldsymbol{r}(t)=(a\cos t,a\sin t,bt)\)</span>
+with <span class="math inline">\(a&gt;0\)</span>, differentiation yields
+<span class="math display">\[\kappa=\frac{a}{a^2+b^2},\qquad
+\tau=\frac{b}{a^2+b^2}.\]</span> The helix has constant curvature and
+torsion. When <span class="math inline">\(b=0\)</span>, the curve lies
+in a plane and has torsion zero.</p></div>
+<figure>
+<img alt="The tangent, normal, and binormal directions along a circular helix." src="figures/ch7_frenet_helix.png" style="width:83.0%"/>
+<figcaption aria-hidden="true">The tangent, normal, and binormal
+directions along a circular helix.</figcaption>
+</figure>
+<div class="learning-box example"><p><strong>Remark — Computational connection.</strong> This derivation
+is implemented in both languages in the paired computational sections
+and in the companion source files.</p></div>
+<h2 id="additional-mathematical-examples-and-r-manuscript-connections">Additional
+mathematical examples and R-manuscript connections</h2>
+<h3 id="coordinate-transformations-of-a-velocity">Coordinate
+transformations of a velocity</h3>
+<p>For <span class="math inline">\(x=r\cos\theta\)</span>, <span class="math inline">\(y=r\sin\theta\)</span>, differentiation yields
+<span class="math display">\[\begin{pmatrix}\dot x\\\dot
+y\end{pmatrix}=\begin{pmatrix}\cos\theta&amp;-r\sin\theta\\\sin\theta&amp;r\cos\theta\end{pmatrix}\begin{pmatrix}\dot
+r\\\dot\theta\end{pmatrix}.\]</span> For <span class="math inline">\(r=2\)</span>, <span class="math inline">\(\theta=\pi/6\)</span>, <span class="math inline">\(\dot r=0.3\)</span>, and <span class="math inline">\(\dot\theta=0.4\)</span>, the two Cartesian
+velocity components are <span class="math inline">\(0.3\cos(\pi/6)-0.8\sin(\pi/6)\)</span> and <span class="math inline">\(0.3\sin(\pi/6)+0.8\cos(\pi/6)\)</span>. The
+angular component is not itself a physical speed: the tangential speed
+is <span class="math inline">\(r\dot\theta\)</span>.</p>
+<h3 id="lowering-and-raising-indices">Lowering and raising indices</h3>
+<p>At <span class="math inline">\(r=2\)</span> the polar metric is <span class="math inline">\(g=\operatorname{diag}(1,4)\)</span>. If <span class="math inline">\(V^i=(2,3)\)</span>, then <span class="math inline">\(V_i=(2,12)\)</span> and <span class="math inline">\(\lVert V\rVert_g^2=V_iV^i=40\)</span>. Multiplying
+by <span class="math inline">\(g^{-1}\)</span> recovers the original
+contravariant components.</p>
+<h3 id="the-cylinder-as-an-intrinsically-flat-surface">The cylinder as
+an intrinsically flat surface</h3>
+<p>For <span class="math inline">\(X(u,v)=(a\cos u,a\sin u,v)\)</span>,
+the metric is <span class="math inline">\(\operatorname{diag}(a^2,1)\)</span>. Since its
+components are constant, the Christoffel symbols vanish in this chart.
+The cylinder bends in three-space but has zero Gaussian curvature. This
+distinguishes intrinsic curvature from extrinsic bending.</p>
+<h2 id="deriving-the-levicivita-connection-from-geometric-principles">Deriving
+the Levi–Civita connection from geometric principles</h2>
+<p>The metric-compatible and torsion-free conditions are not merely
+convenient choices: together they determine a unique connection. Metric
+compatibility states <span class="math display">\[\partial_i
+g_{jk}=\Gamma^\ell_{ij}g_{\ell k}+\Gamma^\ell_{ik}g_{j\ell}.\]</span>
+Write this identity for the cyclic permutations <span class="math inline">\((i,j,k)\)</span>, <span class="math inline">\((j,i,k)\)</span>, and <span class="math inline">\((k,i,j)\)</span>. Add the first two and subtract
+the third, and use <span class="math inline">\(\Gamma^\ell_{ij}=\Gamma^\ell_{ji}\)</span>. One
+obtains <span class="math display">\[2g_{k\ell}\Gamma^\ell_{ij}=\partial_i
+g_{jk}+\partial_j g_{ik}-\partial_k g_{ij}.\]</span> Multiplication by
+<span class="math inline">\(g^{mk}\)</span> yields the Christoffel
+formula. This derivation also shows why the inverse metric appears: it
+converts the lower connection index to an upper one.</p>
+<div class="learning-box example"><p><strong>Example — Connection on a sphere of radius <span class="math inline">\(R\)</span>.</strong> For <span class="math inline">\(g_{\vartheta\vartheta}=R^2\)</span> and <span class="math inline">\(g_{\varphi\varphi}=R^2\sin^2\vartheta\)</span>, we
+have <span class="math inline">\(\partial_\vartheta
+g_{\varphi\varphi}=2R^2\sin\vartheta\cos\vartheta\)</span>. Hence <span class="math display">\[\Gamma^\vartheta_{\varphi\varphi}=-\frac{1}{2R^2}\partial_\vartheta
+g_{\varphi\varphi}=-\sin\vartheta\cos\vartheta,\quad
+\Gamma^\varphi_{\vartheta\varphi}=\frac{\partial_\vartheta
+g_{\varphi\varphi}}{2R^2\sin^2\vartheta}=\cot\vartheta.\]</span> The
+connection coefficients are independent of the constant radius, whereas
+the Gaussian curvature is <span class="math inline">\(R^{-2}\)</span>.</p></div>
+<div class="learning-box check"><p><strong>Checkpoint.</strong> Explain why changing the sphere’s radius
+leaves these Christoffel symbols unchanged but changes lengths and
+curvature.</p></div>
+<h2 id="geodesics-from-a-variational-principle-a-worked-derivation">Geodesics
+from a variational principle: a worked derivation</h2>
+<p>For a curve <span class="math inline">\(q(t)\)</span> in local
+coordinates, define its energy <span class="math display">\[\mathcal
+E[q]=\frac12\int_a^b g_{ij}(q(t))\dot q^i\dot
+q^j\,\,\mathrm{d}t.\]</span> The Euler–Lagrange equation for coordinate
+<span class="math inline">\(q^k\)</span> reads <span class="math display">\[\frac{\,\mathrm{d}}{\,\mathrm{d}t}\bigl(g_{kj}\dot
+q^j\bigr)-\frac12\partial_k g_{ij}\dot q^i\dot q^j=0.\]</span> Expanding
+the time derivative and using symmetry of <span class="math inline">\(\dot q^i\dot q^j\)</span> gives <span class="math display">\[g_{kj}\ddot q^j+\frac12\bigl(\partial_i
+g_{kj}+\partial_j g_{ki}-\partial_k g_{ij}\bigr)\dot q^i\dot
+q^j=0.\]</span> Multiplying by <span class="math inline">\(g^{mk}\)</span> yields <span class="math inline">\(\ddot q^m+\Gamma^m_{ij}\dot q^i\dot
+q^j=0\)</span>. The parameter must be affine; an arbitrary
+reparametrization can introduce an additional term proportional to
+velocity.</p>
+<div class="learning-box example"><p><strong>Example — Conserved angular momentum on a sphere.</strong>
+The spherical energy is <span class="math inline">\(\frac12R^2(\dot\vartheta^2+\sin^2\vartheta\dot\varphi^2)\)</span>.
+Because <span class="math inline">\(\varphi\)</span> does not appear
+explicitly, the Euler–Lagrange equation gives <span class="math display">\[R^2\sin^2\vartheta\,\dot\varphi=\ell,\]</span> a
+constant. A second conserved quantity is the speed squared <span class="math inline">\(R^2(\dot\vartheta^2+\sin^2\vartheta\dot\varphi^2)\)</span>.
+These invariants provide useful checks of numerical geodesic
+solvers.</p></div>
+<h2 id="curvature-calculations-in-detail">Curvature calculations in
+detail</h2>
+<h3 id="first-and-second-fundamental-forms-of-a-graph">First and second
+fundamental forms of a graph</h3>
+<p>For <span class="math inline">\(\boldsymbol{X}(x,y)=(x,y,f(x,y))\)</span>, the
+tangent vectors are <span class="math inline">\(\boldsymbol{X}_x=(1,0,f_x)\)</span> and <span class="math inline">\(\boldsymbol{X}_y=(0,1,f_y)\)</span>. Therefore
+<span class="math display">\[E=1+f_x^2,\qquad F=f_xf_y,\qquad
+G=1+f_y^2.\]</span> With upward unit normal <span class="math inline">\(\boldsymbol{n}=(-f_x,-f_y,1)/\sqrt{1+f_x^2+f_y^2}\)</span>,
+<span class="math display">\[L=\frac{f_{xx}}{\sqrt{1+f_x^2+f_y^2}},\quad
+M=\frac{f_{xy}}{\sqrt{1+f_x^2+f_y^2}},\quad
+N=\frac{f_{yy}}{\sqrt{1+f_x^2+f_y^2}}.\]</span> Substituting into <span class="math inline">\((LN-M^2)/(EG-F^2)\)</span> proves the graph
+curvature formula stated earlier.</p>
+<div class="learning-box example"><p><strong>Example — Paraboloid versus saddle.</strong> At <span class="math inline">\((0,0)\)</span>, the graph <span class="math inline">\(f(x,y)=x^2+y^2\)</span> has Hessian <span class="math inline">\(\operatorname{diag}(2,2)\)</span> and Gaussian
+curvature <span class="math inline">\(4\)</span>. The graph <span class="math inline">\(f(x,y)=x^2-y^2\)</span> has Hessian <span class="math inline">\(\operatorname{diag}(2,-2)\)</span> and curvature
+<span class="math inline">\(-4\)</span>. These opposite signs describe
+intrinsically different local geometries, not merely different
+orientations of the normal.</p></div>
+<h3 id="intrinsic-curvature-of-a-cylinder">Intrinsic curvature of a
+cylinder</h3>
+<p>Consider <span class="math inline">\(\boldsymbol{X}(u,v)=(a\cos
+u,a\sin u,v)\)</span> with <span class="math inline">\(a&gt;0\)</span>.
+Its induced metric is <span class="math inline">\(\operatorname{diag}(a^2,1)\)</span>, independent
+of <span class="math inline">\(u\)</span> and <span class="math inline">\(v\)</span>. Hence all Christoffel symbols vanish
+in this chart, so the Riemann tensor vanishes. The map <span class="math inline">\((u,v)\mapsto(au,v)\)</span> preserves the local
+line element, demonstrating a local isometry to a plane. Globally, the
+periodic identification of <span class="math inline">\(u\)</span> means
+that a full cylinder is not globally identical to the plane.</p>
+<div class="learning-box check"><p><strong>Checkpoint.</strong> A cylinder and sphere both bend in
+ambient space. Why does one have <span class="math inline">\(K=0\)</span> and the other <span class="math inline">\(K&gt;0\)</span>?</p></div>
+<h2 id="numerical-geometry-errors-conditioning-and-validation">Numerical
+geometry: errors, conditioning, and validation</h2>
+<p>A metric tensor must be symmetric and positive definite in every
+regular coordinate chart. In floating-point calculations, check symmetry
+with <span class="math inline">\(\lVert g-g^{\mathsf T}\rVert\)</span>,
+and test the eigenvalues against a tolerance scaled to the matrix norm.
+The condition number <span class="math inline">\(\kappa_2(g)\)</span>
+measures sensitivity when raising indices or solving metric systems.</p>
+<p>For the polar metric <span class="math inline">\(g=\operatorname{diag}(1,r^2)\)</span>, <span class="math inline">\(\kappa_2(g)=\max(1,r^2)/\min(1,r^2)\)</span>,
+which diverges as <span class="math inline">\(r\to0\)</span> and grows
+again for very large <span class="math inline">\(r\)</span>. This is a
+coordinate effect rather than intrinsic curvature. A numerical algorithm
+should switch charts or use Cartesian coordinates near <span class="math inline">\(r=0\)</span>.</p>
+<div class="learning-box example"><p><strong>Example — Convergence of a geodesic integrator.</strong>
+Start at <span class="math inline">\((x,y)=(1,0)\)</span> with Cartesian
+velocity <span class="math inline">\((0,1)\)</span>. The exact curve is
+<span class="math inline">\((1,t)\)</span>, so <span class="math inline">\(r(t)=\sqrt{1+t^2}\)</span> and <span class="math inline">\(\theta(t)=\arctan t\)</span>. A fourth-order
+Runge–Kutta method for the polar geodesic equations should show
+approximately a factor of <span class="math inline">\(16\)</span>
+decrease in global error when the step size is halved, once the
+asymptotic regime is reached. Numerical errors close to machine
+precision may not exhibit this ratio reliably.</p></div>
+<h2 id="further-source-derived-r-investigations">Further source-derived
+R investigations</h2>
+<p>The original R manuscript includes a numerical metric construction, a
+generic finite-difference connection calculation, a fourth-order
+Runge–Kutta geodesic integrator, numerical helix curvature and torsion,
+and a paraboloid surface-area calculation. These are retained in the
+original-source archive and inform the exercises below; the simplified
+paired scripts in this chapter are not substitutes for those full source
+listings.</p>
+<div class="learning-box example"><p><strong>Example — Paraboloid area as a metric integral.</strong>
+Parametrize <span class="math inline">\(z=x^2+y^2\)</span> by <span class="math inline">\(\boldsymbol{X}(r,\theta)=(r\cos\theta,r\sin\theta,r^2)\)</span>
+for <span class="math inline">\(0\le r\le1\)</span>. Then <span class="math display">\[E=1+4r^2,\qquad F=0,\qquad
+G=r^2,\qquad\sqrt{EG-F^2}=r\sqrt{1+4r^2}.\]</span> Thus the surface area
+is <span class="math display">\[A=\int_0^{2\pi}\int_0^1
+r\sqrt{1+4r^2}\,\,\mathrm{d}r\,\,\mathrm{d}\theta
+=\frac\pi6\bigl(5^{3/2}-1\bigr).\]</span> This connects Chapter 7’s
+metric approach with the surface-integration methods of Chapter 5.</p></div>
+<h2 id="solving-the-mathematical-problems-using-r">Solving the
+mathematical problems using R</h2>
+<p>Base R suffices for matrix operations and the simple numerical
+examples. The complete reproducible script is
+<code>code/chapter07_paired.R</code>.</p>
+<h3 id="coordinate-basis-and-metric">Coordinate basis and metric</h3>
+<div class="code-shell"><div class="code-bar">R<a href="code/chapter07-listing-01.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>r &lt;- 2; theta &lt;- pi/6
+J &lt;- matrix(c(cos(theta),sin(theta),
+              -r*sin(theta),r*cos(theta)),2,2)
+g &lt;- crossprod(J)
+print(g)                  # diag(1,4)
+stopifnot(max(abs(g-diag(c(1,4))))&lt;1e-12)</code></pre></div>
+<h3 id="raising-and-lowering-a-vector-index">Raising and lowering a
+vector index</h3>
+<div class="code-shell"><div class="code-bar">R<a href="code/chapter07-listing-02.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>V &lt;- c(2,3)
+V_lower &lt;- as.vector(g %*% V)
+V_recovered &lt;- as.vector(solve(g,V_lower))
+print(c(V_lower,squared_norm=sum(V*V_lower)))
+stopifnot(max(abs(V-V_recovered))&lt;1e-12)</code></pre></div>
+<p>Here <span class="math inline">\(g\)</span> is evaluated at radius
+<span class="math inline">\(r=2\)</span>, so the squared norm is <span class="math inline">\(40\)</span>.</p>
+<h3 id="a-great-circle-distance">A great-circle distance</h3>
+<p>For two points on a sphere of radius <span class="math inline">\(R\)</span>, with unit position vectors <span class="math inline">\(p\)</span> and <span class="math inline">\(q\)</span>, the shorter great-circle distance is
+<span class="math inline">\(R\arccos(p\cdot q)\)</span>, provided the
+angle is chosen in <span class="math inline">\([0,\pi]\)</span>.</p>
+<div class="code-shell"><div class="code-bar">R<a href="code/chapter07-listing-03.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>R &lt;- 6371  # illustrative radius, kilometers
+p &lt;- c(1,0,0); q &lt;- c(0,1,0)
+angle &lt;- acos(max(-1,min(1,sum(p*q))))
+distance &lt;- R*angle
+print(distance)
+stopifnot(abs(distance-R*pi/2)&lt;1e-8)</code></pre></div>
+<h2 id="solving-the-same-problems-using-python">Solving the same
+problems using Python</h2>
+<p>The companion Python script <code>code/chapter07_paired.py</code>
+performs the same computations using NumPy and verifies the same exact
+benchmarks.</p>
+<div class="code-shell"><div class="code-bar">Python<a href="code/chapter07-listing-04.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>import numpy as np
+r, theta = 2.0, np.pi/6
+J = np.array([[np.cos(theta),-r*np.sin(theta)],
+              [np.sin(theta), r*np.cos(theta)]])
+g = J.T @ J
+V = np.array([2.,3.])
+V_lower = g @ V
+assert np.allclose(g,np.diag([1.,4.]))
+assert np.isclose(V @ V_lower,40.)
+assert np.allclose(np.linalg.solve(g,V_lower),V)
+R = 6371.
+p, q = np.array([1.,0.,0.]), np.array([0.,1.,0.])
+angle = np.arccos(np.clip(p @ q,-1,1))
+distance = R*angle
+assert np.isclose(distance,R*np.pi/2)
+print('Metric:',g,'great-circle distance:',distance)</code></pre></div>
+<h2 id="comparing-r-and-python-solutions">Comparing R and Python
+solutions</h2>
+<p>Both implementations use the same coordinate Jacobian, induced
+metric, vector, and sphere radius. Their results agree with exact
+expressions, although the agreement of two programs is not a proof. Near
+coordinate singularities, one must examine conditioning and change
+charts if necessary.</p>
+<h2 id="real-world-application-navigation-on-a-spherical-model">Real-world
+application: navigation on a spherical model</h2>
+<p>Model the Earth as a sphere of illustrative radius <span class="math inline">\(R=6371\)</span> km. Two positions separated by a
+central angle <span class="math inline">\(\alpha\)</span> have shorter
+great-circle distance <span class="math inline">\(R\alpha\)</span>. A
+route following a fixed latitude generally differs from a geodesic and
+can be longer. In applications, accurate navigation requires a geodetic
+ellipsoid and other practical constraints; the spherical calculation is
+an instructional approximation.</p>
+<h2 id="chapter-project-geometry-geodesics-and-coordinate-independence">Chapter
+project: geometry, geodesics, and coordinate independence</h2>
+<p><strong>Project question.</strong> How do intrinsic geometry and
+coordinate choice affect a navigation route on a sphere?</p>
+<ol type="1">
+<li><p>Derive the spherical metric <span class="math inline">\(g=\operatorname{diag}(R^2,R^2\sin^2\vartheta)\)</span>
+from a parametrization, and obtain the area element.</p></li>
+<li><p>Derive the nonzero Christoffel symbols and the geodesic
+equations; explain why the equator is a geodesic.</p></li>
+<li><p>Choose two non-antipodal positions and derive the central-angle
+great-circle distance using unit position vectors.</p></li>
+<li><p>In both R and Python, compute the distance, plot the positions
+and a great-circle route, and check the calculation against an analytic
+special case.</p></li>
+<li><p>Compare the great-circle route with a constant-latitude route
+when the endpoints share a non-equatorial latitude. Identify the
+modeling assumptions and explain the difference in lengths.</p></li>
+<li><p>Explain the coordinate singularities at the poles and distinguish
+them from geometric singularities.</p></li>
+<li><p>Submit a short report including derivations, reproducible code,
+numerical checks, visualizations, and interpretation.</p></li>
+</ol>
+<p><strong>Suggested rubric (100 points):</strong> metric and
+Christoffel derivations 25; geodesic reasoning 20; R analysis 15; Python
+analysis 15; plots and validation 15; interpretation and limitations
+10.</p>
+<h2 id="exercises">Exercises</h2>
+<h3 class="unnumbered" id="foundations-and-coordinate-transformations">Foundations and
+coordinate transformations</h3>
+<ol type="1">
+<li><p>Compute the polar coordinate basis vectors and verify their
+lengths and dot product.</p></li>
+<li><p>Explain why the polar coordinate chart is singular at <span class="math inline">\(r=0\)</span> even though the Euclidean plane is
+smooth there.</p></li>
+<li><p>At <span class="math inline">\((x,y)=(3,4)\)</span>, convert the
+vector <span class="math inline">\((3,4)\)</span> into polar coordinate
+components.</p></li>
+<li><p>Derive the coordinate transformation rule for a covector using
+the chain rule.</p></li>
+<li><p>Show directly that <span class="math inline">\(\omega_i
+v^i\)</span> is unchanged under an invertible coordinate
+transformation.</p></li>
+<li><p>Parametrize a cone away from its apex and compute two tangent
+vectors.</p></li>
+<li><p>Find the tangent plane of the cylinder <span class="math inline">\(x^2+y^2=4\)</span> at <span class="math inline">\((\sqrt2,\sqrt2,1)\)</span>.</p></li>
+<li><p>Distinguish a tangent vector from the differential of a scalar
+function, giving one example of each.</p></li>
+</ol>
+<h3 class="unnumbered" id="metrics-and-covariant-derivatives">Metrics
+and covariant derivatives</h3>
+<ol type="1">
+<li><p>Derive the polar metric <span class="math inline">\(\operatorname{diag}(1,r^2)\)</span> from its
+parametrization.</p></li>
+<li><p>Compute the metric and area element of a sphere of radius <span class="math inline">\(a\)</span> in spherical coordinates.</p></li>
+<li><p>For <span class="math inline">\(\boldsymbol{X}(u,v)=(u,v,u^2+v^2)\)</span>, find
+<span class="math inline">\(E,F,G\)</span> and the area
+element.</p></li>
+<li><p>For the metric <span class="math inline">\(g=\operatorname{diag}(4,9)\)</span>, lower the
+index of <span class="math inline">\(v=(2,-1)\)</span> and recover it
+using <span class="math inline">\(g^{-1}\)</span>.</p></li>
+<li><p>Derive the gradient of <span class="math inline">\(f(r,\theta)=r^2\sin\theta\)</span> in the polar
+coordinate basis.</p></li>
+<li><p>Show that <span class="math inline">\(\left\lVert
+\operatorname{grad}\theta\right\rVert=1/r\)</span> for <span class="math inline">\(r&gt;0\)</span>.</p></li>
+<li><p>Compute <span class="math inline">\(\Gamma^r_{\theta\theta}\)</span> directly from the
+polar metric formula.</p></li>
+<li><p>Compute <span class="math inline">\(\Gamma^\theta_{r\theta}\)</span> and <span class="math inline">\(\Gamma^\theta_{\theta r}\)</span> and explain why
+they agree.</p></li>
+<li><p>For <span class="math inline">\(V^r=0,V^\theta=1\)</span>,
+calculate <span class="math inline">\((\nabla_r V)^\theta\)</span> in
+polar coordinates.</p></li>
+<li><p>Explain why a nonzero Christoffel symbol need not imply
+curvature.</p></li>
+</ol>
+<h3 class="unnumbered" id="geodesics-and-curvature">Geodesics and
+curvature</h3>
+<ol type="1">
+<li><p>Derive the radial and angular geodesic equations in the Euclidean
+plane.</p></li>
+<li><p>Verify that the polar-coordinate representation of the Cartesian
+line <span class="math inline">\((x,y)=(1,t)\)</span> satisfies those
+equations.</p></li>
+<li><p>Derive the Christoffel symbols for the unit sphere
+metric.</p></li>
+<li><p>Verify directly that the equator is a geodesic of the unit
+sphere.</p></li>
+<li><p>Show why a latitude circle with fixed <span class="math inline">\(\vartheta\notin\{0,\pi/2,\pi\}\)</span> is not a
+geodesic.</p></li>
+<li><p>Find the Gaussian curvature at the origin of <span class="math inline">\(z=2x^2+3y^2\)</span>.</p></li>
+<li><p>Find the Gaussian curvature at the origin of <span class="math inline">\(z=x^2-2y^2\)</span>.</p></li>
+<li><p>Compute the first fundamental form of a cylinder of radius <span class="math inline">\(a\)</span> and explain its intrinsic
+flatness.</p></li>
+<li><p>Explain the distinction between mean curvature and Gaussian
+curvature, including the role of normal orientation.</p></li>
+<li><p>Show that the scalar curvature of a round sphere of radius <span class="math inline">\(a\)</span> is <span class="math inline">\(2/a^2\)</span>.</p></li>
+</ol>
+<h3 class="unnumbered" id="curves-and-python-investigations">Curves and
+Python investigations</h3>
+<ol type="1">
+<li><p>Compute curvature and torsion for <span class="math inline">\(\boldsymbol{r}(t)=(2\cos t,2\sin
+t,3t)\)</span>.</p></li>
+<li><p>Verify that the torsion of any regular plane curve is zero
+wherever its curvature is nonzero.</p></li>
+<li><p>Derive the Frenet unit tangent and principal normal of the unit
+circle.</p></li>
+<li><p>Use SymPy to compute the metric of a paraboloid and compare with
+a hand derivation.</p></li>
+<li><p>Write a function that computes Christoffel symbols from a
+two-dimensional metric matrix.</p></li>
+<li><p>Test your function on both Cartesian and polar coordinates of the
+Euclidean plane.</p></li>
+<li><p>Numerically integrate a polar geodesic with initial conditions
+<span class="math inline">\(r(0)=2\)</span>, <span class="math inline">\(\theta(0)=0\)</span>, <span class="math inline">\(\dot r(0)=0\)</span>, <span class="math inline">\(\dot\theta(0)=1/2\)</span> and verify the
+corresponding Cartesian line.</p></li>
+<li><p>Numerically integrate the unit-sphere geodesic equations from a
+point on the equator with initial velocity tangent to the
+equator.</p></li>
+<li><p>Use Python to plot the Gaussian curvature of <span class="math inline">\(z=x^2+y^2\)</span> over a square domain.</p></li>
+<li><p>Use Python to plot the Gaussian curvature of <span class="math inline">\(z=x^2-y^2\)</span> and identify its sign.</p></li>
+<li><p>Compare the metric and Christoffel symbols of a plane and a
+cylinder in suitable coordinates.</p></li>
+<li><p>Explain why numerical integration close to the pole of spherical
+coordinates may be poorly conditioned despite the smoothness of the
+sphere.</p></li>
+</ol>
+<h3 class="unnumbered" id="projects">Projects</h3>
+<p><strong>Project A: A geometry calculator.</strong> Create a
+documented SymPy function that accepts a regular two-parameter surface,
+computes its metric, determinant, area element, and connection, and
+returns interpretable output. Test it on the plane, cylinder, and
+sphere.<br/>
+<strong>Project B: Navigation on a sphere.</strong> Compare a
+great-circle route between two non-antipodal points with a
+constant-latitude route. Calculate their lengths and explain why the
+shorter great-circle arc is optimal.<br/>
+<strong>Project C: Curvature and coordinates.</strong> Calculate the
+curvature tensor of the Euclidean plane in both Cartesian and polar
+coordinates. Explain why its components vanish in both charts even
+though the polar Christoffel symbols do not.</p>
+<h2 id="extended-paired-computational-laboratory-geodesic-verification">Extended
+paired computational laboratory: geodesic verification</h2>
+<p>For <span class="math inline">\(r(0)=1\)</span>, <span class="math inline">\(\theta(0)=0\)</span>, <span class="math inline">\(\dot r(0)=0\)</span>, and <span class="math inline">\(\dot\theta(0)=1\)</span>, the polar geodesic
+equations describe the Cartesian line <span class="math inline">\((x,y)=(1,t)\)</span>. This laboratory asks
+students to integrate the equations numerically, transform back to
+Cartesian coordinates, and compare against the exact path. Use a fixed
+step size <span class="math inline">\(h=1/N\)</span> for <span class="math inline">\(N=20,40,80,160\)</span> and report the maximum
+coordinate error over <span class="math inline">\(0\le
+t\le1\)</span>.</p>
+<h3 class="unnumbered" id="r-implementation">R implementation</h3>
+<div class="code-shell"><div class="code-bar">R<a href="code/chapter07-listing-05.R">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>rhs &lt;- function(z) {
+  r &lt;- z[1]; vr &lt;- z[3]; vt &lt;- z[4]
+  c(vr, vt, r*vt^2, -2*vr*vt/r)
+}
+rk4 &lt;- function(n) {
+  h &lt;- 1/n; z &lt;- c(1,0,0,1)
+  err &lt;- 0
+  for (i in seq_len(n)) {
+    k1 &lt;- rhs(z)
+    k2 &lt;- rhs(z + h*k1/2)
+    k3 &lt;- rhs(z + h*k2/2)
+    k4 &lt;- rhs(z + h*k3)
+    z &lt;- z + h*(k1+2*k2+2*k3+k4)/6
+    t &lt;- i*h
+    err &lt;- max(err,abs(z[1]*cos(z[2])-1),
+               abs(z[1]*sin(z[2])-t))
+  }
+  err
+}
+print(sapply(c(20,40,80,160),rk4))</code></pre></div>
+<h3 class="unnumbered" id="python-implementation">Python
+implementation</h3>
+<div class="code-shell"><div class="code-bar">Python<a href="code/chapter07-listing-06.py">Download</a><button class="copy" type="button">Copy code</button></div><pre><code>import numpy as np
+
+def rhs(z):
+    r, theta, vr, vt = z
+    return np.array([vr, vt, r*vt**2, -2*vr*vt/r])
+
+def rk4(n):
+    h = 1/n
+    z = np.array([1.,0.,0.,1.])
+    error = 0.
+    for i in range(1,n+1):
+        k1 = rhs(z)
+        k2 = rhs(z+h*k1/2)
+        k3 = rhs(z+h*k2/2)
+        k4 = rhs(z+h*k3)
+        z += h*(k1+2*k2+2*k3+k4)/6
+        t = i*h
+        error = max(error,abs(z[0]*np.cos(z[1])-1),
+                    abs(z[0]*np.sin(z[1])-t))
+    return error
+print([rk4(n) for n in (20,40,80,160)])</code></pre></div>
+<p><strong>Interpretation.</strong> Compare the error ratios against the
+fourth-order prediction and discuss when roundoff begins to affect
+observed convergence. Do not infer the accuracy of a general geodesic
+solver solely from this one test.</p>
+<h2 id="additional-advanced-exercises">Additional advanced
+exercises</h2>
+<ol type="1">
+<li><p>Prove the Christoffel formula using metric compatibility and
+torsion-freeness, explicitly showing the three cyclic
+identities.</p></li>
+<li><p>Starting with the energy functional, derive the geodesic
+equations on a sphere of radius <span class="math inline">\(R\)</span>.</p></li>
+<li><p>Establish the conserved angular momentum <span class="math inline">\(R^2\sin^2\vartheta\dot\varphi\)</span> and
+conserved speed along an affinely parametrized spherical
+geodesic.</p></li>
+<li><p>Show that the cylinder parametrization <span class="math inline">\((a\cos u,a\sin u,v)\)</span> is locally isometric
+to the plane with coordinates <span class="math inline">\((au,v)\)</span>.</p></li>
+<li><p>Compute the first and second fundamental forms of the graph <span class="math inline">\(z=xy\)</span> and find its Gaussian curvature at
+the origin.</p></li>
+<li><p>For the polar metric, compute its condition number as a function
+of <span class="math inline">\(r\)</span> and explain why a chart change
+may improve numerical stability.</p></li>
+<li><p>Implement the RK4 geodesic laboratory in R and Python and create
+a log–log plot of error versus step size.</p></li>
+<li><p>Derive the paraboloid surface area from its induced metric and
+confirm the result with numerical integration in both
+languages.</p></li>
+<li><p>For two points on a sphere at common latitude <span class="math inline">\(\lambda\)</span> and longitude separation <span class="math inline">\(\Delta\in(0,\pi)\)</span>, compare the parallel
+arc <span class="math inline">\(R\cos\lambda\,\Delta\)</span> with the
+shorter great-circle distance <span class="math inline">\(R\arccos(\sin^2\lambda+\cos^2\lambda\cos\Delta)\)</span>.
+Discuss equality cases and the geometric reason for the
+inequality.</p></li>
+<li><p>Explain why Christoffel symbols can be nonzero in a flat space,
+while the Riemann curvature tensor vanishes in every smooth
+chart.</p></li>
+</ol>
+<h2 class="unnumbered" id="chapter-summary">Chapter summary</h2>
+<p>Tensor calculus separates geometric quantities from coordinate
+descriptions. A metric measures lengths and angles, the Levi–Civita
+connection differentiates vectors consistently, geodesics generalize
+straight lines, and curvature measures intrinsic bending. Surface
+geometry also includes extrinsic information, such as the second
+fundamental form. The computational approach complements, rather than
+replaces, careful attention to coordinate domains, tensor transformation
+laws, and sign conventions.</p>
+<footer><a href="chapter06.html">6. Vector Fields and Integral Theorems ←</a><a href="chapter08.html">8. Partial Differential Equations and Computational Methods →</a></footer></main><aside class="chapter-toc"><strong>On this page</strong><ul><li><a href="#interactive-investigation">Interactive investigation</a></li><li><a href="#why-geometry-requires-more-than-cartesian-coordinates">Why
+geometry requires more than Cartesian coordinates</a></li><li><a href="#tangent-spaces-differentials-and-covectors">Tangent spaces,
+differentials, and covectors</a></li><li><a href="#coordinate-transformations-and-tensor-components">Coordinate
+transformations and tensor components</a></li><li><a href="#the-metric-tensor-and-geometric-measurement">The metric tensor
+and geometric measurement</a></li><li><a href="#raising-and-lowering-indices">Raising and lowering indices</a></li><li><a href="#christoffel-symbols-and-covariant-differentiation">Christoffel
+symbols and covariant differentiation</a></li><li><a href="#geodesics-locally-straight-paths-on-curved-spaces">Geodesics:
+locally straight paths on curved spaces</a></li><li><a href="#numerical-geodesics-with-scipy">Numerical geodesics with
+SciPy</a></li><li><a href="#curvature-detecting-intrinsic-bending">Curvature: detecting
+intrinsic bending</a></li><li><a href="#riemann-curvature-and-coordinate-independence">Riemann curvature
+and coordinate independence</a></li><li><a href="#the-frenetserret-frame-of-a-space-curve">The Frenet–Serret frame
+of a space curve</a></li><li><a href="#additional-mathematical-examples-and-r-manuscript-connections">Additional
+mathematical examples and R-manuscript connections</a></li><li><a href="#coordinate-transformations-of-a-velocity">Coordinate
+transformations of a velocity</a></li><li><a href="#lowering-and-raising-indices">Lowering and raising indices</a></li><li><a href="#the-cylinder-as-an-intrinsically-flat-surface">The cylinder as
+an intrinsically flat surface</a></li><li><a href="#deriving-the-levicivita-connection-from-geometric-principles">Deriving
+the Levi–Civita connection from geometric principles</a></li><li><a href="#geodesics-from-a-variational-principle-a-worked-derivation">Geodesics
+from a variational principle: a worked derivation</a></li><li><a href="#curvature-calculations-in-detail">Curvature calculations in
+detail</a></li><li><a href="#first-and-second-fundamental-forms-of-a-graph">First and second
+fundamental forms of a graph</a></li><li><a href="#intrinsic-curvature-of-a-cylinder">Intrinsic curvature of a
+cylinder</a></li><li><a href="#numerical-geometry-errors-conditioning-and-validation">Numerical
+geometry: errors, conditioning, and validation</a></li><li><a href="#further-source-derived-r-investigations">Further source-derived
+R investigations</a></li><li><a href="#solving-the-mathematical-problems-using-r">Solving the
+mathematical problems using R</a></li><li><a href="#coordinate-basis-and-metric">Coordinate basis and metric</a></li><li><a href="#raising-and-lowering-a-vector-index">Raising and lowering a
+vector index</a></li><li><a href="#a-great-circle-distance">A great-circle distance</a></li><li><a href="#solving-the-same-problems-using-python">Solving the same
+problems using Python</a></li><li><a href="#comparing-r-and-python-solutions">Comparing R and Python
+solutions</a></li><li><a href="#real-world-application-navigation-on-a-spherical-model">Real-world
+application: navigation on a spherical model</a></li><li><a href="#chapter-project-geometry-geodesics-and-coordinate-independence">Chapter
+project: geometry, geodesics, and coordinate independence</a></li><li><a href="#exercises">Exercises</a></li><li><a href="#foundations-and-coordinate-transformations">Foundations and
+coordinate transformations</a></li><li><a href="#metrics-and-covariant-derivatives">Metrics
+and covariant derivatives</a></li><li><a href="#geodesics-and-curvature">Geodesics and
+curvature</a></li><li><a href="#curves-and-python-investigations">Curves and
+Python investigations</a></li><li><a href="#projects">Projects</a></li><li><a href="#extended-paired-computational-laboratory-geodesic-verification">Extended
+paired computational laboratory: geodesic verification</a></li><li><a href="#r-implementation">R implementation</a></li><li><a href="#python-implementation">Python
+implementation</a></li><li><a href="#additional-advanced-exercises">Additional advanced
+exercises</a></li><li><a href="#chapter-summary">Chapter summary</a></li></ul></aside></div><script src="search-index.js"></script><script src="site.js"></script><script src="investigations.js"></script></body></html>

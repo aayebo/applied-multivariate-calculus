@@ -1,0 +1,5 @@
+x <- c(0,1,2,3); y <- c(1,2,2,4)
+X <- cbind(1,x)
+print(qr.solve(X,y))
+print(coef(lm(y~x)))
+stopifnot(max(abs(qr.solve(X,y)-c(.9,.9)))<1e-10)
